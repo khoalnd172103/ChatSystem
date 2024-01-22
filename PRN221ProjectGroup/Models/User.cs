@@ -15,6 +15,9 @@
         public string City { get; set; }
 
         public List<Photo> photos { get; set; } = new();
-        
+        public List<Friend> SentByUsers { get; set; }
+        public List<Friend> SentUsers { get; set; }
+        public List<Message> MessagesSent { get; set; }
+
     }
 }
