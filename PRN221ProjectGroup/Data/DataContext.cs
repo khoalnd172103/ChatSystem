@@ -7,7 +7,6 @@ namespace PRN221ProjectGroup.Data
     {
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
-
         }
 
         public DbSet<User> Users { get; set; }
@@ -24,14 +23,14 @@ namespace PRN221ProjectGroup.Data
                 .HasKey(f => f.RequestId);
 
             //one user can send friend request to many users
-            //when delete this user, also delete the likes
+            //when delete this user, also delete the friend request
             modelBuilder.Entity<Friend>()
                 .HasOne(s => s.SenderUser)
                 .WithMany(l => l.SentUsers)
                 .HasForeignKey(s => s.SenderId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            //one user can be liked by many users
+            //one user can be sent by many users
             modelBuilder.Entity<Friend>()
                 .HasOne(s => s.RecipientUser)
                 .WithMany(l => l.SentByUsers)
@@ -39,34 +38,31 @@ namespace PRN221ProjectGroup.Data
                 .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<Message>()
-           .HasOne(u => u.Conversation)
-           .WithMany(m => m.MessagesReceived)
-           .OnDelete(DeleteBehavior.Restrict);
+                .HasOne(u => u.Conversation)
+                .WithMany(m => m.MessagesReceived)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Message>()
-            .HasOne(u => u.Sender)
-            .WithMany(m => m.MessagesSent)
-            .OnDelete(DeleteBehavior.Restrict);
+                .HasOne(u => u.Sender)
+                .WithMany(m => m.MessagesSent)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Participants>()
                 .HasKey(f => f.ConversationId);
 
             modelBuilder.Entity<Participants>()
-            .HasOne(p => p.Conversation)
-            .WithMany()
-            .HasForeignKey(p => p.ConversationId)
-            .OnDelete(DeleteBehavior.NoAction);
+                .HasOne(p => p.Conversation)
+                .WithMany()
+                .HasForeignKey(p => p.ConversationId)
+                .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<Participants>()
                 .HasOne(p => p.User)
                 .WithMany()
                 .HasForeignKey(p => p.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
-            // Other configurations or relationships can be added here
 
             base.OnModelCreating(modelBuilder);
         }
-
-
     }
 }
