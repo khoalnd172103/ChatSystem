@@ -24,5 +24,18 @@ namespace DataAccessLayer
                 }
             }
         }
+
+        public bool IsUsernameDuplicate(string username)
+        {
+            try
+            {
+                return GetAll().Any(c => c.UserName.Equals(username, StringComparison.OrdinalIgnoreCase));
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+
+        }
     }
 }

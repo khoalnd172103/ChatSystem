@@ -1,5 +1,6 @@
 ﻿using BusinessObject;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace PRN221ProjectGroup.Data
 {
@@ -19,6 +20,20 @@ namespace PRN221ProjectGroup.Data
         public DbSet<Message> Messages { get; set; }
         public DbSet<Participants> Participants { get; set; }
         public DbSet<Photo> Photos { get; set; }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        => optionsBuilder.UseSqlServer(GetConnectionString());
+
+        private string GetConnectionString()
+        {
+            IConfiguration config = new ConfigurationBuilder()
+             .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.json", true, true)
+            .Build();
+            var strConn = config["ConnectionStrings:DefaultConnection"];
+
+            return strConn;
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

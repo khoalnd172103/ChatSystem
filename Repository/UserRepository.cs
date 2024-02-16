@@ -5,9 +5,16 @@ namespace Repository
 {
     public class UserRepository : IUserRepository
     {
-        public IEnumerable<User> GetUsers()
+        public IEnumerable<User> GetUsers() => UserDAO.Instance.GetAll();
+
+        public void CreateUser(User user)
         {
-            return UserDAO.Instance.GetAll();
+            UserDAO.Instance.Create(user);
+        }
+
+        public bool IsUsernameDuplicate(string username)
+        {
+            return UserDAO.Instance.IsUsernameDuplicate(username);
         }
     }
 }
