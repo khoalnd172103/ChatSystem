@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using PRN221ProjectGroup.Data;
 
 namespace DataAccessLayer
 {

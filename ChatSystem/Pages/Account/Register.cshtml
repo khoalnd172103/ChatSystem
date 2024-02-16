@@ -1,0 +1,51 @@
+﻿@page
+@model ChatSystem.Pages.Account.RegisterModel
+@{
+}
+<h1>Register</h1>
+
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form method="post">
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="User.UserName" class="control-label">Full Name</label>
+                <input asp-for="User.UserName" class="form-control" />
+                <span asp-validation-for="User.UserName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="User.KnownAs" class="control-label"></label>
+                <input asp-for="User.KnownAs" class="form-control" />
+                <span asp-validation-for="User.KnownAs" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="User.DateOfBirth" class="control-label"></label>
+                <input asp-for="User.DateOfBirth" class="form-control" />
+                <span asp-validation-for="User.DateOfBirth" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input asp-for="User.CreateAt" type="datetime" class="form-control" hidden value="@DateTime.Now.ToString("yyyy/MM/dd")" />
+            </div>
+            <div class="form-group">
+                <input asp-for="User.LastActive" type="datetime" class="form-control" hidden value="@DateTime.Now.ToString("yyyy/MM/dd")" />
+            </div>
+
+            <div class="form-group">
+                <label asp-for="User.UserPassword" class="control-label"></label>
+                <input asp-for="User.UserPassword" class="form-control" />
+                <span asp-validation-for="User.UserPassword" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Register" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

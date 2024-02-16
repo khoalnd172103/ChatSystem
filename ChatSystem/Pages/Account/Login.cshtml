@@ -1,0 +1,46 @@
+﻿@page
+@model ChatSystem.Pages.Account.LoginModel
+@{
+    ViewData["Title"] = "Login";
+}
+
+@if (User.Identity.IsAuthenticated)
+{
+    <h1>Welcome to FU Hotel Management - Your Are Logined with the Name "@User.Identity.Name"</h1>
+}
+
+@if (!User.Identity.IsAuthenticated)
+{
+    <h1>Login</h1>
+
+<div class="row">
+    <div class="col-md-4">
+        <form method="post">
+            <h4>Use a local account to log in.</h4>
+            <hr />
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Input.Username"></label>
+                <input asp-for="Input.Username" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label asp-for="Input.Password"></label>
+                <input asp-for="Input.Password" class="form-control" />
+            </div>
+            <div class="row form-check mb-2">
+                <div class="col-5">
+                    <input type="checkbox" asp-for="Input.RememberMe" class="form-check-input"/>
+                    <label class="form-check-label" asp-for="Input.RememberMe"></label>
+                </div>
+                <div class="col"></div>
+            </div>
+            <div class="form-group-row">
+                <div class="col-5">
+                    <button type="submit" class="btn btn-primary">Log in</button>
+                </div>
+                <div class="col"></div>
+            </div>
+        </form>
+    </div>
+</div>
+}
