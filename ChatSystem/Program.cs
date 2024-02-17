@@ -20,6 +20,10 @@ builder.Services.AddRazorPages();
 
 builder.Services.AddSingleton<IUserRepository, UserRepository>();
 
+builder.Services.AddSession(options => {
+    options.IdleTimeout = TimeSpan.FromMinutes(10);
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -39,5 +43,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapRazorPages();
+
+app.UseSession();
 
 app.Run();

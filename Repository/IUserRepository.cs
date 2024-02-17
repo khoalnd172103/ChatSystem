@@ -9,5 +9,7 @@ namespace Repository
         void CreateUser(User user);
 
         bool IsUsernameDuplicate(string username);
+
+        void UpdateUser(User user);
     }
 }
