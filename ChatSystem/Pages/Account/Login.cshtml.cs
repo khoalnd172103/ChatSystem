@@ -71,7 +71,7 @@ namespace ChatSystem.Pages.Account
                 };
 
                 await HttpContext.SignInAsync("CookieAuth", claimsPrincipal, authProperties);
-                //HttpContext.Session.SetInt32("UserId", user.UserId);
+                HttpContext.Session.SetInt32("UserId", user.UserId);
                 return RedirectToPage("/index");
             }
 

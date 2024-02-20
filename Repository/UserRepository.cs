@@ -16,5 +16,7 @@ namespace Repository
         {
             return UserDAO.Instance.IsUsernameDuplicate(username);
         }
+
+        public void UpdateUser(User user) => UserDAO.Instance.Update(user);
     }
 }
