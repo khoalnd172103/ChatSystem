@@ -18,5 +18,10 @@ namespace Repository
         }
 
         public void UpdateUser(User user) => UserDAO.Instance.Update(user);
+
+        public User GetUser(int userId)
+        {
+            return UserDAO.Instance.GetUserById(userId);
+        }
     }
 }

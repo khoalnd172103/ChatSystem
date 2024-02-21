@@ -9,7 +9,6 @@ namespace DataAccessLayer
         private static UserDAO instance = null;
         private static readonly object instacelock = new object();
 
-
         public static UserDAO Instance
         {
             get
@@ -36,6 +35,11 @@ namespace DataAccessLayer
                 return false;
             }
 
+        }
+
+        public User GetUserById(int userId)
+        {
+            return GetAll().FirstOrDefault(u => u.UserId == userId);
         }
     }
 }
