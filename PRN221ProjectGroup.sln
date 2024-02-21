@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataAccessLayer", "DataAcce
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Repository", "Repository\Repository.csproj", "{248EF629-1297-47B4-B64E-1690BAEBE48F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatSystem", "ChatSystem\ChatSystem.csproj", "{1434E32D-88B1-4E74-9E6C-017C7DC9A250}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChatSystem", "ChatSystem\ChatSystem.csproj", "{1434E32D-88B1-4E74-9E6C-017C7DC9A250}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

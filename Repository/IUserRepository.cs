@@ -11,5 +11,6 @@ namespace Repository
         bool IsUsernameDuplicate(string username);
 
         void UpdateUser(User user);
+        User GetUser(int userId);
     }
 }
