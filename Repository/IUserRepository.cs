@@ -12,5 +12,7 @@ namespace Repository
 
         void UpdateUser(User user);
         User GetUser(int userId);
+
+        User Login(string username, string password);
     }
 }

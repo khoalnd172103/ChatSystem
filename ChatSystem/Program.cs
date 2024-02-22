@@ -17,7 +17,10 @@ builder.Services.AddAuthentication("CookieAuth").AddCookie("CookieAuth", options
 builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection")
     ));
-builder.Services.AddRazorPages();
+builder.Services.AddRazorPages().AddRazorPagesOptions(options =>
+{
+    options.Conventions.AddPageRoute("/Users/UserList", "");
+});
 
 builder.Services.AddSingleton<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -27,7 +30,8 @@ builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 builder.Services.AddScoped<IParticipantRepository, ParticipantRepository>();
 builder.Services.AddScoped<IPhotoRepository, PhotoRepository>();
 
-builder.Services.AddSession(options => {
+builder.Services.AddSession(options =>
+{
     options.IdleTimeout = TimeSpan.FromMinutes(10);
 });
 
