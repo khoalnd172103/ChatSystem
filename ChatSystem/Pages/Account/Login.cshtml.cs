@@ -49,10 +49,10 @@ namespace ChatSystem.Pages.Account
 
 
             User user = new User();
-            var check = _userRepository.GetUsers().Any(p => p.UserName.Equals(Input.Username) && p.UserPassword.Equals(Input.Password));
-            if (check)
+
+            user = _userRepository.Login(Input.Username, Input.Password);
+            if (user != null)
             {
-                user = _userRepository.GetUsers().FirstOrDefault(p => p.UserName.Equals(Input.Username) && p.UserPassword.Equals(Input.Password));
 
                 var claims = new List<Claim>
                 {

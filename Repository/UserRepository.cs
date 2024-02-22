@@ -9,6 +9,7 @@ namespace Repository
 
         public void CreateUser(User user)
         {
+            user.UserPassword = BCrypt.Net.BCrypt.EnhancedHashPassword(user.UserPassword, 10);
             UserDAO.Instance.Create(user);
         }
 
@@ -23,5 +24,7 @@ namespace Repository
         {
             return UserDAO.Instance.GetUserById(userId);
         }
+
+        public User Login(string username, string password) => UserDAO.Instance.GetAll().FirstOrDefault(p => p.UserName.Equals(username) && BCrypt.Net.BCrypt.EnhancedVerify(password, p.UserPassword), null);
     }
 }
