@@ -7,17 +7,41 @@ namespace ChatSystem.Pages.Users
     public class UserListModel : PageModel
     {
         private readonly IUserRepository _userRepository;
-        public IEnumerable<User> Users { get; set; }
+        public IEnumerable<UserProfile> Users { get; set; }
 
         public UserListModel(IUserRepository userRepository)
         {
             _userRepository = userRepository;
-            Users = new List<User>();
+            Users = new List<UserProfile>();
         }
 
         public void OnGet()
         {
-            Users = _userRepository.GetUsers();
+            var idClaim = User.Claims.FirstOrDefault(claims => claims.Type == "UserId", null);
+
+            IEnumerable<User> users;
+            if (idClaim != null)
+            {
+                int userId = int.Parse(idClaim.Value);
+                users = _userRepository.GetUsers().Where(u => u.UserId != userId);
+            }
+            else
+            {
+                users = _userRepository.GetUsers();
+            }
+
+            Users = users.Select(user => new UserProfile
+            {
+                UserId = user.UserId,
+                UserName = user.UserName,
+                DateOfBirth = user.DateOfBirth,
+                KnownAs = user.KnownAs,
+                Gender = user.Gender,
+                Introduction = user.Introduction,
+                Interest = user.Interest,
+                City = user.City,
+                Avatar = user.photos.FirstOrDefault(p => p.isMain)?.PhotoUrl
+            }).ToList();
         }
     }
 }

@@ -5,7 +5,7 @@ namespace Repository
 {
     public class UserRepository : IUserRepository
     {
-        public IEnumerable<User> GetUsers() => UserDAO.Instance.GetAll();
+        public IEnumerable<User> GetUsers() => UserDAO.Instance.GetUsers();
 
         public void CreateUser(User user)
         {
@@ -26,5 +26,10 @@ namespace Repository
         }
 
         public User Login(string username, string password) => UserDAO.Instance.GetAll().FirstOrDefault(p => p.UserName.Equals(username) && BCrypt.Net.BCrypt.EnhancedVerify(password, p.UserPassword), null);
+
+        public User GetUserWithPhoto(int userId)
+        {
+            return UserDAO.Instance.GetUser(userId);
+        }
     }
 }

@@ -12,21 +12,22 @@
           <div class="col-md-6 col-xl-4">
             <div class="card">
               <div class="card-body">
-                <div class="media align-items-center">
-                  <span style="background-image: url(https://bootdey.com/img/Content/avatar/avatar1.png)" class="avatar avatar-xl mr-3"></span>
-                  <div class="media-body overflow-hidden">
-                    <h5 class="card-text mb-0">@user.UserName</h5>
-                    <p class="card-text text-uppercase text-muted">@user.KnownAs</p>
-                    <div class="d-flex justify-content-between align-items-center">
-                        <p>@user.Introduction</p>
-                        <form method="post">
-                            <input type="hidden" name="userId" value="@user.UserId" />
-                            <button type="submit" name="addFriend" value="@user.UserId" class="btn btn-outline-primary">Add</button>
-
-                        </form>
-                    </div>
-                  </div>
-                </div>
+                  <a asp-page="UserProfile" asp-route-userId="@user.UserId" class="text-decoration-none">
+                            <div class="media align-items-center">
+                                <span style="background-image: url(@user.Avatar)" class="avatar avatar-xl mr-3"></span>
+                                <div class="media-body overflow-hidden">
+                                    <h5 class="card-text mb-0">@user.UserName</h5>
+                                    <p class="card-text text-uppercase text-muted">@user.KnownAs</p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <p class="text-truncate">@user.Introduction</p>
+                                        <form method="post">
+                                            <input type="hidden" name="userId" value="@user.UserId" />
+                                            <button type="submit" name="addFriend" value="@user.UserId" class="btn btn-outline-primary">Add</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                    </a>
               </div>
             </div>
           </div> 
