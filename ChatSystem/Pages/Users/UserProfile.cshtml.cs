@@ -9,7 +9,7 @@ namespace ChatSystem.Pages.Users
     {
         public int UserId { get; set; }
 
-        [Required(ErrorMessage ="UserName is required")]
+        [Required(ErrorMessage = "UserName is required")]
         [UserNameValidation]
         public string UserName { get; set; }
         [DataType(DataType.Date)]
@@ -36,9 +36,11 @@ namespace ChatSystem.Pages.Users
 
         public IActionResult OnGet()
         {
-            int? userId = HttpContext.Session.GetInt32("UserId");
-            if (userId.HasValue)
+            var idClaim = User.Claims.FirstOrDefault(claims => claims.Type == "UserId", null);
+
+            if (idClaim != null)
             {
+                int userId = int.Parse(idClaim.Value);
                 var user = _userRepository.GetUsers().SingleOrDefault(u => u.UserId.Equals(userId));
                 if (user != null)
                 {
