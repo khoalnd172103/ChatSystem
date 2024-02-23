@@ -10,5 +10,9 @@ namespace Repository
     public interface IFriendRepository : IBaseRepository<Friend>
     {
         public List<Friend> GetFriendRequest(string recipientUserName);
+        IEnumerable<Friend> GetFriend();
+        Task<List<Friend>> GetFriendsForUserAsync(int userId);
+        Task<List<Friend>> SearchFriendsForUserAsync(int userId, string searchKey);
+        Task<List<Friend>> SortByDateAsync(int userId, bool searchKey);
     }
 }

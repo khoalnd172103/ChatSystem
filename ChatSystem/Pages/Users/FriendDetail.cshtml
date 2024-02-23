@@ -1,0 +1,21 @@
+﻿@page "{id}"
+@model FriendDetailModel
+@{
+    ViewData["Title"] = "Friend Detail";
+}
+
+<div class="container mt-4">
+    <h2>Friend Detail</h2>
+    <hr />
+    <div>
+        <h3>User Profile</h3>
+        <p><strong>User ID:</strong> @Model.UserProfile.UserId</p>
+        <p><strong>User Name:</strong> @Model.UserProfile.UserName</p>
+        <p><strong>Date of Birth:</strong> @Model.UserProfile.DateOfBirth.ToShortDateString()</p>
+        <p><strong>Known As:</strong> @Model.UserProfile.KnownAs</p>
+        <p><strong>Gender:</strong> @Model.UserProfile.Gender</p>
+        <p><strong>Introduction:</strong> @Model.UserProfile.Introduction</p>
+        <p><strong>Interest:</strong> @Model.UserProfile.Interest</p>
+        <p><strong>City:</strong> @Model.UserProfile.City</p>
+    </div>
+</div>
