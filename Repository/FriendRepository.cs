@@ -65,5 +65,8 @@ namespace Repository
 
         public Task<List<Friend>> SortByDateAsync(int userId, bool searchKey)
         => FriendDAO.Instance.SortByDateAsync(userId, searchKey);
+
+        public Task UnfriendAsync(int userId, int friendId)
+        => FriendDAO.Instance.UnfriendAsync(userId, friendId);
     }
 }

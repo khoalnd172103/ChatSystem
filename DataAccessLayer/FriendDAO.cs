@@ -36,7 +36,7 @@ namespace DataAccessLayer
             using (var context = new DataContext())
             {
                 var friends = context.Friend
-                    .Where(f => f.SenderId == userId || f.RecipientId == userId)
+                    .Where(f => (f.SenderId == userId || f.RecipientId == userId) && f.status == true)
                     .ToList();
 
                 return friends;
@@ -90,6 +90,22 @@ namespace DataAccessLayer
 
                 return allFriends.ToList();
             }
+        }
+
+        public async Task UnfriendAsync(int userId, int friendId)
+        {
+            using (var context = new DataContext())
+            {
+                var friend = await context.Friend.FirstOrDefaultAsync(f =>
+               (f.SenderId == userId && f.RecipientId == friendId) ||
+               (f.SenderId == friendId && f.RecipientId == userId));
+
+                if (friend != null)
+                {
+                    friend.status = false;
+                    await context.SaveChangesAsync();
+                }
+            }  
         }
     }
 }

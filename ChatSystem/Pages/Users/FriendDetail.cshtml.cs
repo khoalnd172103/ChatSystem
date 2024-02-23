@@ -1,20 +1,27 @@
 using BusinessObject;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Repository;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace ChatSystem.Pages.Users
 {
     public class FriendDetailModel : PageModel
     {
+        private readonly IFriendRepository _friendRepository;
         private readonly IUserRepository _userRepository;
+        public UserProfile UserProfile { get; set; }
 
-        public FriendDetailModel(IUserRepository userRepository)
+
+        public FriendDetailModel(IFriendRepository friendRepository, IUserRepository userRepository)
         {
+            _friendRepository = friendRepository;
             _userRepository = userRepository;
+            UserProfile = new UserProfile();
         }
 
-        public UserProfile UserProfile { get; set; }
 
         public IActionResult OnGet(int id)
         {
@@ -38,6 +45,14 @@ namespace ChatSystem.Pages.Users
             {
                 return NotFound();
             }
+        }
+
+
+        public async Task<IActionResult> OnPost(int friendId)
+        {
+            var userId = int.Parse(User.Claims.FirstOrDefault(claim => claim.Type == "UserId").Value);
+            await _friendRepository.UnfriendAsync(userId, friendId);
+            return RedirectToPage("/Users/FriendList");
         }
     }
 }

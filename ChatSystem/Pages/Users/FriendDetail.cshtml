@@ -17,5 +17,9 @@
         <p><strong>Introduction:</strong> @Model.UserProfile.Introduction</p>
         <p><strong>Interest:</strong> @Model.UserProfile.Interest</p>
         <p><strong>City:</strong> @Model.UserProfile.City</p>
+        <form method="post">
+            <input type="hidden" name="friendId" value="@Model.UserProfile.UserId" />
+            <button type="submit" class="btn btn-danger">Unfriend</button>
+        </form>
     </div>
 </div>
