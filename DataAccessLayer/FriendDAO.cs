@@ -36,7 +36,7 @@ namespace DataAccessLayer
             using (var context = new DataContext())
             {
                 var friends = context.Friend
-                    .Where(f => (f.SenderId == userId || f.RecipientId == userId) && f.status == true)
+                    .Where(f => (f.SenderId == userId && f.status == true) || (f.RecipientId == userId && f.status == true))
                     .ToList();
 
                 return friends;

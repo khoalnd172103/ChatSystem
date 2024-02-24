@@ -28,6 +28,7 @@ namespace ChatSystem.Pages.Users
             }
 
             int userId = int.Parse(idClaim.Value);
+            HttpContext.Session.SetInt32("UserId", userId);
 
             if (!string.IsNullOrEmpty(searchTerm))
             {

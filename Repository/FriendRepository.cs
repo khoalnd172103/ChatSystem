@@ -59,7 +59,6 @@ namespace Repository
         public async Task<List<Friend>> GetFriendsForUserAsync(int userId)
         => FriendDAO.Instance.GetFriendsForUser(userId);
 
-
         public Task<List<Friend>> SearchFriendsForUserAsync(int userId, string searchKey)
         => FriendDAO.Instance.SearchFriendsForUserAsync(userId, searchKey);
 
