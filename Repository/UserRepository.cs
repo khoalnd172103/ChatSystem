@@ -1,11 +1,37 @@
 ﻿using BusinessObject;
 using DataAccessLayer;
+using Repository.DTOs;
 
 namespace Repository
 {
     public class UserRepository : IUserRepository
     {
-        public IEnumerable<User> GetUsers() => UserDAO.Instance.GetUsers();
+        public PaginatedList<UserDto> GetUsers(string? searchString, int? pageIndex, int pageSize)
+        {
+            var users = UserDAO.Instance.GetUsers();
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                users = users.Where(u => u.UserName.ToLower().Contains(searchString.ToLower()));
+            }
+
+            var userDtos = users.Select(user => new UserDto
+            {
+                UserId = user.UserId,
+                UserName = user.UserName,
+                DateOfBirth = user.DateOfBirth,
+                KnownAs = user.KnownAs,
+                Gender = user.Gender,
+                Introduction = user.Introduction,
+                Interest = user.Interest,
+                City = user.City,
+                Avatar = user.photos.FirstOrDefault(p => p.isMain)?.PhotoUrl
+            }).ToList();
+
+
+            return PaginatedList<UserDto>.CreateAsync(
+                userDtos.AsQueryable(), pageIndex ?? 1, pageSize);
+        }
 
         public void CreateUser(User user)
         {
