@@ -2,6 +2,7 @@
 @model FriendListModel
 @{
     ViewData["Title"] = "Friend List";
+    int userId = HttpContext.Session.GetInt32("UserId") ?? -1;
 }
 
 <div class="container mt-4">
@@ -26,19 +27,44 @@
         </div>
     </div>
     <div class="row">
-        @foreach (var friend in Model.Friends)
+@*         @foreach (var friend in Model.Friends)
         {
             <div class="col-md-6 mb-5">
                 <div class="friend-box p-3 border rounded">
                     <div class="d-flex align-items-center">
                         <img src="http://bootdey.com/img/Content/avatar/avatar1.png" alt="Friend Photo" class="mr-7" style="max-width: 100px; max-height: 100px;">
                         <div>
-                            <h5><a href="/Users/FriendDetail/@friend.RecipientId">@friend.RecipientUserName</a></h5>
+                            <h5><a href="/Users/FriendDetail/@(friend.RecipientId == userId ? friend.SenderId : friend.RecipientId)">@((friend.RecipientId == userId ? friend.SenderUserName : friend.RecipientUserName))</a></h5>
                             <p>Date Added: @friend.DateSend.ToShortDateString()</p>
                         </div>
                     </div>
                 </div>
             </div>
-        }
+        } *@
+        <div class="col-md-6 mb-5">
+            <div class="friend-box p-3 border rounded">
+                <div class="d-flex align-items-center">
+                    <img src="http://bootdey.com/img/Content/avatar/avatar1.png" alt="Friend Photo" class="mr-7" style="max-width: 100px; max-height: 100px;">
+                    <div>
+                        <h5>Rene</h5>
+                        <p>Date Added: 23/01/2024</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-5">
+            <div class="friend-box p-3 border rounded">
+                <div class="d-flex align-items-center">
+                    <img src="http://bootdey.com/img/Content/avatar/avatar1.png" alt="Friend Photo" class="mr-7" style="max-width: 100px; max-height: 100px;">
+                    <div>
+                        <h5>Messi</h5>
+                        <p>Date Added: 19/12/2022</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
     </div>
 </div>
