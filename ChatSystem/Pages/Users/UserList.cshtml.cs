@@ -1,4 +1,5 @@
 using BusinessObject;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Repository;
 
@@ -7,11 +8,13 @@ namespace ChatSystem.Pages.Users
     public class UserListModel : PageModel
     {
         private readonly IUserRepository _userRepository;
+        private readonly IFriendRepository _friendRepository;
         public IEnumerable<UserProfile> Users { get; set; }
 
-        public UserListModel(IUserRepository userRepository)
+        public UserListModel(IUserRepository userRepository, IFriendRepository friendRepository)
         {
             _userRepository = userRepository;
+            _friendRepository = friendRepository;
             Users = new List<UserProfile>();
         }
 
@@ -42,6 +45,13 @@ namespace ChatSystem.Pages.Users
                 City = user.City,
                 Avatar = user.photos.FirstOrDefault(p => p.isMain)?.PhotoUrl
             }).ToList();
+        }
+
+        public async Task<IActionResult> OnPost(int userId)
+        {
+            var senderId = int.Parse(User.Claims.FirstOrDefault(claim => claim.Type == "UserId").Value);
+            await _friendRepository.SendFriendRequest(senderId, userId);
+            return RedirectToPage("/Users/UserList");
         }
     }
 }

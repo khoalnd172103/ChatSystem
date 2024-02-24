@@ -107,5 +107,33 @@ namespace DataAccessLayer
                 }
             }  
         }
+
+        public async Task SendFriendRequest(int senderId, int recipientId)
+        {
+            using (var context = new DataContext())
+            {
+                var existingRequest = await context.Friend.FirstOrDefaultAsync(f =>
+            (f.SenderId == senderId && f.RecipientId == recipientId) ||
+            (f.SenderId == recipientId && f.RecipientId == senderId));
+
+                // Check if a friend request already exists between these two users
+                if (existingRequest != null)
+                {
+                    return;
+                }
+
+                // Create a new Friend object to represent the friend request
+                var friendRequest = new Friend
+                {
+                    SenderId = senderId,
+                    RecipientId = recipientId,
+                    DateSend = DateTime.Now,
+                    status = false
+                };
+
+                await context.Friend.AddAsync(friendRequest);
+                await context.SaveChangesAsync();
+            }
+        }
     }
 }

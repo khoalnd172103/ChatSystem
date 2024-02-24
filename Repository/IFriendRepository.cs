@@ -15,6 +15,7 @@ namespace Repository
         Task<List<Friend>> SearchFriendsForUserAsync(int userId, string searchKey);
         Task<List<Friend>> SortByDateAsync(int userId, bool searchKey);
         Task UnfriendAsync(int userId, int friendId);
+        Task SendFriendRequest(int senderId, int recipientId);
 
     }
 }

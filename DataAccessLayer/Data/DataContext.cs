@@ -1,4 +1,5 @@
 ﻿using BusinessObject;
+using CloudinaryDotNet;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
@@ -40,6 +41,11 @@ namespace PRN221ProjectGroup.Data
             // Configure primary key for Friend entity
             modelBuilder.Entity<Friend>()
                 .HasKey(f => f.RequestId);
+
+            modelBuilder.Entity<Friend>()
+            .Property(a => a.RequestId)
+            .ValueGeneratedOnAdd()
+            .UseIdentityColumn();
 
             //one user can send friend request to many users
             //when delete this user, also delete the friend request
