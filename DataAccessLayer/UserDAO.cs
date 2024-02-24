@@ -1,4 +1,6 @@
 ﻿using BusinessObject;
+using Microsoft.EntityFrameworkCore;
+using PRN221ProjectGroup.Data;
 
 namespace DataAccessLayer
 {
@@ -22,6 +24,18 @@ namespace DataAccessLayer
                     return instance;
                 }
             }
+        }
+
+        public IEnumerable<User> GetUsers()
+        {
+            var db = new DataContext();
+            return db.Users.Include(u => u.photos).ToList();
+        }
+
+        public User GetUser(int userId)
+        {
+            var db = new DataContext();
+            return db.Users.Include(c => c.photos).SingleOrDefault(u => u.UserId.Equals(userId));
         }
 
         public bool IsUsernameDuplicate(string username)

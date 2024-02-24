@@ -1,9 +1,5 @@
 ﻿using BusinessObject;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using DataAccessLayer;
 
 namespace Repository
 {
@@ -12,6 +8,11 @@ namespace Repository
         public void Create(Photo entity)
         {
             throw new NotImplementedException();
+        }
+
+        public void CreatePhoto(Photo photo)
+        {
+            PhotoDAO.Instance.Create(photo);
         }
 
         public bool Delete(Photo entity)
@@ -34,9 +35,19 @@ namespace Repository
             throw new NotImplementedException();
         }
 
+        public Photo GetUserPhotoIsMain(int userId)
+        {
+            return PhotoDAO.Instance.GetAll().SingleOrDefault(p => p.UserId == userId && p.isMain == true);
+        }
+
         public bool Update(Photo entity)
         {
             throw new NotImplementedException();
+        }
+
+        public void UpdatePhoto(Photo photo)
+        {
+            PhotoDAO.Instance.Update(photo);
         }
     }
 }

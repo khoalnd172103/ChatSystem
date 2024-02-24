@@ -39,6 +39,11 @@ namespace ChatSystem.Pages.Account
                 ModelState.AddModelError("User.UserName", "This Username already existed!");
                 return Page();
             }
+            if (DateTime.Now.AddYears(-118).CompareTo(User.DateOfBirth) >= 0 || DateTime.Now.AddYears(-18).CompareTo(User.DateOfBirth) <= 0)
+            {
+                ModelState.AddModelError("User.DateOfBirth", "Must between 18 and 100 year old");
+                return Page();
+            }
 
             _userRepository.CreateUser(User);
 
@@ -52,8 +57,6 @@ namespace ChatSystem.Pages.Account
 
             var identity = new ClaimsIdentity(claims, "CookieAuth");
             ClaimsPrincipal claimsPrincipal = new ClaimsPrincipal(identity);
-
-
 
             await HttpContext.SignInAsync("CookieAuth", claimsPrincipal);
             //HttpContext.Session.SetInt32("UserId", user.UserId);

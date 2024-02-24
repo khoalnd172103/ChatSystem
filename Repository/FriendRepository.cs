@@ -1,5 +1,6 @@
 ﻿using BusinessObject;
 using DataAccessLayer;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -47,9 +48,25 @@ namespace Repository
                 fr.status == false).ToList();
         }
 
+        public IEnumerable<Friend> GetFriend()
+        => FriendDAO.Instance.GetAll();
+
         public bool Update(Friend entity)
         {
             throw new NotImplementedException();
         }
+
+        public async Task<List<Friend>> GetFriendsForUserAsync(int userId)
+        => FriendDAO.Instance.GetFriendsForUser(userId);
+
+
+        public Task<List<Friend>> SearchFriendsForUserAsync(int userId, string searchKey)
+        => FriendDAO.Instance.SearchFriendsForUserAsync(userId, searchKey);
+
+        public Task<List<Friend>> SortByDateAsync(int userId, bool searchKey)
+        => FriendDAO.Instance.SortByDateAsync(userId, searchKey);
+
+        public Task UnfriendAsync(int userId, int friendId)
+        => FriendDAO.Instance.UnfriendAsync(userId, friendId);
     }
 }
