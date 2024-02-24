@@ -49,12 +49,13 @@ namespace ChatSystem.Pages.Account
 
 
             User user = new User();
-
-            user = _userRepository.Login(Input.Username, Input.Password);
-            if (user != null)
+            try
             {
+                user = _userRepository.Login(Input.Username, Input.Password);
+                if (user != null)
+                {
 
-                var claims = new List<Claim>
+                    var claims = new List<Claim>
                 {
                     new Claim(ClaimTypes.Name, user.KnownAs),
                     new Claim("UserId", user.UserId.ToString()),
@@ -62,22 +63,32 @@ namespace ChatSystem.Pages.Account
                     //new Claim(ClaimTypes.Role, "User"),
                 };
 
-                var identity = new ClaimsIdentity(claims, "CookieAuth");
-                ClaimsPrincipal claimsPrincipal = new ClaimsPrincipal(identity);
+                    var identity = new ClaimsIdentity(claims, "CookieAuth");
+                    ClaimsPrincipal claimsPrincipal = new ClaimsPrincipal(identity);
 
-                var authProperties = new AuthenticationProperties
+                    var authProperties = new AuthenticationProperties
+                    {
+                        IsPersistent = Input.RememberMe
+                    };
+
+                    await HttpContext.SignInAsync("CookieAuth", claimsPrincipal, authProperties);
+                    HttpContext.Session.SetInt32("UserId", user.UserId);
+                    TempData["success"] = "Login Successful";
+                    return RedirectToPage("/Users/UserList");
+                }
+                else
                 {
-                    IsPersistent = Input.RememberMe
-                };
-
-                await HttpContext.SignInAsync("CookieAuth", claimsPrincipal, authProperties);
-                HttpContext.Session.SetInt32("UserId", user.UserId);
-                return RedirectToPage("/Users/UserList");
+                    TempData["error"] = "Login fail";
+                }
+                return Page();
+            }
+            catch (Exception ex)
+            {
+                TempData["error"] = "Login fail";
+                return Page();
             }
 
 
-
-            return Page();
         }
     }
 }
