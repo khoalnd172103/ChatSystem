@@ -1,8 +1,11 @@
-﻿namespace BusinessObject
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace BusinessObject
 {
     public class Friend
     {
-        public string RequestId { get; set; }
+        [Key]
+        public int RequestId { get; set; }
         public User SenderUser { get; set; }
         public int SenderId { get; set; }
         public string SenderUserName { get; set;}

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace DataAccessLayer.Migrations
 {
     /// <inheritdoc />
-    public partial class IntialCreation : Migration
+    public partial class updatedatabase : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -20,7 +20,7 @@ namespace DataAccessLayer.Migrations
                     UserName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     UserPassword = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DateOfBirth = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    KnownAs = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    KnownAs = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     LastActive = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Gender = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -59,7 +59,8 @@ namespace DataAccessLayer.Migrations
                 name: "Friend",
                 columns: table => new
                 {
-                    RequestId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    RequestId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     SenderId = table.Column<int>(type: "int", nullable: false),
                     SenderUserName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     RecipientId = table.Column<int>(type: "int", nullable: false),
@@ -146,7 +147,7 @@ namespace DataAccessLayer.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Participants", x => x.ConversationId);
+                    table.PrimaryKey("PK_Participants", x => new { x.ConversationId, x.UserId });
                     table.ForeignKey(
                         name: "FK_Participants_Conversations_ConversationId",
                         column: x => x.ConversationId,

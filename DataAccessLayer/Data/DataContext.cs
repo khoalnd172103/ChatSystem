@@ -1,4 +1,5 @@
 ﻿using BusinessObject;
+using CloudinaryDotNet;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
@@ -41,6 +42,11 @@ namespace PRN221ProjectGroup.Data
             modelBuilder.Entity<Friend>()
                 .HasKey(f => f.RequestId);
 
+            modelBuilder.Entity<Friend>()
+            .Property(a => a.RequestId)
+            .ValueGeneratedOnAdd()
+            .UseIdentityColumn();
+
             //one user can send friend request to many users
             //when delete this user, also delete the friend request
             modelBuilder.Entity<Friend>()
@@ -67,17 +73,17 @@ namespace PRN221ProjectGroup.Data
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Participants>()
-                .HasKey(f => f.ConversationId);
+                .HasKey(p => new {p.ConversationId, p.UserId});
 
             modelBuilder.Entity<Participants>()
                 .HasOne(p => p.Conversation)
-                .WithMany()
+                .WithMany(c => c.Participants)
                 .HasForeignKey(p => p.ConversationId)
                 .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<Participants>()
                 .HasOne(p => p.User)
-                .WithMany()
+                .WithMany(u => u.ParticipatedConversations)
                 .HasForeignKey(p => p.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 

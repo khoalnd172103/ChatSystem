@@ -52,8 +52,11 @@ namespace DataAccessLayer.Migrations
 
             modelBuilder.Entity("BusinessObject.Friend", b =>
                 {
-                    b.Property<string>("RequestId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("RequestId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RequestId"));
 
                     b.Property<DateTime>("DateSend")
                         .HasColumnType("datetime2");
@@ -138,7 +141,7 @@ namespace DataAccessLayer.Migrations
                     b.Property<int>("status")
                         .HasColumnType("int");
 
-                    b.HasKey("ConversationId");
+                    b.HasKey("ConversationId", "UserId");
 
                     b.HasIndex("UserId");
 
@@ -268,13 +271,13 @@ namespace DataAccessLayer.Migrations
             modelBuilder.Entity("BusinessObject.Participants", b =>
                 {
                     b.HasOne("BusinessObject.Conversation", "Conversation")
-                        .WithMany()
+                        .WithMany("Participants")
                         .HasForeignKey("ConversationId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("BusinessObject.User", "User")
-                        .WithMany()
+                        .WithMany("ParticipatedConversations")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -298,11 +301,15 @@ namespace DataAccessLayer.Migrations
             modelBuilder.Entity("BusinessObject.Conversation", b =>
                 {
                     b.Navigation("MessagesReceived");
+
+                    b.Navigation("Participants");
                 });
 
             modelBuilder.Entity("BusinessObject.User", b =>
                 {
                     b.Navigation("MessagesSent");
+
+                    b.Navigation("ParticipatedConversations");
 
                     b.Navigation("SentByUsers");
 

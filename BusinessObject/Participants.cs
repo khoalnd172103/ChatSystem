@@ -8,5 +8,6 @@
         public int UserId { get; set; }
         public int status { get; set; }
         public bool isAdmin { get; set; }
+
     }
 }
