@@ -1,7 +1,7 @@
-using BusinessObject;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Repository;
+using Repository.DTOs;
 
 namespace ChatSystem.Pages.Users
 {
@@ -9,48 +9,56 @@ namespace ChatSystem.Pages.Users
     {
         private readonly IUserRepository _userRepository;
         private readonly IFriendRepository _friendRepository;
-        public IEnumerable<UserProfile> Users { get; set; }
+        public PaginatedList<UserDto> Users { get; set; }
+        public string CurrentFilter { get; set; }
 
         public UserListModel(IUserRepository userRepository, IFriendRepository friendRepository)
         {
             _userRepository = userRepository;
             _friendRepository = friendRepository;
-            Users = new List<UserProfile>();
         }
 
-        public void OnGet()
+        public IActionResult OnGet(string searchString, int? pageIndex)
         {
+            const int pageSize = 5;
             var idClaim = User.Claims.FirstOrDefault(claims => claims.Type == "UserId", null);
 
-            IEnumerable<User> users;
-            if (idClaim != null)
+            if (searchString != null)
             {
-                int userId = int.Parse(idClaim.Value);
-                users = _userRepository.GetUsers().Where(u => u.UserId != userId);
+                pageIndex = 1;
             }
             else
             {
-                users = _userRepository.GetUsers();
+                searchString = CurrentFilter;
             }
 
-            Users = users.Select(user => new UserProfile
-            {
-                UserId = user.UserId,
-                UserName = user.UserName,
-                DateOfBirth = user.DateOfBirth,
-                KnownAs = user.KnownAs,
-                Gender = user.Gender,
-                Introduction = user.Introduction,
-                Interest = user.Interest,
-                City = user.City,
-                Avatar = user.photos.FirstOrDefault(p => p.isMain)?.PhotoUrl
-            }).ToList();
+            CurrentFilter = searchString;
+
+            //if (idClaim != null)
+            //{
+            //    int userId = int.Parse(idClaim.Value);
+            //    Users = _userRepository.GetUsers(searchString, pageIndex ?? 1, pageSize);
+            //}
+            //else
+            //{
+            //    Users = _userRepository.GetUsers(searchString, pageIndex ?? 1, pageSize);
+            //}
+            Users = _userRepository.GetUsers(searchString, pageIndex ?? 1, pageSize);
+
+            return Page();
         }
 
         public async Task<IActionResult> OnPost(int userId)
         {
-            var senderId = int.Parse(User.Claims.FirstOrDefault(claim => claim.Type == "UserId").Value);
-            await _friendRepository.SendFriendRequest(senderId, userId);
+
+            int? currentUserId = HttpContext.Session.GetInt32("UserId");
+            if (currentUserId != null)
+            {
+                var senderId = (int)currentUserId;
+                var recipientUserName = _userRepository.GetUser(userId).UserName;
+                var senderUserName = _userRepository.GetUser(senderId).UserName;
+                await _friendRepository.SendFriendRequest(senderId, userId, senderUserName, recipientUserName);
+            }
             return RedirectToPage("/Users/UserList");
         }
     }

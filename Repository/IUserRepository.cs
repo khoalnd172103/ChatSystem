@@ -1,10 +1,11 @@
 ﻿using BusinessObject;
+using Repository.DTOs;
 
 namespace Repository
 {
     public interface IUserRepository
     {
-        IEnumerable<User> GetUsers();
+        PaginatedList<UserDto> GetUsers(string? searchString, int? pageIndex, int pageSize);
 
         void CreateUser(User user);
 
