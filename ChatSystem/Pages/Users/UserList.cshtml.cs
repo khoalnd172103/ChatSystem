@@ -50,8 +50,15 @@ namespace ChatSystem.Pages.Users
 
         public async Task<IActionResult> OnPost(int userId)
         {
-            var senderId = int.Parse(User.Claims.FirstOrDefault(claim => claim.Type == "UserId").Value);
-            await _friendRepository.SendFriendRequest(senderId, userId);
+
+            int? currentUserId = HttpContext.Session.GetInt32("UserId");
+            if (currentUserId != null)
+            {
+                var senderId = (int)currentUserId;
+                var recipientUserName = _userRepository.GetUser(userId).UserName;
+                var senderUserName = _userRepository.GetUser(senderId).UserName;
+                await _friendRepository.SendFriendRequest(senderId, userId, senderUserName, recipientUserName);
+            }
             return RedirectToPage("/Users/UserList");
         }
     }

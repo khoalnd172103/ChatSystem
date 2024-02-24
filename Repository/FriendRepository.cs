@@ -68,7 +68,7 @@ namespace Repository
         public Task UnfriendAsync(int userId, int friendId)
         => FriendDAO.Instance.UnfriendAsync(userId, friendId);
 
-        public Task SendFriendRequest(int senderId, int recipientId)
-            => FriendDAO.Instance.SendFriendRequest(senderId, recipientId);
+        public Task SendFriendRequest(int senderId, int recipientId, string senderUsername, string recipientUsername)
+            => FriendDAO.Instance.SendFriendRequest(senderId, recipientId, senderUsername, recipientUsername);
     }
 }

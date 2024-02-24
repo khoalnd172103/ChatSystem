@@ -108,7 +108,7 @@ namespace DataAccessLayer
             }  
         }
 
-        public async Task SendFriendRequest(int senderId, int recipientId)
+        public async Task SendFriendRequest(int senderId, int recipientId, string senderUsername, string recipientUsername)
         {
             using (var context = new DataContext())
             {
@@ -126,7 +126,9 @@ namespace DataAccessLayer
                 var friendRequest = new Friend
                 {
                     SenderId = senderId,
+                    SenderUserName = senderUsername,
                     RecipientId = recipientId,
+                    RecipientUserName = recipientUsername,
                     DateSend = DateTime.Now,
                     status = false
                 };
