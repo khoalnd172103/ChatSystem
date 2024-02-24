@@ -67,17 +67,17 @@ namespace PRN221ProjectGroup.Data
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Participants>()
-                .HasKey(f => f.ConversationId);
+                .HasKey(p => new {p.ConversationId, p.UserId});
 
             modelBuilder.Entity<Participants>()
                 .HasOne(p => p.Conversation)
-                .WithMany()
+                .WithMany(c => c.Participants)
                 .HasForeignKey(p => p.ConversationId)
                 .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<Participants>()
                 .HasOne(p => p.User)
-                .WithMany()
+                .WithMany(u => u.ParticipatedConversations)
                 .HasForeignKey(p => p.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 

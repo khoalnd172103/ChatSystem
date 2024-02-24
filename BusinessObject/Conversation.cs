@@ -9,6 +9,7 @@
         public DateTime CreateAt {  get; set; }
         public bool isGroup { get; set; }
         public List<Message> MessagesReceived { get; set; }
+        public List<Participants> Participants {  get; set; }
 
     }
 }

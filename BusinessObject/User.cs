@@ -38,6 +38,6 @@ namespace BusinessObject
         public List<Friend>? SentByUsers { get; set; }
         public List<Friend>? SentUsers { get; set; }
         public List<Message>? MessagesSent { get; set; }
-
+        public List<Participants> ParticipatedConversations { get; set; }
     }
 }
