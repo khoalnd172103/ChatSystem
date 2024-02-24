@@ -4,6 +4,7 @@ using Repository;
 using System.ComponentModel.DataAnnotations;
 using DataAccessLayer;
 using BusinessObject;
+using ChatSystem.Pages.Users.Validation;
 
 namespace ChatSystem.Pages.Users
 {
@@ -15,13 +16,13 @@ namespace ChatSystem.Pages.Users
         [UserNameValidation]
         public string UserName { get; set; }
         [DataType(DataType.Date)]
+        [BirthdayValidation(18)]
         public DateTime DateOfBirth { get; set; }
         public string? KnownAs { get; set; }
         public string? Gender { get; set; }
         public string? Introduction { get; set; }
         public string? Interest { get; set; }
         public string? City { get; set; }
-        public string? Avatar { get; set; }
     }
 
     public class EditProfileModel : PageModel
@@ -34,11 +35,15 @@ namespace ChatSystem.Pages.Users
         [BindProperty]
         public EditProfile UserProfile { get; set; }
 
+        [BindProperty]
+        public string ? Avatar { get; set; }
+
         public EditProfileModel(IUserRepository userRepository, IPhotoRepository photoRepository, ICloudinaryService cloudinaryService)
         {
             _userRepository = userRepository;
             _photoRepository = photoRepository;
             _cloudinary = cloudinaryService;
+            UserProfile = new EditProfile();
         }
 
         public IActionResult OnGet()
@@ -51,19 +56,18 @@ namespace ChatSystem.Pages.Users
                 var user = _userRepository.GetUserWithPhoto(userId);
                 if (user != null)
                 {
-                    UserProfile = new EditProfile
-                    {
-                        UserId = user.UserId,
-                        UserName = user.UserName,
-                        DateOfBirth = user.DateOfBirth,
-                        KnownAs = user.KnownAs,
-                        Gender = user.Gender,
-                        Introduction = user.Introduction,
-                        Interest = user.Interest,
-                        City = user.City,
-                    };
-                    UserProfile.Avatar = _photoRepository.GetUserPhotoIsMain(userId).PhotoUrl;
+                    UserProfile.UserId = user.UserId;
+                    UserProfile.UserName = user.UserName;
+                    UserProfile.DateOfBirth = user.DateOfBirth;
+                    UserProfile.KnownAs = user.KnownAs;
+                    UserProfile.Gender = user.Gender;
+                    UserProfile.Introduction = user.Introduction;
+                    UserProfile.Interest = user.Interest;
+                    UserProfile.City = user.City;
+
+                    Avatar = _photoRepository.GetUserPhotoIsMain(userId).PhotoUrl;
                 }
+
                 return Page();
             }
             else
@@ -72,11 +76,11 @@ namespace ChatSystem.Pages.Users
             }
         }
 
-        public IActionResult OnPost()
+        public IActionResult OnPostUpdateProfile()
         {
             if (!ModelState.IsValid)
             {
-                return Page();
+                return OnGet();
             }
 
             var user = _userRepository.GetUser(UserProfile.UserId);
@@ -84,6 +88,13 @@ namespace ChatSystem.Pages.Users
             if (user == null)
             {
                 return NotFound();
+            }
+
+            var isValidUserName = _userRepository.IsUserNameValidForUpdate(UserProfile.UserId, UserProfile.UserName);
+            if (isValidUserName)
+            {
+                ViewData["Message"] = "This username is already used";
+                return OnGet();
             }
 
             user.UserName = UserProfile.UserName;
@@ -95,6 +106,8 @@ namespace ChatSystem.Pages.Users
             user.City = UserProfile.City;
 
             _userRepository.UpdateUser(user);
+
+            TempData["success"] = "Update Successful";
             return RedirectToPage("/Users/EditProfile");
         }
 
@@ -102,19 +115,17 @@ namespace ChatSystem.Pages.Users
         {
             if (imageFile == null || imageFile.Length == 0)
             {
-                ModelState.AddModelError(string.Empty, "Please select a file.");
-                return Page();
+                ViewData["ChangeImageMessage"] = "Please select a file.";
+                ModelState.Clear();
+                return OnGet();
             }
 
-            var idClaim = User.Claims.FirstOrDefault(claims => claims.Type == "UserId", null);
-            int userId = int.Parse(idClaim.Value);
-
-            Photo photo = _photoRepository.GetUserPhotoIsMain(userId);
+            Photo photo = _photoRepository.GetUserPhotoIsMain(UserProfile.UserId);
 
             var result = await _cloudinary.AddPhotoAsync(imageFile);
             if (result.Error != null)
             {
-                ModelState.AddModelError(string.Empty, "Image upload failed. Please try again later.");
+                ViewData["ChangeImageMessage"] = "Image upload failed. Please try again later.";
                 return Page();
             }
 

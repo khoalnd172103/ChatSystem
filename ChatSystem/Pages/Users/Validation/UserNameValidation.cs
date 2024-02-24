@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace ChatSystem.Pages.Users
+namespace ChatSystem.Pages.Users.Validation
 {
     public class UserNameValidation : ValidationAttribute
     {

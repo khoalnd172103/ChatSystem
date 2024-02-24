@@ -6,9 +6,14 @@ namespace Repository
 {
     public class UserRepository : IUserRepository
     {
-        public PaginatedList<UserDto> GetUsers(string? searchString, int? pageIndex, int pageSize)
+        public PaginatedList<UserDto> GetUsers(string? searchString, int? pageIndex, int pageSize, int userId)
         {
             var users = UserDAO.Instance.GetUsers();
+
+            if (userId != 0)
+            {
+                users = users.Where(u => u.UserId != userId);
+            }
 
             if (!string.IsNullOrEmpty(searchString))
             {
@@ -56,6 +61,11 @@ namespace Repository
         public User GetUserWithPhoto(int userId)
         {
             return UserDAO.Instance.GetUser(userId);
+        }
+
+        public bool IsUserNameValidForUpdate(int userId, string username)
+        {
+            return UserDAO.Instance.IsUserNameValidForUpdate(userId, username);
         }
     }
 }

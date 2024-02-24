@@ -55,5 +55,17 @@ namespace DataAccessLayer
         {
             return GetAll().FirstOrDefault(u => u.UserId == userId);
         }
+
+        public bool IsUserNameValidForUpdate(int userId, string username)
+        {
+            try
+            {
+                return GetAll().Any(u => u.UserName.Equals(username) && u.UserId != userId);
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
     }
 }
