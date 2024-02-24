@@ -79,7 +79,7 @@ namespace ChatSystem.Pages.Users
                 return Page();
             }
 
-            var user = _userRepository.GetUsers().SingleOrDefault(u => u.UserId.Equals(UserProfile.UserId));
+            var user = _userRepository.GetUser(UserProfile.UserId);
 
             if (user == null)
             {

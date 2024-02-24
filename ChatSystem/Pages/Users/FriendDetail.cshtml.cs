@@ -25,7 +25,7 @@ namespace ChatSystem.Pages.Users
 
         public IActionResult OnGet(int id)
         {
-            var user = _userRepository.GetUsers().SingleOrDefault(u => u.UserId == id);
+            var user = _userRepository.GetUser(id);
             if (user != null)
             {
                 UserProfile = new UserProfile

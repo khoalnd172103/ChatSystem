@@ -5,6 +5,17 @@
 
 <link rel="stylesheet" href="~/css/userlist.css">
 
+<div class="row mt-3">
+    <div class="col-5">
+        <form method="get">
+            <div class="input-group mb-3">
+                <input type="text" class="form-control" placeholder="Search..." aria-label="Search" aria-describedby="button-addon2" name="searchString" value="@Model.CurrentFilter">
+                <button class="btn btn-outline-secondary" type="submit" id="button-addon2">Search</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <div class="container">
   <div class="row">
         @foreach (var user in Model.Users)
@@ -34,3 +45,17 @@
         }
   </div>
 </div>
+
+@if (Model.Users.TotalPages > 1)
+{
+    <nav aria-label="Page navigation">
+        <ul class="pagination">
+            @for (int i = 1; i <= Model.Users.TotalPages; i++)
+            {
+                <li class="page-item @(i == Model.Users.PageIndex ? "active" : "")">
+                    <a class="page-link" asp-page="./UserList" asp-route-pageIndex="@i">@i</a>
+                </li>
+            }
+        </ul>
+    </nav>
+}
