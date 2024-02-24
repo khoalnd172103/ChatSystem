@@ -1,0 +1,44 @@
+﻿@page
+@model FriendListModel
+@{
+    ViewData["Title"] = "Friend List";
+}
+
+<div class="container mt-4">
+    <h2>Friend List</h2>
+    <hr />
+    <div class="row">
+        <div class="col-md-8 mb-3">
+            <form method="get" class="d-flex">
+                <input type="text" class="form-control mr-10" placeholder="Search by friend name" name="searchTerm">
+                <button type="submit" class="btn btn-primary">Search</button>
+            </form>
+        </div>
+        <div class="col-md-4 mb-3 d-flex">
+            <form method="get">
+                <input type="hidden" name="sortDirection" value="asc"/>
+                <button type="submit" class="btn btn-primary mr-3">Date Ascending</button>
+            </form>
+            <form method="get">
+                <input type="hidden" name="sortDirection" value="desc"/>
+                <button type="submit" class="btn btn-primary">Date Descending</button>
+            </form>
+        </div>
+    </div>
+    <div class="row">
+        @foreach (var friend in Model.Friends)
+        {
+            <div class="col-md-6 mb-5">
+                <div class="friend-box p-3 border rounded">
+                    <div class="d-flex align-items-center">
+                        <img src="http://bootdey.com/img/Content/avatar/avatar1.png" alt="Friend Photo" class="mr-7" style="max-width: 100px; max-height: 100px;">
+                        <div>
+                            <h5><a href="/Users/FriendDetail/@friend.RecipientId">@friend.RecipientUserName</a></h5>
+                            <p>Date Added: @friend.DateSend.ToShortDateString()</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
