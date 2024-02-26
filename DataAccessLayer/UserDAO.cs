@@ -67,5 +67,18 @@ namespace DataAccessLayer
                 return false;
             }
         }
+
+        public List<User> GetUserInGroupChat(int conversationId)
+        {
+            using (var context = new DataContext())
+            {
+                var participants = context.Participants
+                   .Where(p => p.ConversationId == conversationId)
+                   .Select(p => p.User)
+                   .ToList();
+
+                return participants;
+            }
+        }
     }
 }

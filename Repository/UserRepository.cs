@@ -67,5 +67,10 @@ namespace Repository
         {
             return UserDAO.Instance.IsUserNameValidForUpdate(userId, username);
         }
+
+        public List<User> GetUserInGroupChat(int conversationId)
+        {
+            return UserDAO.Instance.GetUserInGroupChat(conversationId);
+        }
     }
 }
