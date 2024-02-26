@@ -4,9 +4,10 @@
     ViewData["Title"] = "Login";
 }
 
+
 @if (User.Identity.IsAuthenticated)
 {
-    <h1>Welcome to FU Hotel Management - Your Are Logined with the Name "@User.Identity.Name"</h1>
+    <h1>You are already logged in</h1>
 }
 
 @if (!User.Identity.IsAuthenticated)
@@ -44,3 +45,4 @@
     </div>
 </div>
 }
+

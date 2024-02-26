@@ -44,9 +44,16 @@ namespace ChatSystem.Pages.Account
                 ModelState.AddModelError("User.DateOfBirth", "Must between 18 and 100 year old");
                 return Page();
             }
+            try
+            {
+                _userRepository.CreateUser(User);
+                TempData["success"] = "Register successful";
+            }
+            catch (Exception ex)
+            {
+                TempData["error"] = "Register fail";
 
-            _userRepository.CreateUser(User);
-
+            }
             var claims = new List<Claim>
                 {
                     new Claim(ClaimTypes.Name, User.KnownAs),
@@ -60,6 +67,8 @@ namespace ChatSystem.Pages.Account
 
             await HttpContext.SignInAsync("CookieAuth", claimsPrincipal);
             //HttpContext.Session.SetInt32("UserId", user.UserId);
+            TempData["success"] = "Register successful";
+
             return RedirectToPage("/index");
 
         }

@@ -1,7 +1,7 @@
-using BusinessObject;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Repository;
+using Repository.DTOs;
 
 namespace ChatSystem.Pages.Users
 {
@@ -9,42 +9,47 @@ namespace ChatSystem.Pages.Users
     {
         private readonly IUserRepository _userRepository;
         private readonly IFriendRepository _friendRepository;
-        public IEnumerable<UserProfile> Users { get; set; }
+        public PaginatedList<UserDto> Users { get; set; }
+        public string CurrentFilter { get; set; }
+        public bool IsLogined { get; set; } = false;
 
         public UserListModel(IUserRepository userRepository, IFriendRepository friendRepository)
         {
             _userRepository = userRepository;
             _friendRepository = friendRepository;
-            Users = new List<UserProfile>();
         }
 
-        public void OnGet()
+        public IActionResult OnGet(string searchString, int? pageIndex)
         {
+            const int pageSize = 5;
             var idClaim = User.Claims.FirstOrDefault(claims => claims.Type == "UserId", null);
-
-            IEnumerable<User> users;
             if (idClaim != null)
             {
-                int userId = int.Parse(idClaim.Value);
-                users = _userRepository.GetUsers().Where(u => u.UserId != userId);
+                IsLogined = true;
+            }
+
+            if (searchString != null)
+            {
+                pageIndex = 1;
             }
             else
             {
-                users = _userRepository.GetUsers();
+                searchString = CurrentFilter;
             }
 
-            Users = users.Select(user => new UserProfile
+            CurrentFilter = searchString;
+
+            if (idClaim != null)
             {
-                UserId = user.UserId,
-                UserName = user.UserName,
-                DateOfBirth = user.DateOfBirth,
-                KnownAs = user.KnownAs,
-                Gender = user.Gender,
-                Introduction = user.Introduction,
-                Interest = user.Interest,
-                City = user.City,
-                Avatar = user.photos.FirstOrDefault(p => p.isMain)?.PhotoUrl
-            }).ToList();
+                int userId = int.Parse(idClaim.Value);
+                Users = _userRepository.GetUsers(searchString, pageIndex ?? 1, pageSize, userId);
+            }
+            else
+            {
+                Users = _userRepository.GetUsers(searchString, pageIndex ?? 1, pageSize, 0);
+            }
+
+            return Page();
         }
 
         public async Task<IActionResult> OnPost(int userId)

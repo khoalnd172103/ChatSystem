@@ -10,13 +10,18 @@
         <div class="card mb-4 mb-xl-0">
             <div class="card-header">Profile Picture</div>
             <div class="card-body text-center">
-                <img class="img-account-profile rounded-circle mb-2" src="@Model.UserProfile.Avatar" alt="">
-                <form method="post" enctype="multipart/form-data" asp-page-handler="UploadImage">
-                    <div class="form-group mt-2 mb-3 px-5">
-                      <input class="form-control" type="file" id="formFile" name="imageFile">
-                    </div>
-                    <button class="btn btn-primary" type="submit">Upload</button>
-                </form>
+                <img class="img-account-profile rounded-circle mb-2" src="@Model.Avatar" alt="">
+                    <form method="post" enctype="multipart/form-data" asp-page-handler="UploadImage">
+                        <input type="hidden" asp-for="UserProfile.UserId" />
+                        <div class="form-group mt-2 mb-3 px-5">
+                            <input class="form-control" type="file" id="formFile" name="imageFile">
+                        </div>
+                        <button class="btn btn-primary" type="submit">Change</button>
+                    </form>
+                    @if (ViewData["ChangeImageMessage"] != null)
+                        {
+                                    <p class="text-danger">@ViewData["ChangeImageMessage"]</p>
+                        }
             </div>
         </div>
     </div>
@@ -24,7 +29,7 @@
         <div class="card mb-4">
             <div class="card-header">User Profile</div>
             <div class="card-body">
-                <form method="post">
+                <form method="post" asp-page-handler="UpdateProfile">
                     <input type="hidden" asp-for="UserProfile.UserId" />
                     <div class="mb-3">
                         <label asp-for="UserProfile.UserName" class="form-label">Full Name</label>
@@ -40,7 +45,7 @@
                     </div>
                     <div class="mb-3">
                         <label asp-for="UserProfile.Introduction" class="small mb-1">Introduction</label>
-                        <input asp-for="UserProfile.Introduction" class="form-control">
+                        <textarea asp-for="UserProfile.Introduction" class="form-control"></textarea>
                         <span asp-validation-for="UserProfile.Introduction" class="text-danger"></span>
                     </div>
                     <div class="row gx-3 mb-3">
@@ -58,7 +63,11 @@
                     <div class="row gx-3 mb-3">
                         <div class="col-md-6">
                             <label asp-for="UserProfile.Gender" class="small mb-1">Gender</label>
-                            <input asp-for="UserProfile.Gender" class="form-control">
+                            <select asp-for="UserProfile.Gender" class="form-select">
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
                             <span asp-validation-for="UserProfile.Gender" class="text-danger"></span>
                         </div>
                         <div class="col-md-6">
@@ -67,6 +76,10 @@
                             <span asp-validation-for="UserProfile.DateOfBirth" class="text-danger"></span>
                         </div>
                     </div>
+                    @if (ViewData["Message"] != null)
+                        {
+                                <p class="text-danger">@ViewData["Message"]</p>
+                        }
                     <div class="form-group">
                         <input type="submit" value="Save" class="btn btn-primary" />
                     </div>
@@ -75,3 +88,5 @@
         </div>
     </div>
 </div>
+
+

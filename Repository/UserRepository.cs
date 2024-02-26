@@ -1,11 +1,42 @@
 ﻿using BusinessObject;
 using DataAccessLayer;
+using Repository.DTOs;
 
 namespace Repository
 {
     public class UserRepository : IUserRepository
     {
-        public IEnumerable<User> GetUsers() => UserDAO.Instance.GetUsers();
+        public PaginatedList<UserDto> GetUsers(string? searchString, int? pageIndex, int pageSize, int userId)
+        {
+            var users = UserDAO.Instance.GetUsers();
+
+            if (userId != 0)
+            {
+                users = users.Where(u => u.UserId != userId);
+            }
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                users = users.Where(u => u.UserName.ToLower().Contains(searchString.ToLower()));
+            }
+
+            var userDtos = users.Select(user => new UserDto
+            {
+                UserId = user.UserId,
+                UserName = user.UserName,
+                DateOfBirth = user.DateOfBirth,
+                KnownAs = user.KnownAs,
+                Gender = user.Gender,
+                Introduction = user.Introduction,
+                Interest = user.Interest,
+                City = user.City,
+                Avatar = user.photos.FirstOrDefault(p => p.isMain)?.PhotoUrl
+            }).ToList();
+
+
+            return PaginatedList<UserDto>.CreateAsync(
+                userDtos.AsQueryable(), pageIndex ?? 1, pageSize);
+        }
 
         public void CreateUser(User user)
         {
@@ -30,6 +61,11 @@ namespace Repository
         public User GetUserWithPhoto(int userId)
         {
             return UserDAO.Instance.GetUser(userId);
+        }
+
+        public bool IsUserNameValidForUpdate(int userId, string username)
+        {
+            return UserDAO.Instance.IsUserNameValidForUpdate(userId, username);
         }
     }
 }

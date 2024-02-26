@@ -14,9 +14,16 @@ namespace ChatSystem.Pages.Users
         }
 
         public UserProfile UserProfile { get; set; }
+        public bool IsLogined { get; set; } = false;
 
         public IActionResult OnGet(int userId)
         {
+            var idClaim = User.Claims.FirstOrDefault(claims => claims.Type == "UserId", null);
+            if (idClaim != null)
+            {
+                IsLogined = true;
+            }
+
             var user = _userRepository.GetUserWithPhoto(userId);
             if (user == null)
             {
