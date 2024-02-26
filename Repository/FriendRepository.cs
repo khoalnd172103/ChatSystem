@@ -1,6 +1,7 @@
 ﻿using BusinessObject;
 using DataAccessLayer;
 using Microsoft.EntityFrameworkCore;
+using Repository.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,10 +13,12 @@ namespace Repository
     public class FriendRepository : IFriendRepository
     {
         private readonly FriendDAO friendDAO;
+        private readonly IPhotoRepository photoRepository;
 
         public FriendRepository()
         {
             friendDAO = new FriendDAO();
+            photoRepository = new PhotoRepository();
         }
         public void Create(Friend entity)
         {
@@ -34,7 +37,7 @@ namespace Repository
 
         public Friend GetById(int entityId)
         {
-            throw new NotImplementedException();
+            return friendDAO.GetAll().FirstOrDefault(u => u.RequestId == entityId);
         }
 
         public List<Friend> GetByName(string name)
@@ -42,10 +45,22 @@ namespace Repository
             throw new NotImplementedException();
         }
 
-        public List<Friend> GetFriendRequest(string recipientUserName)
+        public PaginatedList<FriendRequestDto> GetFriendRequest(int? pageIndex, int pageSize, string recipientUserName)
         {
-            return friendDAO.GetAll().Where(fr => fr.RecipientUserName == recipientUserName &&
-                fr.status == false).ToList();
+            var friendRequest = friendDAO.GetAll().Where(fr => fr.RecipientUserName == recipientUserName &&
+               fr.status == false).ToList();
+
+            var friendRequestDto = friendRequest.Select(request => new FriendRequestDto
+            {
+                RequestId = request.RequestId,
+                SenderId = request.SenderId,
+                DateSend = request.DateSend,
+                SenderName = request.SenderUserName,
+                AvatarUrl = photoRepository.GetUserPhotoIsMain(request.SenderId).PhotoUrl
+            }).ToList();
+
+            return PaginatedList<FriendRequestDto>.CreateAsync(
+                friendRequestDto.AsQueryable(), pageIndex ?? 1, pageSize);
         }
 
         public IEnumerable<Friend> GetFriend()
@@ -70,5 +85,15 @@ namespace Repository
 
         public Task SendFriendRequest(int senderId, int recipientId, string senderUsername, string recipientUsername)
             => FriendDAO.Instance.SendFriendRequest(senderId, recipientId, senderUsername, recipientUsername);
+
+        public void UpdateFriendRequest(Friend friend)
+        {
+            friendDAO.Update(friend);
+        }
+
+        public void DeclineFriendRequest(Friend friend)
+        {
+            friendDAO.Remove(friend);
+        }
     }
 }

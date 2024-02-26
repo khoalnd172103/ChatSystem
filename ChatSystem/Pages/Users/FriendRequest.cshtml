@@ -3,14 +3,25 @@
 @{
 }
 
-<div class="card" style="width: 18rem;">
-    <img class="card-img-top" src="https://bootdey.com/img/Content/avatar/avatar1.png" alt="Card image cap">
-    <div class="card-body">
-        <p class="card-text text-uppercase text-muted">User</p>
-        <p class="card-text text-muted">2 days ago</p>
-        <div class="d-flex justify-content-between align-items-center">
-            <button type="button" class="btn btn-outline-primary">Accept</button>
-            <button type="button" class="btn btn-outline-danger">Decline</button>
-        </div>
+<div class="container">
+    <div class="row">
+        @foreach(var request in Model.Request)
+        {
+            <div class="card" style="width: 18rem;">
+                <img class="card-img-top" src="@request.AvatarUrl" alt="Card image cap">
+                <div class="card-body">
+                    <p class="card-text text-uppercase text-muted">@request.SenderName</p>
+                    <p class="card-text text-muted">2 days ago</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <form method="post">
+                            <input type="hidden" name="requestId" value="@request.RequestId" />
+                            <button asp-page-handler="Accept" class="btn btn-outline-primary">Accept</button>
+                            <button asp-page-handler="Decline" class="btn btn-outline-danger">Decline</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        }
     </div>
 </div>
+
