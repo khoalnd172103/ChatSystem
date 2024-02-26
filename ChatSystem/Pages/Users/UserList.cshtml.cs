@@ -11,6 +11,7 @@ namespace ChatSystem.Pages.Users
         private readonly IFriendRepository _friendRepository;
         public PaginatedList<UserDto> Users { get; set; }
         public string CurrentFilter { get; set; }
+        public bool IsLogined { get; set; } = false;
 
         public UserListModel(IUserRepository userRepository, IFriendRepository friendRepository)
         {
@@ -22,6 +23,10 @@ namespace ChatSystem.Pages.Users
         {
             const int pageSize = 5;
             var idClaim = User.Claims.FirstOrDefault(claims => claims.Type == "UserId", null);
+            if (idClaim != null)
+            {
+                IsLogined = true;
+            }
 
             if (searchString != null)
             {
@@ -34,16 +39,15 @@ namespace ChatSystem.Pages.Users
 
             CurrentFilter = searchString;
 
-            //if (idClaim != null)
-            //{
-            //    int userId = int.Parse(idClaim.Value);
-            //    Users = _userRepository.GetUsers(searchString, pageIndex ?? 1, pageSize);
-            //}
-            //else
-            //{
-            //    Users = _userRepository.GetUsers(searchString, pageIndex ?? 1, pageSize);
-            //}
-            Users = _userRepository.GetUsers(searchString, pageIndex ?? 1, pageSize);
+            if (idClaim != null)
+            {
+                int userId = int.Parse(idClaim.Value);
+                Users = _userRepository.GetUsers(searchString, pageIndex ?? 1, pageSize, userId);
+            }
+            else
+            {
+                Users = _userRepository.GetUsers(searchString, pageIndex ?? 1, pageSize, 0);
+            }
 
             return Page();
         }

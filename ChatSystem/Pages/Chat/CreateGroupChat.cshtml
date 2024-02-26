@@ -1,0 +1,163 @@
+﻿@page
+@model ChatSystem.Pages.Chat.CreateGroupChatModel
+@{
+}
+
+<div class="container">
+    <form method="post" id="createGroupForm">
+        <div class="row">
+            <div class="col-md-3">
+                 <div class="form-group">
+                    <label for="groupName">Group Name:</label>
+                    <input type="text" class="form-control" id="groupName" name="groupName">
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-3">
+            <div class="col-md-6">
+                <h2>Friend List</h2>
+                <ul class="list-group">
+                     @foreach (var friend in Model.Friends)
+                     {
+                         <div class="people-nearby">
+                              <div class="nearby-user">
+                                <div class="row align-items-center">
+                                  <div class="col-md-2 col-sm-2">
+                                    <img src="@friend.Avatar" alt="@friend.UserName" class="profile-photo-lg">
+                                  </div>
+                                  <div class="col-md-7 col-sm-7">
+                                    <h5>@friend.UserName</h5>
+                                  </div>
+                                  <div class="col-md-3 col-sm-3">
+                                    <div class="d-flex">
+                                        <input type="checkbox" name="selectedFriends" value="@friend.UserId" onclick="addOrRemoveFriend(this)">
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                         </div>
+                     }
+                </ul>
+            </div>
+            <div class="col-md-6">
+                <h2>Selected Friends</h2>
+                <ul id="selectedFriendsList" class="list-group">
+
+                </ul>
+            </div>
+        </div>
+
+        <input type="hidden" asp-for="SelectedFriends" id="selectedFriendsInput"/>
+
+        <div class="row mt-3 justify-content-end text-center">
+            <div class="col-md-2">
+                <div class="">
+                    <button id="createButton" type="submit" class="btn btn-success">Create</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+@section Scripts {
+    <script>
+        var selectedFriends = [];
+
+        function addOrRemoveFriend(checkbox) {
+            var friendId = checkbox.value;
+            var nearbyUser = checkbox.closest('.nearby-user');
+            var friendName = nearbyUser.querySelector('h5').innerText.trim();
+            var friendAvatar = nearbyUser.querySelector('.profile-photo-lg').getAttribute('src');
+
+            if (checkbox.checked) {
+                if (!selectedFriends.some(friend => friend.id === friendId)) {
+                    selectedFriends.push({ id: friendId, name: friendName, avatar: friendAvatar });
+                }
+            } else {
+                selectedFriends = selectedFriends.filter(friend => friend.id !== friendId);
+            }
+
+            updateCreateButton();
+            updateSelectedFriendsList();
+        }
+
+        function updateSelectedFriendsList() {
+            var selectedFriendsList = document.getElementById('selectedFriendsList');
+            selectedFriendsList.innerHTML = '';
+
+            selectedFriends.forEach(function(friend) {
+                var userContainer = document.createElement('div');
+                userContainer.className = 'people-nearby';
+
+                var user = document.createElement('div');
+                user.className = 'nearby-user';
+
+                var row = document.createElement('div');
+                row.className = 'row align-items-center';
+
+                var colAvatar = document.createElement('div');
+                colAvatar.className = 'col-md-2 col-sm-2';
+
+                var userAvatar = document.createElement('img');
+                userAvatar.src = friend.avatar;
+                userAvatar.alt = friend.name;
+                userAvatar.className = 'profile-photo-lg';
+
+                var colName = document.createElement('div');
+                colName.className = 'col-md-7 col-sm-7';
+
+                var userName = document.createElement('h5');
+                userName.innerText = friend.name;
+
+                colAvatar.appendChild(userAvatar);
+                colName.appendChild(userName);
+                row.appendChild(colAvatar);
+                row.appendChild(colName);
+
+                user.appendChild(row);
+
+                userContainer.appendChild(user);
+                selectedFriendsList.appendChild(userContainer);
+            });
+
+            var selectedFriendsInput = document.getElementById('selectedFriendsInput');
+            selectedFriendsInput.value = JSON.stringify(selectedFriends.map(friend => friend.id));
+            console.log(selectedFriendsInput.value);
+        }
+
+        function updateCreateButton() {
+            var createButton = document.getElementById('createButton');
+            if (selectedFriends.length === 0) {
+                createButton.disabled = true;
+            } else {
+                createButton.disabled = false;
+            }
+        }
+        updateCreateButton();
+    </script>
+}
+
+<style>
+     .people-nearby .nearby-user{
+      padding: 20px 0;
+      border-top: 1px solid #f1f2f2;
+      border-bottom: 1px solid #f1f2f2;
+      margin-bottom: 20px;
+    }
+
+    img.profile-photo-lg{
+      height: 80px;
+      width: 80px;
+      border-radius: 50%;
+    }
+
+    input[type="checkbox"] {
+       width: 24px;
+       height: 24px;
+    }
+</style>
+
+
+

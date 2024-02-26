@@ -5,7 +5,7 @@ namespace Repository
 {
     public interface IUserRepository
     {
-        PaginatedList<UserDto> GetUsers(string? searchString, int? pageIndex, int pageSize);
+        PaginatedList<UserDto> GetUsers(string? searchString, int? pageIndex, int pageSize, int userId);
 
         void CreateUser(User user);
 
@@ -16,5 +16,6 @@ namespace Repository
 
         User Login(string username, string password);
         User GetUserWithPhoto(int  userId);
+        bool IsUserNameValidForUpdate(int userId, string username);
     }
 }

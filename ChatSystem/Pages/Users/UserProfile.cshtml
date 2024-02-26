@@ -42,10 +42,13 @@
             <div class="row mt-4">
                 <div class="col-lg-11 mx-auto">
                     <div class="nav nav-pills justify-content-end">
-                        <form method="post">
-                             <input type="hidden" name="userId" value="@Model.UserProfile.UserId" />
-                             <button type="submit" name="addFriend" value="@Model.UserProfile.UserId" class="btn btn-outline-primary">Add Friend</button>
-                        </form>
+                        @if (Model.IsLogined)
+                        {
+                            <form method="post">
+                                 <input type="hidden" name="userId" value="@Model.UserProfile.UserId" />
+                                 <button type="submit" name="addFriend" value="@Model.UserProfile.UserId" class="btn btn-outline-primary">Add Friend</button>
+                            </form>
+                        }
                     </div>
                 </div>
             </div>

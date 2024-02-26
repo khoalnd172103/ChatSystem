@@ -1,4 +1,5 @@
 ﻿using BusinessObject;
+using DataAccessLayer;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +12,37 @@ namespace Repository
     {
         public void Create(Conversation entity)
         {
-            throw new NotImplementedException();
+            ConversationDAO.Instance.Create(entity);
+        }
+
+        public void CreateGroup(int creatorId, string groupName, List<string> memberIdList)
+        {
+            var conversation = new Conversation
+            {
+                ConversationName = groupName,
+                UserId = creatorId,
+                CreateAt = DateTime.Now,
+                isGroup = true,
+                Participants = new List<Participants>()
+            };
+
+            conversation.Participants.Add(new Participants
+            {
+                UserId = creatorId,
+                status = 1,
+                isAdmin = true,
+                Conversation = conversation
+            });
+
+            conversation.Participants.AddRange(memberIdList.Select(friendId => new Participants
+            {
+                UserId = int.Parse(friendId),
+                status = 1,
+                isAdmin = false,
+                Conversation = conversation
+            }));
+
+            ConversationDAO.Instance.Create(conversation);
         }
 
         public bool Delete(Conversation entity)
