@@ -1,7 +1,6 @@
 using DataAccessLayer;
 using DataAccessLayer.Data;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using PRN221ProjectGroup.Data;
 using Repository;
 
@@ -34,6 +33,8 @@ builder.Services.AddScoped<IPhotoRepository, PhotoRepository>();
 
 builder.Services.Configure<CloudinarySetting>(builder.Configuration.GetSection("CloudinarySettings"));
 builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
+
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.AddSession(options =>
 {
