@@ -60,6 +60,7 @@ namespace ChatSystem.Pages.Chat
         {
             if(!ModelState.IsValid)
             {
+                TempData["error"] = "Group name is required";
                 return await OnGetAsync();
             }
 
