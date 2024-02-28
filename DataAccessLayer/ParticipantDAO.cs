@@ -1,13 +1,43 @@
 ﻿using BusinessObject;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using PRN221ProjectGroup.Data;
 
 namespace DataAccessLayer
 {
     public class ParticipantDAO : BaseDAO<Participants>
     {
+
+        public ParticipantDAO() { }
+
+        private static ParticipantDAO instance = null;
+        private static readonly object instacelock = new object();
+
+        public static ParticipantDAO Instance
+        {
+            get
+            {
+                lock (instacelock)
+                {
+                    if (instance == null)
+                    {
+                        instance = new ParticipantDAO();
+                    }
+                    return instance;
+                }
+            }
+        }
+
+        public User GetOtherParticipantWhenNotGroupConversation(int conversationId, int userId)
+        {
+            User otherUser = null;
+            using (var context = new DataContext())
+            {
+                Participants otherParticipant = context.Participants.FirstOrDefault(p => conversationId == p.ConversationId && p.UserId != userId);
+
+                otherUser = context.Users.Include(u => u.photos).FirstOrDefault(u => u.UserId == otherParticipant.UserId);
+            }
+            return otherUser;
+
+        }
     }
 }

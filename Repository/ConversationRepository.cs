@@ -1,10 +1,5 @@
 ﻿using BusinessObject;
 using DataAccessLayer;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Repository
 {
@@ -52,7 +47,12 @@ namespace Repository
 
         public List<Conversation> GetAll()
         {
-            throw new NotImplementedException();
+            return (List<Conversation>)ConversationDAO.Instance.GetAll();
+        }
+
+        public async Task<List<Conversation>> GetAllUserConversation(int userId)
+        {
+            return await ConversationDAO.Instance.GetConverstationsOfUser(userId);
         }
 
         public Conversation GetById(int entityId)
