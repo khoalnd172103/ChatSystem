@@ -77,6 +77,21 @@ namespace Repository
             throw new NotImplementedException();
         }
 
+        public bool IsUserInConversation(int conversationId, int userId)
+        {
+            bool result = false;
 
+            Conversation conversation = ConversationDAO.Instance.GetConversationAndParticipantById(conversationId);
+
+            foreach (var participant in conversation.Participants)
+            {
+                if (participant.UserId == userId)
+                {
+                    return true;
+                }
+            }
+
+            return result;
+        }
     }
 }

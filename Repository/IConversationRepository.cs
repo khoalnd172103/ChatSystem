@@ -9,5 +9,7 @@ namespace Repository
         List<Conversation> GetAllUserConversation(int userId);
 
         public Conversation GetConversationById(int conversationId);
+
+        bool IsUserInConversation(int conversationId, int userId);
     }
 }

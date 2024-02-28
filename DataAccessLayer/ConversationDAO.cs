@@ -48,5 +48,14 @@ namespace DataAccessLayer
         {
             return GetAll().FirstOrDefault(c => c.ConversationId == conversationId);
         }
+        public Conversation GetConversationAndParticipantById(int conversationId)
+        {
+            Conversation conversation = new Conversation();
+            using (var context = new DataContext())
+            {
+                conversation = context.Conversations.Include(c => c.Participants).FirstOrDefault(c => c.ConversationId == conversationId);
+            }
+            return conversation;
+        }
     }
 }

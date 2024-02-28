@@ -10,6 +10,7 @@ namespace ChatSystem.Helpers
         {
             CreateMap<Conversation, ConversationDto>();
             CreateMap<User, UserDto>();
+
         }
     }
 }
