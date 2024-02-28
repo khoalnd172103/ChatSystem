@@ -31,20 +31,23 @@ namespace ChatSystem.Pages.Chat
         public List<User> GroupChatParticipants { get; set; }
         public Conversation Conversation { get; set; }
 
-        public void OnGet()
-        {
-            //hard code for test
-            int conversationId = 1;
-            GroupChatParticipants = _userRepository.GetUserInGroupChat(conversationId);
-            Conversation = _conversationRepository.GetConversationById(conversationId);
+        //public void OnGet()
+        //{
+        //    //hard code for test
+        //    int conversationId = 1;
+        //    GroupChatParticipants = _userRepository.GetUserInGroupChat(conversationId);
+        //    Conversation = _conversationRepository.GetConversationById(conversationId);
             
-        }
+        //}
 
         [BindProperty(SupportsGet = true)]
         public List<ConversationDto> ConversationDtoList { get; set; } = default!;
 
         public async Task OnGetAsync()
         {
+            int conversationId = 1;
+            GroupChatParticipants = _userRepository.GetUserInGroupChat(conversationId);
+            Conversation = _conversationRepository.GetConversationById(conversationId);
             var idClaim = User.Claims.FirstOrDefault(claims => claims.Type == "UserId", null);
 
             if (idClaim != null)
