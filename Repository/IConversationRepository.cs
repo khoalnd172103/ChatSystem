@@ -9,5 +9,7 @@ namespace Repository
         Task<List<Conversation>> GetAllUserConversation(int userId);
 
         public Conversation GetConversationById(int conversationId);
+
+        public Task<List<Conversation>> GetAllConversationById(int userID);
     }
 }

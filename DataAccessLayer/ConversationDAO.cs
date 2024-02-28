@@ -47,5 +47,17 @@ namespace DataAccessLayer
         {
             return GetAll().FirstOrDefault(c => c.ConversationId == conversationId);
         }
+
+        public async Task<List<Conversation>> GetUserGroupConversationsByUserId(int userId)
+        {
+            List<Conversation> groupConversations = new List<Conversation>();
+            using (var context = new DataContext())
+            {
+                 groupConversations = context.Conversations
+                .Where(c => c.UserId == userId && c.isGroup)
+                .ToList();
+            }
+            return groupConversations;
+        }
     }
 }

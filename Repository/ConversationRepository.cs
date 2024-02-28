@@ -74,5 +74,11 @@ namespace Repository
         {
             throw new NotImplementedException();
         }
+
+        public async Task<List<Conversation>> GetAllConversationById(int userID)
+        {
+            return await ConversationDAO.Instance.GetUserGroupConversationsByUserId(userID);
+        }
+
     }
 }
