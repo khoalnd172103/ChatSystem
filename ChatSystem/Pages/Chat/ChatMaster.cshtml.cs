@@ -13,19 +13,24 @@ namespace ChatSystem.Pages.Chat
     {
         private readonly IConversationRepository _conversationRepository;
         private readonly IParticipantRepository _participantRepository;
+        private readonly IMessageRepository _messageRepository;
         private readonly IMapper _mapper;
 
-        public ChatMasterModel(IConversationRepository conversationRepository, IParticipantRepository participantRepository, IMapper mapper)
+        public ChatMasterModel(IConversationRepository conversationRepository, IParticipantRepository participantRepository, IMapper mapper, IMessageRepository messageRepository)
         {
             _conversationRepository = conversationRepository;
             _participantRepository = participantRepository;
             _mapper = mapper;
+            _messageRepository = messageRepository;
         }
 
         [BindProperty(SupportsGet = true)]
         public List<ConversationDto> ConversationDtoList { get; set; } = default!;
 
-        public async Task OnGetAsync()
+        [BindProperty]
+        public ConversationDto conversationDto { get; set; }
+
+        public IActionResult OnGet()
         {
             var idClaim = User.Claims.FirstOrDefault(claims => claims.Type == "UserId", null);
 
@@ -33,9 +38,11 @@ namespace ChatSystem.Pages.Chat
             {
                 ConversationDtoList = new List<ConversationDto>();
                 int userId = int.Parse(idClaim.Value);
-                List<Conversation> conversationList = await _conversationRepository.GetAllUserConversation(userId);
+                List<Conversation> conversationList = _conversationRepository.GetAllUserConversation(userId);
+                List<Conversation> conversationOrderList = conversationList.OrderByDescending(c => _messageRepository.GetLastestMessageFromConversation(c).DateSend.Ticks).ThenByDescending(c => c.CreateAt.Ticks).ToList();
+                //List<Conversation> conversationOrderList = conversationList.OrderByDescending(c => c.CreateAt.Ticks).ToList();
 
-                foreach (var conversation in conversationList)
+                foreach (var conversation in conversationOrderList)
                 {
                     ConversationDto conversationDto = _mapper.Map<Conversation, ConversationDto>(conversation);
                     if (!conversationDto.isGroup)
@@ -49,9 +56,18 @@ namespace ChatSystem.Pages.Chat
                     ConversationDtoList.Add(conversationDto);
                 }
 
+                return Page();
             }
+            return Page();
+
         }
 
+        public async Task<IActionResult> OnPostLoadConversation()
+        {
+
+
+            return OnGet();
+        }
 
     }
 }

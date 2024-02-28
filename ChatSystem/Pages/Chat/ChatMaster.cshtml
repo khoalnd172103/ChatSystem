@@ -15,29 +15,32 @@
                 </div>
             </div>
 
-            @foreach (var conversation in Model.ConversationDtoList)
+            @foreach (var conversationDto in Model.ConversationDtoList)
             {
-                if (conversation.isGroup)
+                if (conversationDto.isGroup)
                 {
-                    <a href="#" class="list-group-item list-group-item-action border-0">
+                    <form method="post" asp-page-handler="LoadConversation">
+                    <input type="hidden" asp-for="conversationDto"/>
+                    <button class="list-group-item list-group-item-action border-0">
                         <div class="badge bg-success float-end">5</div>
                         <div class="d-flex align-items-start">
-                            <img src="https://bootdey.com/img/Content/avatar/avatar5.png" class="rounded-circle me-1" alt="@conversation.ConversationName" width="40" height="40" />
+                                <img src="https://bootdey.com/img/Content/avatar/avatar5.png" class="rounded-circle me-1" alt="@conversationDto.ConversationName" width="40" height="40" />
                             <div class="flex-grow-1 ms-3">
-                                @conversation.ConversationName
+                                    @conversationDto.ConversationName
                                 <div class="small"><span class="fas fa-circle chat-online"></span> Online</div>
                             </div>
                         </div>
-                    </a>
+                    </button>
+                    </form>
                 }
                 else
                 {
                     <a href="#" class="list-group-item list-group-item-action border-0">
                         <div class="badge bg-success float-end">5</div>
                         <div class="d-flex align-items-start">
-                            <img src="@conversation.Avatar" class="rounded-circle me-1" alt="@conversation.OtherUserId" width="40" height="40" />
+                            <img src="@conversationDto.Avatar" class="rounded-circle me-1" alt="@conversationDto.OtherUserId" width="40" height="40" />
                             <div class="flex-grow-1 ms-3">
-                                @conversation.OtherUserName
+                                @conversationDto.OtherUserName
                                 <div class="small"><span class="fas fa-circle chat-online"></span> Online</div>
                             </div>
                         </div>

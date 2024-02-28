@@ -50,9 +50,11 @@ namespace Repository
             return (List<Conversation>)ConversationDAO.Instance.GetAll();
         }
 
-        public async Task<List<Conversation>> GetAllUserConversation(int userId)
+        public List<Conversation> GetAllUserConversation(int userId)
         {
-            return await ConversationDAO.Instance.GetConverstationsOfUser(userId);
+            List<Conversation> list = ConversationDAO.Instance.GetConverstationsOfUser(userId);
+
+            return list;
         }
 
         public Conversation GetById(int entityId)
@@ -69,5 +71,7 @@ namespace Repository
         {
             throw new NotImplementedException();
         }
+
+
     }
 }

@@ -1,9 +1,4 @@
 ﻿using BusinessObject;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Repository
 {
@@ -37,6 +32,27 @@ namespace Repository
         public bool Update(Message entity)
         {
             throw new NotImplementedException();
+        }
+
+        public Message GetLastestMessageFromConversation(Conversation conversation)
+        {
+            if (conversation.MessagesReceived.Count == 0)
+            {
+                return new Message
+                {
+                    DateSend = DateTime.MinValue
+                };
+            }
+            DateTime lastest = DateTime.MinValue;
+            foreach (Message message in conversation.MessagesReceived)
+            {
+                if (message.DateSend.CompareTo(lastest) > 0)
+                {
+                    lastest = message.DateSend;
+                }
+            }
+
+            return conversation.MessagesReceived.FirstOrDefault(m => m.DateSend == lastest);
         }
     }
 }
