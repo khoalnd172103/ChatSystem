@@ -44,5 +44,9 @@ namespace DataAccessLayer
             }
             return conversations;
         }
+        public Conversation GetConversationById(int conversationId)
+        {
+            return GetAll().FirstOrDefault(c => c.ConversationId == conversationId);
+        }
     }
 }

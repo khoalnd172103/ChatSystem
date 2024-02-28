@@ -16,13 +16,32 @@ namespace ChatSystem.Pages.Chat
         private readonly IMessageRepository _messageRepository;
         private readonly IMapper _mapper;
 
-        public ChatMasterModel(IConversationRepository conversationRepository, IParticipantRepository participantRepository, IMapper mapper, IMessageRepository messageRepository)
+        private readonly IUserRepository _userRepository;
+
+        public ChatMasterModel(IConversationRepository conversationRepository,
+            IParticipantRepository participantRepository,
+            IUserRepository userRepository,
+            IMapper mapper, IMessageRepository messageRepository)
         {
             _conversationRepository = conversationRepository;
             _participantRepository = participantRepository;
+            _conversationRepository = conversationRepository;
+            _userRepository = userRepository;
             _mapper = mapper;
             _messageRepository = messageRepository;
         }
+
+        public List<User> GroupChatParticipants { get; set; }
+        public Conversation Conversation { get; set; }
+
+        //public void OnGet()
+        //{
+        //    //hard code for test
+        //    int conversationId = 1;
+        //    GroupChatParticipants = _userRepository.GetUserInGroupChat(conversationId);
+        //    Conversation = _conversationRepository.GetConversationById(conversationId);
+
+        //}
 
         [BindProperty(SupportsGet = true)]
         public List<ConversationDto> ConversationDtoList { get; set; } = default!;
@@ -32,6 +51,9 @@ namespace ChatSystem.Pages.Chat
 
         public IActionResult OnGet()
         {
+            int conversationId = 1;
+            GroupChatParticipants = _userRepository.GetUserInGroupChat(conversationId);
+            Conversation = _conversationRepository.GetConversationById(conversationId);
             var idClaim = User.Claims.FirstOrDefault(claims => claims.Type == "UserId", null);
 
             if (idClaim != null)

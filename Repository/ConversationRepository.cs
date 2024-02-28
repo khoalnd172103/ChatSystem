@@ -67,6 +67,11 @@ namespace Repository
             throw new NotImplementedException();
         }
 
+        public Conversation GetConversationById(int conversationId)
+        {
+            return ConversationDAO.Instance.GetConversationById(conversationId);
+        }
+
         public bool Update(Conversation entity)
         {
             throw new NotImplementedException();
