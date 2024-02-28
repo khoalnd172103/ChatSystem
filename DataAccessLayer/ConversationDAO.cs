@@ -26,7 +26,6 @@ namespace DataAccessLayer
             }
         }
 
-
         public async Task<List<Conversation>> GetConverstationsOfUser(int userId)
         {
             List<Conversation> conversations = new List<Conversation>();
@@ -43,6 +42,10 @@ namespace DataAccessLayer
                 }
             }
             return conversations;
+            }
+        public Conversation GetConversationById(int conversationId)
+        {
+            return GetAll().FirstOrDefault(c => c.ConversationId == conversationId);
         }
     }
 }

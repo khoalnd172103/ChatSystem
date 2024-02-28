@@ -13,13 +13,31 @@ namespace ChatSystem.Pages.Chat
     {
         private readonly IConversationRepository _conversationRepository;
         private readonly IParticipantRepository _participantRepository;
+        private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
 
-        public ChatMasterModel(IConversationRepository conversationRepository, IParticipantRepository participantRepository, IMapper mapper)
+        public ChatMasterModel(IConversationRepository conversationRepository, 
+            IParticipantRepository participantRepository,
+            IUserRepository userRepository, 
+            IMapper mapper)
         {
             _conversationRepository = conversationRepository;
             _participantRepository = participantRepository;
+            _conversationRepository = conversationRepository;
+            _userRepository = userRepository;
             _mapper = mapper;
+        }
+
+        public List<User> GroupChatParticipants { get; set; }
+        public Conversation Conversation { get; set; }
+
+        public void OnGet()
+        {
+            //hard code for test
+            int conversationId = 1;
+            GroupChatParticipants = _userRepository.GetUserInGroupChat(conversationId);
+            Conversation = _conversationRepository.GetConversationById(conversationId);
+            
         }
 
         [BindProperty(SupportsGet = true)]

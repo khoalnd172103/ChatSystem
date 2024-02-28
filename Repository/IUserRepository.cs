@@ -17,5 +17,6 @@ namespace Repository
         User Login(string username, string password);
         User GetUserWithPhoto(int  userId);
         bool IsUserNameValidForUpdate(int userId, string username);
+        List<User> GetUserInGroupChat(int conversationId);
     }
 }
