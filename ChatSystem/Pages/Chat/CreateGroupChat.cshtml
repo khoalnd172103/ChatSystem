@@ -17,34 +17,38 @@
         <div class="row mt-3">
             <div class="col-md-6">
                 <h2>Friend List</h2>
-                <ul class="list-group">
-                     @foreach (var friend in Model.Friends)
-                     {
-                         <div class="people-nearby">
-                              <div class="nearby-user">
-                                <div class="row align-items-center">
-                                  <div class="col-md-2 col-sm-2">
-                                    <img src="@friend.Avatar" alt="@friend.UserName" class="profile-photo-lg">
-                                  </div>
-                                  <div class="col-md-7 col-sm-7">
-                                    <h5>@friend.UserName</h5>
-                                  </div>
-                                  <div class="col-md-3 col-sm-3">
-                                    <div class="d-flex">
-                                        <input type="checkbox" name="selectedFriends" value="@friend.UserId" onclick="addOrRemoveFriend(this)">
+                <div class="friend-list-container" style="max-height: 450px; overflow-y: auto; overflow-x: hidden;">
+                    <ul class="list-group">
+                         @foreach (var friend in Model.Friends)
+                         {
+                             <div class="people-nearby">
+                                  <div class="nearby-user">
+                                    <div class="row align-items-center">
+                                      <div class="col-md-2 col-sm-2">
+                                        <img src="@friend.Avatar" alt="@friend.UserName" class="profile-photo-lg">
+                                      </div>
+                                      <div class="col-md-7 col-sm-7">
+                                        <h5>@friend.UserName</h5>
+                                      </div>
+                                      <div class="col-md-3 col-sm-3">
+                                        <div class="d-flex">
+                                            <input type="checkbox" name="selectedFriends" value="@friend.UserId" onclick="addOrRemoveFriend(this)">
+                                        </div>
+                                      </div>
                                     </div>
                                   </div>
-                                </div>
-                              </div>
-                         </div>
-                     }
-                </ul>
+                             </div>
+                         }
+                    </ul>
+                </div>
             </div>
             <div class="col-md-6">
                 <h2>Selected Friends</h2>
-                <ul id="selectedFriendsList" class="list-group">
+                <div class="friend-list-container" style="max-height: 450px; overflow-y: auto; overflow-x: hidden;">
+                    <ul id="selectedFriendsList" class="list-group">
 
-                </ul>
+                    </ul>
+                </div>
             </div>
         </div>
 

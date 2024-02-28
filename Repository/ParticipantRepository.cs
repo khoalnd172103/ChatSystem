@@ -1,14 +1,18 @@
 ﻿using BusinessObject;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using DataAccessLayer;
 
 namespace Repository
 {
     public class ParticipantRepository : IParticipantRepository
     {
+
+        public User GetOtherParticipant(int conversationId, int userId)
+        {
+            User user = ParticipantDAO.Instance.GetOtherParticipantWhenNotGroupConversation(conversationId, userId);
+
+            return user;
+        }
+
         public void Create(Participants entity)
         {
             throw new NotImplementedException();
