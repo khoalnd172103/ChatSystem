@@ -263,8 +263,8 @@
                                     <div class="dropdown">
                                         <button class="btn btn-sm btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false"></button>
                                         <ul class="dropdown-menu">
-                                            <li><a class="dropdown-item" href="#">Kick</a></li>
-                                            <li><a class="dropdown-item" href="#">Promote</a></li>
+                                            <li><a class="dropdown-item kick-participant" data-participant-id="@participant.UserId" data-conversation-id="@Model.conversationDto.ConversationId" href="#">Kick</a></li>
+                                            <li><a class="dropdown-item promote-participant" data-participant-id="@participant.UserId" data-conversation-id="@Model.conversationDto.ConversationId" href="#">Promote</a></li>
                                         </ul>
                                     </div>
                                 </li>
@@ -272,7 +272,7 @@
                             }
                             <button type="button" class="btn btn-primary mt-3">Add User</button>
                             <button type="button" class="btn btn-primary mt-3">Delete Group</button>
-                            <button type="button" class="btn btn-primary mt-3">Edit Group Name</button>
+                            <button type="button" class="btn btn-primary mt-3" id="editGroupButton">Edit Group Name</button>
                         </div>
                     </div>
 
@@ -285,6 +285,157 @@
             </div>
         }
         
+    </div>
+    <script>
+        //show Promote Modal
+        const handlePromoteParticipantClick = (event) => {
+            event.preventDefault();
+
+            const participantId = parseInt(event.target.dataset.participantId);
+            const conversationId = parseInt(event.target.dataset.conversationId);
+
+            const modalBody = document.querySelector("#promoteConfirmationModal .modal-body");
+            modalBody.textContent = `Are you sure you want to promote this user to admin?`;
+
+            const confirmPromotionBtn = document.querySelector(".confirm-promotion");
+            confirmPromotionBtn.addEventListener("click", () => {
+                promoteParticipant(conversationId, participantId);
+            });
+
+            $("#promoteConfirmationModal").modal("show");
+        };
+
+        //handle Promote
+        async function promoteParticipant(conversationId, userId) {
+            try {
+                const response = await fetch(`/ChatMasterDuplicate/PromoteUserToAdmin?conversationId=${conversationId}&userId=${userId}`, {
+                    method: 'POST'
+                });
+
+                if (response.ok) {
+                    console.log('User promoted to admin successfully');
+                } else {
+                    console.error('Failed to promote user to admin');
+                }
+            } catch (error) {
+                console.error('Error promoting user to admin:', error);
+            }
+        }
+
+        document.addEventListener("click", (event) => {
+            if (event.target.classList.contains("promote-participant")) {
+                handlePromoteParticipantClick(event);
+            }
+        });
+
+        document.addEventListener("click", (event) => {
+            if (event.target.classList.contains("kick-participant")) {
+                handleKickParticipantClick(event);
+            }
+        });
+
+
+        // Function to handle click events on kick participant links
+        const handleKickParticipantClick = (event) => {
+            event.preventDefault();
+
+            const participantId = parseInt(event.target.dataset.participantId);
+            const conversationId = parseInt(event.target.dataset.conversationId);
+
+            $("#kickConfirmationModal").modal("show");
+
+            const confirmKickBtn = document.querySelector(".confirm-kick");
+            confirmKickBtn.addEventListener("click", () => {
+                kickParticipant(conversationId, participantId);
+            });
+        };
+
+        // Function to kick a participant from the conversation
+        async function kickParticipant(conversationId, userId) {
+            try {
+                const response = await fetch(`/ChatMasterDuplicate/KickUserFromGroup?conversationId=${conversationId}&userId=${userId}`, {
+                    method: 'POST'
+                });
+
+                if (response.ok) {
+                    console.log('User kicked successfully');
+                } else {
+                    console.error('Failed to kick user');
+                }
+            } catch (error) {
+                console.error('Error kicking user:', error);
+            }
+        }
+
+
+
+        //show Edit Modal
+        const editGroupButton = document.getElementById('editGroupButton');
+
+        editGroupButton.addEventListener('click', () => {
+            $('#editGroupModal').modal('show'); 
+        });
+
+
+    </script>
+
+</div>
+
+<div class="modal fade" id="promoteConfirmationModal" tabindex="-1" aria-labelledby="promoteConfirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="promoteConfirmationModalLabel">Promote User</h5>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to promote this user to admin?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary confirm-promotion" data-dismiss="modal">Promote</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="kickConfirmationModal" tabindex="-1" aria-labelledby="kickConfirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="kickConfirmationModalLabel">Kick User</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to kick this user?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary confirm-kick">Confirm</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="editGroupModal" tabindex="-1" role="dialog" aria-labelledby="editGroupModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editGroupModalLabel">Edit Group Name</h5>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label for="newGroupName">New Group Name</label>
+                        <input type="text" class="form-control" id="newGroupName" name="newGroupName" placeholder="Enter new group name">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="saveGroupName">Save</button>
+            </div>
+        </div>
     </div>
 </div>
 

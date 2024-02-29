@@ -31,8 +31,7 @@ namespace ChatSystem.Pages.Chat
             _messageRepository = messageRepository;
         }
 
-        public List<User> GroupChatParticipants
-        { get; set; }
+        public List<User> GroupChatParticipants { get; set; }
         public Conversation currentConversation { get; set; }
         public UserDto UserDto { get; set; }
 
@@ -150,6 +149,48 @@ namespace ChatSystem.Pages.Chat
             GroupChatParticipants = _userRepository.GetUserInGroupChat(conversationId);
             currentConversation = _conversationRepository.GetConversationById(conversationId);
         }
+
+        public IActionResult PromoteUserToAdmin(int conversationId, int userId)
+        {
+            var participant = _participantRepository.GetParticipantByConversationIdAndUserId(conversationId, userId);
+
+            if (participant != null)
+            {
+                participant.status = 1;
+                participant.isAdmin = true;
+
+                _participantRepository.Update(participant);
+            }
+            return Page();
+        }
+
+        public IActionResult KickUserFromGroup(int conversationId, int userId)
+        {
+            var participant = _participantRepository.GetParticipantByConversationIdAndUserId(conversationId, userId);
+
+            if (participant != null)
+            {
+                participant.status = 0;
+
+                _participantRepository.Update(participant);
+            }
+            return Page();
+        }
+
+        public IActionResult EditGroupName(int conversationId, string newGroupName) 
+        {
+            var conversation = _conversationRepository.GetConversationById(conversationId);
+
+            if (conversation != null)
+            {
+                conversation.ConversationName = newGroupName;
+
+                _conversationRepository.Update(conversation);
+            }
+            return Page();
+        }
+
+
 
     }
 }
