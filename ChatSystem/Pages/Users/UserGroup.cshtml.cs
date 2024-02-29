@@ -2,13 +2,14 @@ using BusinessObject;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Repository;
-using System.Text.RegularExpressions;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace ChatSystem.Pages.Users
 {
     public class UserGroupModel : PageModel
     {
-
         private readonly IConversationRepository _conversationRepository;
         private readonly IUserRepository _userRepository;
 
@@ -17,11 +18,12 @@ namespace ChatSystem.Pages.Users
             _conversationRepository = conversationRepository;
             _userRepository = userRepository;
         }
+        public Conversation Conversation1 { get; set; }
         public List<User> GroupChatParticipants { get; set; }
-        public List<Conversation> Conversation { get; set; }
+        public List<Conversation> Conversations { get; set; }
         public User UserObj { get; set; }
 
-        public async Task<IActionResult> OnGetAsync()
+        public async Task<IActionResult> OnGetAsync(int conversationId)
         {
             var idClaim = User.Claims.FirstOrDefault(claims => claims.Type == "UserId");
             if (idClaim == null)
@@ -33,28 +35,11 @@ namespace ChatSystem.Pages.Users
 
             UserObj = _userRepository.GetUser(userId);
 
-            Conversation = await _conversationRepository.GetAllConversationById(userId);
+            GroupChatParticipants = _userRepository.GetUserInGroupChat(conversationId);
 
-            var groupData = new List<(string, List<string>)>();
-
-            foreach (var conversation in Conversation)
-            {
-                if (conversation.isGroup)
-                {
-                    var participants = _userRepository.GetUserInGroupChat(conversation.ConversationId);
-
-                    var participantNames = participants.Select(p => p.KnownAs).ToList();
-
-                    groupData.Add((GroupName: conversation.ConversationName, Members: participantNames));
-                }
-            }
-
-            ViewData["GroupData"] = groupData;
+            Conversation1 = _conversationRepository.GetConversationById(conversationId);
 
             return Page();
         }
-
-
-
     }
 }
