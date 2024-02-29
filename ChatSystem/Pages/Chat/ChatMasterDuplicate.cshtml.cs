@@ -15,13 +15,17 @@ namespace ChatSystem.Pages.Chat
         private readonly IParticipantRepository _participantRepository;
         private readonly IMessageRepository _messageRepository;
         private readonly IMapper _mapper;
-
         private readonly IUserRepository _userRepository;
+
+        private readonly IFriendRepository _friendRepository;
+        private readonly IPhotoRepository _photoRepository;
 
         public ChatMasterDuplicateModel(IConversationRepository conversationRepository,
             IParticipantRepository participantRepository,
             IUserRepository userRepository,
-            IMapper mapper, IMessageRepository messageRepository)
+            IMapper mapper, IMessageRepository messageRepository, 
+            IFriendRepository friendRepository,
+            IPhotoRepository photoRepository)
         {
             _conversationRepository = conversationRepository;
             _participantRepository = participantRepository;
@@ -29,6 +33,8 @@ namespace ChatSystem.Pages.Chat
             _userRepository = userRepository;
             _mapper = mapper;
             _messageRepository = messageRepository;
+            _friendRepository = friendRepository;
+            _photoRepository = photoRepository;
         }
 
         public List<User> GroupChatParticipants
@@ -41,6 +47,12 @@ namespace ChatSystem.Pages.Chat
 
         [BindProperty]
         public ConversationDto conversationDto { get; set; }
+
+        [BindProperty]
+        public List<FriendDto> Friends { get; set; }
+
+        [BindProperty]
+        public List<string> SelectedFriends { get; set; }
 
         public IActionResult OnGet()
         {
@@ -151,5 +163,49 @@ namespace ChatSystem.Pages.Chat
             currentConversation = _conversationRepository.GetConversationById(conversationId);
         }
 
+        public async Task<IActionResult> OnGetFriendListPartialAsync(int conversationId)
+        {
+            var idClaim = User.Claims.FirstOrDefault(claims => claims.Type == "UserId");
+            if (idClaim == null)
+            {
+                return RedirectToPage("/Account/Login");
+            }
+
+            int userId = int.Parse(idClaim.Value);
+
+            var friends = await _friendRepository.GetFriendsNotInGroupAsync(userId, conversationId);
+
+            Friends = friends.Select(friend => new FriendDto
+            {
+                UserId = friend.RecipientId,
+                UserName = friend.RecipientUserName,
+                Avatar = _photoRepository.GetUserPhotoIsMain(friend.RecipientId).PhotoUrl
+            }).ToList();
+
+            return Partial("_FriendListPartial", Friends);
+        }
+
+        public async Task<IActionResult> OnPostAddUserToGroup(int conversationId)
+        {
+            try
+            {
+                var idClaim = User.Claims.FirstOrDefault(claims => claims.Type == "UserId");
+                if (idClaim == null)
+                {
+                    return RedirectToPage("/Account/Login");
+                }
+
+                int userId = int.Parse(idClaim.Value);
+                _conversationRepository.AddUserToGroup(userId, conversationId, SelectedFriends);
+                TempData["success"] = "Invite Successful";
+
+                return RedirectToPage("/Chat/ChatMasterDuplicate", new { id = conversationId });
+            }
+            catch (Exception ex)
+            {
+                TempData["error"] = "Have an error " + ex.Message + " , try again";
+                return LoadConversation(conversationId);
+            }
+        }
     }
 }

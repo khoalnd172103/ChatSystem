@@ -1,12 +1,6 @@
 ﻿using BusinessObject;
 using DataAccessLayer;
-using Microsoft.EntityFrameworkCore;
 using Repository.DTOs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Repository
 {
@@ -94,6 +88,11 @@ namespace Repository
         public void DeclineFriendRequest(Friend friend)
         {
             friendDAO.Remove(friend);
+        }
+
+        public Task<List<Friend>> GetFriendsNotInGroupAsync(int userId, int convarsationId)
+        {
+            return friendDAO.GetFriendsNotInGroup(userId, convarsationId);
         }
     }
 }

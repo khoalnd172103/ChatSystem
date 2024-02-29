@@ -40,6 +40,31 @@ namespace Repository
             ConversationDAO.Instance.Create(conversation);
         }
 
+        public void AddUserToGroup(int creatorId, int conversationId, List<string> memberIdList)
+        {
+            var currentConversation = ConversationDAO.Instance.GetConversationById(conversationId);
+
+            var conversation = new Conversation
+            {
+                ConversationId = conversationId,
+                ConversationName = currentConversation.ConversationName,
+                UserId = creatorId,
+                CreateAt = DateTime.Now,
+                isGroup = true,
+                Participants = new List<Participants>()
+            };
+
+            conversation.Participants.AddRange(memberIdList.Select(friendId => new Participants
+            {
+                UserId = int.Parse(friendId),
+                status = 1,
+                isAdmin = false,
+                Conversation = conversation
+            }));
+
+            ConversationDAO.Instance.Update(conversation);
+        }
+
         public bool Delete(Conversation entity)
         {
             throw new NotImplementedException();

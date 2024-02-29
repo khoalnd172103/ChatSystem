@@ -137,5 +137,15 @@ namespace DataAccessLayer
                 await context.SaveChangesAsync();
             }
         }
+
+        public async Task<List<Friend>> GetFriendsNotInGroup(int userId, int conversationId)
+        {
+            var context = new DataContext();
+
+            return await context.Friend
+                    .Where(f => f.SenderId == userId && !context.Participants
+                    .Where(p => p.ConversationId == conversationId && p.UserId != userId)
+                    .Any(p => p.UserId == f.RecipientId)).ToListAsync();
+        }
     }
 }
