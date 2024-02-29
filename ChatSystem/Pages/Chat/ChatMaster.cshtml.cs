@@ -31,7 +31,7 @@ namespace ChatSystem.Pages.Chat
             _messageRepository = messageRepository;
         }
 
-        public List<User> GroupChatParticipants
+        public List<UserDto> GroupChatParticipants
         { get; set; }
         public Conversation currentConversation { get; set; }
         public UserDto UserDto { get; set; }
@@ -41,6 +41,11 @@ namespace ChatSystem.Pages.Chat
 
         [BindProperty]
         public ConversationDto conversationDto { get; set; }
+
+        [BindProperty]
+        public List<MessageDto> MessageDtoList { get; set; } = default!;
+
+        //private Dictionary<int, UserDto> UserDtoDictionary { get; set; }
 
         public IActionResult OnGet()
         {
@@ -69,7 +74,6 @@ namespace ChatSystem.Pages.Chat
 
                     if (conversationId != null)
                     {
-
                         LoadConversation((int)conversationId);
                     }
                     return Page();
@@ -98,32 +102,17 @@ namespace ChatSystem.Pages.Chat
             {
                 return Page();
             }
-            var user = _userRepository.GetUserWithPhoto(userId);
-            if (user == null)
+            UserDto = _userRepository.GetUserDtoWithPhoto(userId);
+            if (UserDto == null)
             {
                 return NotFound();
             }
 
-
-            UserDto = new UserDto
-            {
-                UserId = user.UserId,
-                UserName = user.UserName,
-                DateOfBirth = user.DateOfBirth,
-                KnownAs = user.KnownAs,
-                Gender = user.Gender,
-                Introduction = user.Introduction,
-                Interest = user.Interest,
-                City = user.City,
-                Avatar = user.photos.FirstOrDefault(p => p.isMain)?.PhotoUrl
-            };
-
-
-
-
             GetConversationDetail(conversationId);
 
             conversationDto = MapConversationToDto(currentConversation, UserDto.UserId);
+
+            MessageDtoList = _messageRepository.GetMessagesFromConversation(currentConversation, GroupChatParticipants);
 
 
             return Page();
@@ -183,6 +172,15 @@ namespace ChatSystem.Pages.Chat
 
             return conversationDto;
         }
+
+        //private MessageDto MapMessageToDto(Message message)
+        //{
+        //    MessageDto messageDto = _mapper.Map<Message, MessageDto>(message);
+        //    if (messageDto != null)
+        //    {
+
+        //    }
+        //}
 
 
         private void GetConversationDetail(int conversationId)

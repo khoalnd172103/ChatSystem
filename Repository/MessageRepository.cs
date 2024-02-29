@@ -1,4 +1,6 @@
 ﻿using BusinessObject;
+using DataAccessLayer;
+using Repository.DTOs;
 
 namespace Repository
 {
@@ -53,6 +55,38 @@ namespace Repository
             }
 
             return conversation.MessagesReceived.FirstOrDefault(m => m.DateSend == lastest);
+        }
+
+        public List<MessageDto> GetMessagesFromConversation(Conversation conversation, List<UserDto> userDtos)
+        {
+            List<MessageDto> messageDtos = new List<MessageDto>();
+
+            if (conversation == null)
+            {
+                return null;
+            }
+
+            List<Message> messages = MessageDAO.Instance.GetMessages(conversation.ConversationId);
+
+            foreach (var message in messages)
+            {
+                UserDto sender = userDtos.FirstOrDefault(u => u.UserId == message.SenderId);
+                MessageDto messageDto = new MessageDto
+                {
+                    MessageId = message.MessageId,
+                    SenderId = message.SenderId,
+                    SenderUserName = sender.UserName,
+                    Content = message.Content,
+                    DateSend = message.DateSend,
+                    DateRead = message.DateRead,
+                    SenderDelete = message.SenderDelete,
+                    Avatar = sender.Avatar,
+
+                };
+                messageDtos.Add(messageDto);
+            }
+
+            return messageDtos.OrderBy(m => m.DateSend).ToList();
         }
     }
 }
