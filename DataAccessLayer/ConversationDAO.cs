@@ -26,23 +26,24 @@ namespace DataAccessLayer
             }
         }
 
-        public async Task<List<Conversation>> GetConverstationsOfUser(int userId)
+
+        public List<Conversation> GetConverstationsOfUser(int userId)
         {
             List<Conversation> conversations = new List<Conversation>();
             using (var context = new DataContext())
             {
-                var participants = await context.Participants
+                var participants = context.Participants
                     .Where(p => p.UserId == userId)
-                    .ToListAsync();
+                    .ToList();
 
                 foreach (Participants participant in participants)
                 {
-                    Conversation c = context.Conversations.FirstOrDefault(c => c.ConversationId == participant.ConversationId);
+                    Conversation c = context.Conversations.Include(c => c.MessagesReceived).FirstOrDefault(c => c.ConversationId == participant.ConversationId);
                     conversations.Add(c);
                 }
             }
             return conversations;
-            }
+        }
         public Conversation GetConversationById(int conversationId)
         {
             return GetAll().FirstOrDefault(c => c.ConversationId == conversationId);
@@ -58,6 +59,16 @@ namespace DataAccessLayer
                 .ToList();
             }
             return groupConversations;
+        }
+        
+        public Conversation GetConversationAndParticipantById(int conversationId)
+        {
+            Conversation conversation = new Conversation();
+            using (var context = new DataContext())
+            {
+                conversation = context.Conversations.Include(c => c.Participants).FirstOrDefault(c => c.ConversationId == conversationId);
+            }
+            return conversation;
         }
     }
 }

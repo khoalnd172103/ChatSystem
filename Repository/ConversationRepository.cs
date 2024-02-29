@@ -50,9 +50,11 @@ namespace Repository
             return (List<Conversation>)ConversationDAO.Instance.GetAll();
         }
 
-        public async Task<List<Conversation>> GetAllUserConversation(int userId)
+        public List<Conversation> GetAllUserConversation(int userId)
         {
-            return await ConversationDAO.Instance.GetConverstationsOfUser(userId);
+            List<Conversation> list = ConversationDAO.Instance.GetConverstationsOfUser(userId);
+
+            return list;
         }
 
         public Conversation GetById(int entityId)
@@ -80,5 +82,21 @@ namespace Repository
             return await ConversationDAO.Instance.GetUserGroupConversationsByUserId(userID);
         }
 
+        public bool IsUserInConversation(int conversationId, int userId)
+        {
+            bool result = false;
+
+            Conversation conversation = ConversationDAO.Instance.GetConversationAndParticipantById(conversationId);
+
+            foreach (var participant in conversation.Participants)
+            {
+                if (participant.UserId == userId)
+                {
+                    return true;
+                }
+            }
+
+            return result;
+        }
     }
 }
