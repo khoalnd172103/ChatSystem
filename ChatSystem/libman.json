@@ -3,7 +3,8 @@
   "defaultProvider": "unpkg",
   "libraries": [
     {
-      "library": "@microsoft/signalr@8.0.0",
+      "provider": "unpkg",
+      "library": "@microsoft/signalr@latest",
       "destination": "wwwroot/lib/microsoft/signalr/"
     }
   ]
