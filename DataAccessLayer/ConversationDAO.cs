@@ -59,6 +59,9 @@ namespace DataAccessLayer
                 .ToList();
             }
             return groupConversations;
+        }
+        
+
         public Conversation GetConversationAndParticipantById(int conversationId)
         {
             Conversation conversation = new Conversation();
