@@ -1,3 +1,5 @@
+using ChatSystem;
+using ChatSystem.Hubs;
 using DataAccessLayer;
 using DataAccessLayer.Data;
 using Microsoft.EntityFrameworkCore;
@@ -15,6 +17,8 @@ builder.Services.AddAuthentication("CookieAuth").AddCookie("CookieAuth", options
     options.AccessDeniedPath = "/Account/AccessDenied";
     options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
 });
+
+builder.Services.AddSignalR();
 
 builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection")
@@ -75,5 +79,6 @@ catch (Exception ex)
 app.MapRazorPages();
 
 app.UseSession();
+app.MapHub<NotificationHub>("/friendRequest");
 
 app.Run();
