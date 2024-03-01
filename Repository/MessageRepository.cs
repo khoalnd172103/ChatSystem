@@ -61,11 +61,6 @@ namespace Repository
         {
             List<MessageDto> messageDtos = new List<MessageDto>();
 
-            if (conversation == null)
-            {
-                return null;
-            }
-
             List<Message> messages = MessageDAO.Instance.GetMessages(conversation.ConversationId);
 
             foreach (var message in messages)
