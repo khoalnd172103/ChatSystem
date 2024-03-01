@@ -6,6 +6,8 @@ namespace Repository
     {
         User GetOtherParticipant(int conversationId, int userId);
         Participants GetParticipantByConversationIdAndUserId(int conversationId, int userId);
+        public void UpdateParticipants(Participants participants);
+
 
     }
 }

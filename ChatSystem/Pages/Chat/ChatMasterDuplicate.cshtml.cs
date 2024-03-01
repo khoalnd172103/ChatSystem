@@ -37,7 +37,7 @@ namespace ChatSystem.Pages.Chat
             _photoRepository = photoRepository;
         }
 
-        public List<User> GroupChatParticipants { get; set; }
+        public List<UserDto> GroupChatParticipants { get; set; }
         public Conversation currentConversation { get; set; }
         public UserDto UserDto { get; set; }
 
@@ -162,45 +162,73 @@ namespace ChatSystem.Pages.Chat
             currentConversation = _conversationRepository.GetConversationById(conversationId);
         }
 
-        public IActionResult PromoteUserToAdmin(int conversationId, int userId)
+        public IActionResult OnPostPromoteUserToAdmin(int conversationId, int userId)
         {
-            var participant = _participantRepository.GetParticipantByConversationIdAndUserId(conversationId, userId);
-
-            if (participant != null)
+            try
             {
-                participant.status = 1;
-                participant.isAdmin = true;
+                var participant = _participantRepository.GetParticipantByConversationIdAndUserId(conversationId, userId);
+                
+                if (participant != null)
+                {
+                    participant.status = 1;
+                    participant.isAdmin = true;
 
-                _participantRepository.Update(participant);
+                    _participantRepository.UpdateParticipants(participant);
+                }
+                TempData["success"] = "Update Successful";
+                return RedirectToPage("/Chat/ChatMasterDuplicate", new { id = conversationId });
             }
-            return Page();
+            catch (Exception ex)
+            {
+                TempData["error"] = "Have an error " + ex.Message + " , try again";
+                return LoadConversation(conversationId);
+            }
         }
 
-        public IActionResult KickUserFromGroup(int conversationId, int userId)
+        public IActionResult OnPostKickUserFromGroup(int conversationId, int userId)
         {
-            var participant = _participantRepository.GetParticipantByConversationIdAndUserId(conversationId, userId);
-
-            if (participant != null)
+            try
             {
-                participant.status = 0;
+                var participant = _participantRepository.GetParticipantByConversationIdAndUserId(conversationId, userId);
 
-                _participantRepository.Update(participant);
+                if (participant != null)
+                {
+                    participant.status = 0;
+
+                    _participantRepository.UpdateParticipants(participant);
+                }
+                TempData["success"] = "User kicked from the group successfully.";
+                return RedirectToPage("/Chat/ChatMasterDuplicate", new { id = conversationId });
             }
-            return Page();
+            catch (Exception ex)
+            {
+                TempData["error"] = "An error occurred while kicking the user: " + ex.Message;
+                return LoadConversation(conversationId);
+            }
         }
 
-        public IActionResult EditGroupName(int conversationId, string newGroupName) 
+        public IActionResult OnPostEditGroupName(int conversationId, string newGroupName)
         {
-            var conversation = _conversationRepository.GetConversationById(conversationId);
-
-            if (conversation != null)
+            try
             {
-                conversation.ConversationName = newGroupName;
+                var conversation = _conversationRepository.GetConversationById(conversationId);
 
-                _conversationRepository.Update(conversation);
+                if (conversation != null)
+                {
+                    conversation.ConversationName = newGroupName;
+
+                    _conversationRepository.UpdateConversation(conversation);
+                }
+                TempData["success"] = "Group Name Updated Successfully";
+                return RedirectToPage("/Chat/ChatMasterDuplicate", new { id = conversationId });
             }
-            return Page();
+            catch (Exception ex)
+            {
+                TempData["error"] = "An error occurred: " + ex.Message + ". Please try again.";
+                return LoadConversation(conversationId);
+            }
         }
+
 
 
 

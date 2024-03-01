@@ -47,5 +47,8 @@ namespace Repository
         {
             return ParticipantDAO.Instance.GetParticipantByConversationIdAndUserId(conversationId, userId);
         }
+
+        public void UpdateParticipants(Participants participants)
+        => ParticipantDAO.Instance.Update(participants);
     }
 }

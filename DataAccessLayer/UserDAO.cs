@@ -74,17 +74,26 @@ namespace DataAccessLayer
             using (var context = new DataContext())
             {
                 var participants = context.Participants
-                   .Where(p => p.ConversationId == conversationId);
+                    .Where(p => p.ConversationId == conversationId && p.status == 1)
+                    .ToList();
+
                 using (var context1 = new DataContext())
                 {
                     foreach (var participant in participants)
                     {
-                        var user = context1.Users.Include(u => u.photos).FirstOrDefault(u => u.UserId == participant.UserId);
-                        users.Add(user);
+                        var user = context1.Users.Include(u => u.photos)
+                            .FirstOrDefault(u => u.UserId == participant.UserId);
+
+                        if (user != null)
+                        {
+                            users.Add(user);
+                        }
                     }
                 }
-                return users;
             }
+            return users;
         }
+
+
     }
 }

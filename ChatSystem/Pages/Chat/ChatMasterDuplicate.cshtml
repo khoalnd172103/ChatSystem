@@ -152,7 +152,7 @@
                                 Invite
                             </button>
                             <button type="button" class="btn btn-primary mt-3">Delete Group</button>
-                            <button type="button" class="btn btn-primary mt-3" id="editGroupButton">Edit Group Name</button>
+                            <button type="button" class="btn btn-primary mt-3 edit-group-name" data-conversation-id="@Model.conversationDto.ConversationId">Edit Group Name</button>
                         </div>
                     </div>
 
@@ -167,40 +167,18 @@
         
     </div>
     <script>
-        //show Promote Modal
+        // Function to handle click on "Promote"
         const handlePromoteParticipantClick = (event) => {
             event.preventDefault();
 
             const participantId = parseInt(event.target.dataset.participantId);
             const conversationId = parseInt(event.target.dataset.conversationId);
 
-            const modalBody = document.querySelector("#promoteConfirmationModal .modal-body");
-            modalBody.textContent = `Are you sure you want to promote this user to admin?`;
-
-            const confirmPromotionBtn = document.querySelector(".confirm-promotion");
-            confirmPromotionBtn.addEventListener("click", () => {
-                promoteParticipant(conversationId, participantId);
-            });
+            document.getElementById('conversationIdInput').value = conversationId;
+            document.getElementById('userIdInput').value = participantId;
 
             $("#promoteConfirmationModal").modal("show");
         };
-
-        //handle Promote
-        async function promoteParticipant(conversationId, userId) {
-            try {
-                const response = await fetch(`/ChatMasterDuplicate/PromoteUserToAdmin?conversationId=${conversationId}&userId=${userId}`, {
-                    method: 'POST'
-                });
-
-                if (response.ok) {
-                    console.log('User promoted to admin successfully');
-                } else {
-                    console.error('Failed to promote user to admin');
-                }
-            } catch (error) {
-                console.error('Error promoting user to admin:', error);
-            }
-        }
 
         document.addEventListener("click", (event) => {
             if (event.target.classList.contains("promote-participant")) {
@@ -208,11 +186,6 @@
             }
         });
 
-        document.addEventListener("click", (event) => {
-            if (event.target.classList.contains("kick-participant")) {
-                handleKickParticipantClick(event);
-            }
-        });
 
 
         // Function to handle click events on kick participant links
@@ -222,40 +195,36 @@
             const participantId = parseInt(event.target.dataset.participantId);
             const conversationId = parseInt(event.target.dataset.conversationId);
 
-            $("#kickConfirmationModal").modal("show");
+            document.getElementById('conversationId').value = conversationId;
+            document.getElementById('userId').value = participantId;
 
-            const confirmKickBtn = document.querySelector(".confirm-kick");
-            confirmKickBtn.addEventListener("click", () => {
-                kickParticipant(conversationId, participantId);
-            });
+            $("#kickConfirmationModal").modal("show");
         };
 
-        // Function to kick a participant from the conversation
-        async function kickParticipant(conversationId, userId) {
-            try {
-                const response = await fetch(`/ChatMasterDuplicate/KickUserFromGroup?conversationId=${conversationId}&userId=${userId}`, {
-                    method: 'POST'
-                });
-
-                if (response.ok) {
-                    console.log('User kicked successfully');
-                } else {
-                    console.error('Failed to kick user');
-                }
-            } catch (error) {
-                console.error('Error kicking user:', error);
+        document.addEventListener("click", (event) => {
+            if (event.target.classList.contains("kick-participant")) {
+                handleKickParticipantClick(event);
             }
-        }
-
+        });
 
 
         //show Edit Modal
-        const editGroupButton = document.getElementById('editGroupButton');
 
-        editGroupButton.addEventListener('click', () => {
-            $('#editGroupModal').modal('show'); 
+        const handleEditGroupNameClick = (event) => {
+            event.preventDefault();
+
+            const conversationId = parseInt(event.target.dataset.conversationId);
+
+            document.getElementById('conversationIdGroup').value = conversationId;
+
+            $('#editGroupModal').modal('show');
+        };
+
+        document.addEventListener("click", (event) => {
+            if (event.target.classList.contains("edit-group-name")) {
+                handleEditGroupNameClick(event);
+            }
         });
-
 
     </script>
 
@@ -266,17 +235,24 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="promoteConfirmationModalLabel">Promote User</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 Are you sure you want to promote this user to admin?
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary confirm-promotion" data-dismiss="modal">Promote</button>
+                <form asp-page-handler="PromoteUserToAdmin" method="post">
+                    <input type="hidden" name="conversationId" id="conversationIdInput">
+                    <input type="hidden" name="userId" id="userIdInput">
+                    <button type="submit" class="btn btn-primary">Confirm</button>
+                </form>
             </div>
         </div>
     </div>
 </div>
+
+
 
 <div class="modal fade" id="kickConfirmationModal" tabindex="-1" aria-labelledby="kickConfirmationModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -290,7 +266,11 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary confirm-kick">Confirm</button>
+                <form asp-page-handler="KickUserFromGroup" method="post">
+                    <input type="hidden" name="conversationId" id="conversationId">
+                    <input type="hidden" name="userId" id="userId">
+                    <button type="submit" class="btn btn-primary">Confirm</button>
+                </form>
             </div>
         </div>
     </div>
@@ -304,20 +284,21 @@
                 <h5 class="modal-title" id="editGroupModalLabel">Edit Group Name</h5>
             </div>
             <div class="modal-body">
-                <form>
+                <form method="post" asp-page-handler="EditGroupName">
+                    <input type="hidden" name="conversationId" id="conversationIdGroup">
                     <div class="form-group">
-                        <label for="newGroupName">New Group Name</label>
                         <input type="text" class="form-control" id="newGroupName" name="newGroupName" placeholder="Enter new group name">
                     </div>
+                    <button type="submit" class="btn btn-primary">Save</button>
                 </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" id="saveGroupName">Save</button>
             </div>
         </div>
     </div>
 </div>
+
 
 <div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
   <div class="modal-dialog">

@@ -13,5 +13,7 @@ namespace Repository
 
         public Task<List<Conversation>> GetAllConversationById(int userID);
         bool IsUserInConversation(int conversationId, int userId);
+        void UpdateConversation(Conversation conversation);
+
     }
 }

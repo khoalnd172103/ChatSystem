@@ -123,6 +123,7 @@ namespace Repository
             return result;
         }
 
-
+        public void UpdateConversation(Conversation conversation)
+        => ConversationDAO.Instance.Update(conversation);
     }
 }
