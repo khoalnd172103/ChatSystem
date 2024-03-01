@@ -68,9 +68,52 @@ namespace Repository
             return UserDAO.Instance.IsUserNameValidForUpdate(userId, username);
         }
 
-        public List<User> GetUserInGroupChat(int conversationId)
+        public List<UserDto> GetUserInGroupChat(int conversationId)
         {
-            return UserDAO.Instance.GetUserInGroupChat(conversationId);
+            List<User> users = UserDAO.Instance.GetUserInGroupChat(conversationId);
+            List<UserDto> usersDto = new List<UserDto>();
+            foreach (User user in users)
+            {
+
+                UserDto userDto = new UserDto
+                {
+                    UserId = user.UserId,
+                    UserName = user.UserName,
+                    DateOfBirth = user.DateOfBirth,
+                    KnownAs = user.KnownAs,
+                    Gender = user.Gender,
+                    Introduction = user.Introduction,
+                    Interest = user.Interest,
+                    City = user.City,
+                    Avatar = user.photos.FirstOrDefault(p => p.isMain)?.PhotoUrl
+                };
+                if (!usersDto.Contains(userDto))
+                {
+                    usersDto.Add(userDto);
+                }
+            }
+
+            return usersDto;
+        }
+
+        public UserDto GetUserDtoWithPhoto(int userId)
+        {
+            User user = UserDAO.Instance.GetUser(userId);
+
+            return new UserDto
+            {
+                UserId = user.UserId,
+                UserName = user.UserName,
+                DateOfBirth = user.DateOfBirth,
+                KnownAs = user.KnownAs,
+                Gender = user.Gender,
+                Introduction = user.Introduction,
+                Interest = user.Interest,
+                City = user.City,
+                Avatar = user.photos.FirstOrDefault(p => p.isMain)?.PhotoUrl
+            };
+
+
         }
     }
 }

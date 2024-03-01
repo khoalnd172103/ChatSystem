@@ -70,14 +70,20 @@ namespace DataAccessLayer
 
         public List<User> GetUserInGroupChat(int conversationId)
         {
+            List<User> users = new List<User>();
             using (var context = new DataContext())
             {
                 var participants = context.Participants
-                   .Where(p => p.ConversationId == conversationId)
-                   .Select(p => p.User)
-                   .ToList();
-
-                return participants;
+                   .Where(p => p.ConversationId == conversationId);
+                using (var context1 = new DataContext())
+                {
+                    foreach (var participant in participants)
+                    {
+                        var user = context1.Users.Include(u => u.photos).FirstOrDefault(u => u.UserId == participant.UserId);
+                        users.Add(user);
+                    }
+                }
+                return users;
             }
         }
     }

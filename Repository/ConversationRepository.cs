@@ -78,7 +78,6 @@ namespace Repository
         public List<Conversation> GetAllUserConversation(int userId)
         {
             List<Conversation> list = ConversationDAO.Instance.GetConverstationsOfUser(userId);
-
             return list;
         }
 
@@ -123,5 +122,7 @@ namespace Repository
 
             return result;
         }
+
+
     }
 }
