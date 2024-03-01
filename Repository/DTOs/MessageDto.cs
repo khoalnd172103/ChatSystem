@@ -10,5 +10,6 @@
         public DateTime? DateRead { get; set; }
         public bool SenderDelete { get; set; }
         public string Avatar { get; set; }
+        public string DisplaySendTime { get; set; }
     }
 }

@@ -97,46 +97,50 @@
                 
 
             
-                <div class="chat-messages-section p-4">
-                    <div class="all-chat-message">
+            <div class="chat-messages-section p-4">
+                <div class="all-chat-message">
                     
-                        @foreach(var messageDto in Model.MessageDtoList){
-                            if (messageDto.SenderId == Model.UserDto.UserId){
-                            <div class="chat-message-right mb-4">
-                                <div>
-                                    <img src="@messageDto.Avatar" class="rounded-circle me-1" alt="Chris Wood" width="40" height="40" />
-                                    <div class="text-muted small text-nowrap mt-2">@messageDto.DateSend</div>
-                                </div>
-                                <div class="flex-shrink-1 bg-light rounded py-2 px-3 me-3">
-                                    <div class="fw-bold mb-1">You</div>
-                                    @messageDto.Content
-                                </div>
+                @foreach(var messageDto in Model.MessageDtoList){
+                    if (messageDto.SenderId == Model.UserDto.UserId){
+                    <div class="chat-message-right mb-4">
+                        <div class="message-time-content">
+                            <div class="flex-shrink-1 bg-light rounded px-3 me-3">
+                                <p class="message-content" style="background-color: #78c2ad; border-radius: 6px">@messageDto.Content</p>
                             </div>
-                            }else{
-                            <div class="chat-message-left pb-4">
-                                <div>
-                                    <img src="@messageDto.Avatar" class="rounded-circle me-1" alt="Sharon Lessman" width="40" height="40" />
-                                    <div class="text-muted small text-nowrap mt-2">@messageDto.DateSend</div>
-                                </div>
-                                <div class="flex-shrink-1 bg-light rounded py-2 px-3 ms-3">
-                                    <div class="fw-bold mb-1">@messageDto.SenderUserName</div>
+                                <div class="d-flex flex-row-reverse ">
+                                <div class="text-muted small text-nowrap mt-2 ">@messageDto.DisplaySendTime</div>
+                            </div>
+                        </div>  
+                    </div>
+                    }else{
+                    <div class="chat-message-left pb-4">
+                        <div>
+                            <img src="@messageDto.Avatar" class="rounded-circle me-1" alt="@messageDto.SenderUserName" width="40" height="40" />
+                        </div>
+                        <div class="message-time-content">
+                            <div class="flex-shrink-1 bg-light rounded py-2 px-3 ms-3">
+                                <div class="fw-bold mb-1 message-content">@messageDto.SenderUserName</div>
                                         @messageDto.Content
                                 </div>
-                            </div>
-                            }
-                        }
-
-
-                    
-                
-            </div>
-
-            <div class="flex-grow-0 py-3 px-4 border-top">
-                <div class="input-group">
-                    <input type="text" class="form-control" placeholder="Type your message" />
-                    <button class="btn btn-primary">Send</button>
+                                <div class="d-flex flex-row ">
+                                    <div class="text-muted small text-nowrap mt-2 ">@messageDto.DisplaySendTime</div>
+                                </div>
+                        </div>
+                    </div>
+                    }
+                }
                 </div>
-            </div>
+
+                <div class="flex-grow-0 py-3 px-4 border-top">
+                    <form method="post" asp-page-handler="SendMessage" id="sendMessageForm">
+                        <input type="hidden" asp-for="conversationDto.ConversationId"/>
+                        <div class="input-group">
+                                <textarea asp-for="@Model.MessageContent" id="messageTextArea" type="text" class="form-control" placeholder="Type your message" rows="2"></textarea>
+                            
+                            <button id="sendBtn" type="submit" class="btn btn-primary">Send</button>
+                        </div>
+                    </form>
+                </div>
             </div>
 
 
@@ -160,7 +164,15 @@
         overflow: hidden
     }
 
+    textarea {
+        resize: none;
+    }
 
+    .message-content{
+        padding : 0 6px;
+        margin : 0;
+        white-space: pre-wrap;
+    }
 
 	.chat-online {
 		color: #34ce57
@@ -198,13 +210,14 @@
         align-content: end;
         display: flex;
         flex-direction: column-reverse;
-        min-height: 70vh;
+        min-height: 65vh;
     }
 
 	.chat-message-left,
 	.chat-message-right {
 		display: flex;
-		flex-shrink: 0
+		flex-shrink: 0;
+        margin-bottom: 10px !important;
 	}
 
 	.chat-message-left {
@@ -226,6 +239,11 @@
 		padding-left: 1.5rem !important;
 	}
 
+    .px-3 {
+        padding-right: 0.5rem !important;
+        padding-left: 0.5rem !important;
+    }
+
 	.flex-grow-0 {
 		flex-grow: 0 !important;
 	}
@@ -234,3 +252,22 @@
 		border-top: 1px solid #dee2e6 !important;
 	}
 </style>
+
+<script src="~/lib/jquery/dist/jquery.js"></script>
+<script>
+    //String.prototype.nl2br = function () {
+    //    return this.replace(/\r\n/g, "<br />");
+    //}
+
+    var $j = jQuery.noConflict();
+                $j("#messageTextArea").val('');
+        $j("textarea").keypress(function (event) {
+            console.log("press")
+            if (event.keyCode == 13 && !event.shiftKey) {
+                $j("#sendMessageForm").submit();
+                return false;
+            }
+        });
+
+    
+        </script>
