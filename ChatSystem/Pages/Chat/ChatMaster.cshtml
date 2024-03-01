@@ -124,6 +124,10 @@
                             </button>
                             <button type="button" class="btn btn-primary mt-3 delete-group" data-conversation-id="@Model.conversationDto.ConversationId">Delete group</button>
                             <button type="button" class="btn btn-primary mt-3 edit-group-name" data-conversation-id="@Model.conversationDto.ConversationId">Edit group name</button>
+                            <button type="button" class="btn btn-danger mt-3" 
+                                    onclick="outGroupModal(@Model.conversationDto.ConversationId)">
+                                Out
+                            </button>
                         </div>
                     </div>
 
@@ -329,40 +333,94 @@
 </div>
 
 
+<!-- Begin invite memeber modal  -->
 <div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+        <form method="post" >
+          <div class="modal-header text-center">
+            <h5 class="modal-title" id="addUserModalLabel">Invite your friends</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+                <input type="hidden" id="conversationIdInviteGroup" name="conversationId" />
+                <div id="friendListContainer">
+                    <input type="hidden" asp-for="SelectedFriends" id="selectedFriendsInput"/>
+                    <!--  -->
+                </div>
+          </div>
+          <div class="modal-footer">
+            <button id="addButton" type="submit" class="btn btn-primary" asp-page-handler="AddUserToGroup">Invite</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+      </form>
+    </div>
+  </div>
+</div>
+<!-- End invite memeber modal  -->
+
+<!-- Begin out group modal  -->
+<div class="modal fade" id="outGroupModal" tabindex="-1" aria-labelledby="outGroupModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <form method="post">
+                <input type="hidden" id="conversationIdOutGroup" name="conversationId" />
                 <div class="modal-header text-center">
-                    <h5 class="modal-title" id="addUserModalLabel">Invite your friends</h5>
+                    <h5 class="modal-title">Out Conversation</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
-                    <input type="hidden" id="conversationIdInput" name="conversationId" />
-                    <div id="friendListContainer">
-                        <input type="hidden" asp-for="SelectedFriends" id="selectedFriendsInput" />
-                        <!--  -->
+                @if(Model.IsLastAdminLogined && !Model.IsLastMemberLogined)
+                {
+                    <div class="modal-body">
+                        Your are the last admin in this conversation, before you out, promote somebody!
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button id="addButton" type="submit" class="btn btn-primary" asp-page-handler="AddUserToGroup">Invite</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                }
+                else if (Model.IsLastMemberLogined)
+                {
+                    <div class="modal-body">
+                        You are the last member in this conversation, wanna out ??
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary" asp-page-handler="OutGroup">Out</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>                   
+                }
+                else
+                {
+                    <div class="modal-body">
+                        Are you sure you want to out this conversation ??
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary" asp-page-handler="OutGroup">Out</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                }
             </form>
         </div>
     </div>
 </div>
+<!-- End out group modal  -->
 
-                        <script>
+<script>
     function showAddUserModal(conversationId) {
-        document.getElementById('conversationIdInput').value = conversationId;
+        document.getElementById('conversationIdInviteGroup').value = conversationId;
         $('#addUserModal').modal('show');
 
-        $('#conversationIdInput').val(conversationId);
+        $('#conversationIdInviteGroup').val(conversationId);
         console.log(conversationId);
 
-        $('#friendListContainer').load('/Chat/ChatMasterDuplicate?handler=FriendListPartial&conversationId=' + conversationId);
+        $('#friendListContainer').load('/Chat/ChatMaster?handler=FriendListPartial&conversationId=' + conversationId);
         console.log("LOADED");
+    }
+
+    function outGroupModal(conversationId) {
+        document.getElementById('conversationIdOutGroup').value = conversationId;
+        $('#outGroupModal').modal('show');
+
+        $('#conversationIdOutGroup').val(conversationId);
     }
 </script>
 

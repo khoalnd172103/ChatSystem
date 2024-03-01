@@ -18,6 +18,7 @@ namespace Repository
                 UserId = creatorId,
                 CreateAt = DateTime.Now,
                 isGroup = true,
+                MessagesReceived = new List<Message>(),
                 Participants = new List<Participants>()
             };
 

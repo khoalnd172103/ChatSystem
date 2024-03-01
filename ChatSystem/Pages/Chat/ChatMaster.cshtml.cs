@@ -62,6 +62,12 @@ namespace ChatSystem.Pages.Chat
         [BindProperty]
         public string MessageContent { get; set; }
 
+        [BindProperty]
+        public bool IsLastAdminLogined { get; set; } = false;
+
+        [BindProperty]
+        public bool IsLastMemberLogined { get; set; } = false;
+
         //private Dictionary<int, UserDto> UserDtoDictionary { get; set; }
 
         public IActionResult OnGet()
@@ -93,6 +99,10 @@ namespace ChatSystem.Pages.Chat
                     {
                         LoadConversation((int)conversationId);
                     }
+
+                    IsLastAdminLogined = _participantRepository.IsLastAdminInConversation(conversationId, userId);
+                    IsLastMemberLogined = _participantRepository.IsLastMemberInConversation(conversationId);
+
                     return Page();
                 }
                 return Page();
@@ -346,7 +356,38 @@ namespace ChatSystem.Pages.Chat
                 _conversationRepository.AddUserToGroup(userId, conversationId, SelectedFriends);
                 TempData["success"] = "Invite Successful";
 
-                return RedirectToPage("/Chat/ChatMasterDuplicate", new { id = conversationId });
+                return RedirectToPage("/Chat/ChatMaster", new { id = conversationId });
+            }
+            catch (Exception ex)
+            {
+                TempData["error"] = "Have an error " + ex.Message + " , try again";
+                return LoadConversation(conversationId);
+            }
+        }
+
+        public async Task<IActionResult> OnPostOutGroup(int conversationId)
+        {
+            try
+            {
+                var idClaim = User.Claims.FirstOrDefault(claims => claims.Type == "UserId");
+                if (idClaim == null)
+                {
+                    return RedirectToPage("/Account/Login");
+                }
+
+                int userId = int.Parse(idClaim.Value);
+
+                IsLastMemberLogined = _participantRepository.IsLastMemberInConversation(conversationId);
+
+                _participantRepository.OutConversation(conversationId, userId);
+                if (IsLastMemberLogined)
+                {
+                    _conversationRepository.DeleteConversation(conversationId);
+                }
+
+                TempData["success"] = "Out Successful";
+
+                return RedirectToPage("/Chat/ChatMaster");
             }
             catch (Exception ex)
             {
