@@ -42,5 +42,10 @@ namespace Repository
         {
             throw new NotImplementedException();
         }
+
+        public Participants GetParticipantByConversationIdAndUserId(int conversationId, int userId)
+        {
+            return ParticipantDAO.Instance.GetParticipantByConversationIdAndUserId(conversationId, userId);
+        }
     }
 }
