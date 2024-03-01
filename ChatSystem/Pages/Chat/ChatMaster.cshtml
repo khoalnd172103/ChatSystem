@@ -93,9 +93,47 @@
         </div>
         
       
-        <div class="col-12 col-md-2">
-                
-        </div>
+            <div class="col-12 col-md-2">
+                @if (Model.conversationDto.isGroup)
+                {
+                    <div style="margin-left: 7px">
+                        <div class="card-body">
+                            <div class="position-relative text-center mb-3">
+                                <img src="https://bootdey.com/img/Content/avatar/avatar3.png" class="rounded-circle me-1" width="60" height="60">
+                            </div>
+                            <h5 class="card-title text-center">@Model.currentConversation.ConversationName</h5>
+                            <hr class="mb-4">
+                            <h6>Group Members:</h6>
+                            @foreach (var participant in Model.GroupChatParticipants)
+                            {
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    @participant.KnownAs
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false"></button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item kick-participant" data-participant-id="@participant.UserId" data-conversation-id="@Model.conversationDto.ConversationId" href="#">Kick</a></li>
+                                            <li><a class="dropdown-item promote-participant" data-participant-id="@participant.UserId" data-conversation-id="@Model.conversationDto.ConversationId" href="#">Promote</a></li>
+                                        </ul>
+                                    </div>
+                                </li>
+
+                            }
+                            <button type="button" class="btn btn-primary mt-3"
+                                    onclick="showAddUserModal(@Model.conversationDto.ConversationId)">
+                                Invite
+                            </button>
+                            <button type="button" class="btn btn-primary mt-3 delete-group" data-conversation-id="@Model.conversationDto.ConversationId">Delete group</button>
+                            <button type="button" class="btn btn-primary mt-3 edit-group-name" data-conversation-id="@Model.conversationDto.ConversationId">Edit group name</button>
+                        </div>
+                    </div>
+
+                }
+                else
+                {
+
+                }
+
+            </div>
         }
         
     </div>
@@ -120,4 +158,331 @@
         });
 
     
-        </script>
+</script>
+<script>
+    // Function to handle click on "Promote"
+    const handlePromoteParticipantClick = (event) => {
+        event.preventDefault();
+
+        const participantId = parseInt(event.target.dataset.participantId);
+        const conversationId = parseInt(event.target.dataset.conversationId);
+
+        document.getElementById('conversationIdInput').value = conversationId;
+        document.getElementById('userIdInput').value = participantId;
+
+        $("#promoteConfirmationModal").modal("show");
+    };
+
+    document.addEventListener("click", (event) => {
+        if (event.target.classList.contains("promote-participant")) {
+            handlePromoteParticipantClick(event);
+        }
+    });
+
+
+
+    // Function to handle click events on kick participant links
+    const handleKickParticipantClick = (event) => {
+        event.preventDefault();
+
+        const participantId = parseInt(event.target.dataset.participantId);
+        const conversationId = parseInt(event.target.dataset.conversationId);
+
+        document.getElementById('conversationId').value = conversationId;
+        document.getElementById('userId').value = participantId;
+
+        $("#kickConfirmationModal").modal("show");
+    };
+
+    document.addEventListener("click", (event) => {
+        if (event.target.classList.contains("kick-participant")) {
+            handleKickParticipantClick(event);
+        }
+    });
+
+
+    //show Edit Modal
+
+    const handleEditGroupNameClick = (event) => {
+        event.preventDefault();
+
+        const conversationId = parseInt(event.target.dataset.conversationId);
+
+        document.getElementById('conversationIdGroup').value = conversationId;
+
+        $('#editGroupModal').modal('show');
+    };
+
+    document.addEventListener("click", (event) => {
+        if (event.target.classList.contains("edit-group-name")) {
+            handleEditGroupNameClick(event);
+        }
+    });
+
+    //show delete Modal
+    const handleDeleteGroupClick = (event) => {
+        event.preventDefault();
+
+        const conversationId = parseInt(event.target.dataset.conversationId);
+
+        document.getElementById('conversationIdDelete').value = conversationId;
+
+        $('#deleteGroupModal').modal('show');
+    };
+
+    document.addEventListener("click", (event) => {
+        if (event.target.classList.contains("delete-group")) {
+            handleDeleteGroupClick(event);
+        }
+    });
+
+</script>
+
+<div class="modal fade" id="promoteConfirmationModal" tabindex="-1" aria-labelledby="promoteConfirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="promoteConfirmationModalLabel">Promote User</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to promote this user to admin?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form asp-page-handler="PromoteUserToAdmin" method="post">
+                    <input type="hidden" name="conversationId" id="conversationIdInput">
+                    <input type="hidden" name="userId" id="userIdInput">
+                    <button type="submit" class="btn btn-primary">Confirm</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="modal fade" id="kickConfirmationModal" tabindex="-1" aria-labelledby="kickConfirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="kickConfirmationModalLabel">Kick User</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to kick this user?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form asp-page-handler="KickUserFromGroup" method="post">
+                    <input type="hidden" name="conversationId" id="conversationId">
+                    <input type="hidden" name="userId" id="userId">
+                    <button type="submit" class="btn btn-primary">Confirm</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="editGroupModal" tabindex="-1" role="dialog" aria-labelledby="editGroupModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editGroupModalLabel">Edit Group Name</h5>
+            </div>
+            <div class="modal-body">
+                <form method="post" asp-page-handler="EditGroupName">
+                    <input type="hidden" name="conversationId" id="conversationIdGroup">
+                    <div class="form-group">
+                        <input type="text" class="form-control" id="newGroupName" name="newGroupName" placeholder="Enter new group name">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteGroupModal" tabindex="-1" aria-labelledby="deleteGroupModalLable" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteGroupModalLable">Delete Group</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete the group?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form asp-page-handler="DeleteGroup" method="post">
+                    <input type="hidden" name="conversationId" id="conversationIdDelete">
+                    <button type="submit" class="btn btn-primary">Confirm</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post">
+                <div class="modal-header text-center">
+                    <h5 class="modal-title" id="addUserModalLabel">Invite your friends</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="conversationIdInput" name="conversationId" />
+                    <div id="friendListContainer">
+                        <input type="hidden" asp-for="SelectedFriends" id="selectedFriendsInput" />
+                        <!--  -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="addButton" type="submit" class="btn btn-primary" asp-page-handler="AddUserToGroup">Invite</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+                        <script>
+    function showAddUserModal(conversationId) {
+        document.getElementById('conversationIdInput').value = conversationId;
+        $('#addUserModal').modal('show');
+
+        $('#conversationIdInput').val(conversationId);
+        console.log(conversationId);
+
+        $('#friendListContainer').load('/Chat/ChatMasterDuplicate?handler=FriendListPartial&conversationId=' + conversationId);
+        console.log("LOADED");
+    }
+</script>
+
+
+@section Scripts {
+    <script>
+        var selectedFriends = [];
+
+        function addOrRemoveFriend(checkbox) {
+            var friendId = checkbox.value;
+            console.log(friendId);
+
+            if (checkbox.checked) {
+                if (!selectedFriends.some(friend => friend.id === friendId)) {
+                    selectedFriends.push({ id: friendId });
+                }
+            } else {
+                selectedFriends = selectedFriends.filter(friend => friend.id !== friendId);
+            }
+
+            console.log(selectedFriends);
+
+            updateCreateButton();
+
+            var selectedFriendsInput = document.getElementById('selectedFriendsInput');
+            selectedFriendsInput.value = JSON.stringify(selectedFriends.map(friend => friend.id));
+            console.log(selectedFriendsInput.value);
+        }
+
+        function updateCreateButton() {
+            var createButton = document.getElementById('addButton');
+            if (selectedFriends.length === 0) {
+                createButton.disabled = true;
+            } else {
+                createButton.disabled = false;
+            }
+        }
+        updateCreateButton();
+
+    </script>
+}
+    <style>
+        html, body {
+            margin: 0;
+            height: 120%;
+            overflow: hidden
+        }
+
+
+
+        .chat-online {
+            color: #34ce57
+        }
+
+        .chat-offline {
+            color: #e4606d
+        }
+
+
+        .chat-list {
+            max-height: 80vh;
+            overflow-y: scroll
+        }
+
+            .chat-list > * {
+                margin: 20px 0;
+                padding: 0 10px;
+            }
+
+                .chat-list > *:first-child {
+                    margin-top: 0px;
+                }
+
+        .chat-messages-section {
+            display: flex;
+            flex-direction: column;
+            max-height: 80vh;
+            overflow: hidden;
+            padding-bottom: 10px
+        }
+
+        .all-chat-message {
+            grid-column: 2;
+            grid-row: 2;
+            overflow-y: scroll;
+            align-content: end;
+            display: flex;
+            flex-direction: column-reverse;
+        }
+
+        .chat-message-left,
+        .chat-message-right {
+            display: flex;
+            flex-shrink: 0
+        }
+
+        .chat-message-left {
+            margin-right: auto
+        }
+
+        .chat-message-right {
+            flex-direction: row-reverse;
+            margin-left: auto
+        }
+
+        .py-3 {
+            padding-top: 1rem !important;
+            padding-bottom: 1rem !important;
+        }
+
+        .px-4 {
+            padding-right: 1.5rem !important;
+            padding-left: 1.5rem !important;
+        }
+
+        .flex-grow-0 {
+            flex-grow: 0 !important;
+        }
+
+        .border-top {
+            border-top: 1px solid #dee2e6 !important;
+        }
+    </style>

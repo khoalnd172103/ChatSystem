@@ -76,18 +76,18 @@ namespace DataAccessLayer
         {
             using (var context = new DataContext())
             {
-                // Step 1: Remove associated messages
+                // Step 1: Remove from messages table
                 var messages = context.Messages.Where(m => m.ConversationId == conversationId);
                 context.Messages.RemoveRange(messages);
 
-                // Step 2: Remove conversation entry
+                // Step 2: Remove from conversation table
                 var conversation = context.Conversations.FirstOrDefault(c => c.ConversationId == conversationId);
                 if (conversation != null)
                 {
                     context.Conversations.Remove(conversation);
                 }
 
-                // Step 3: Remove participants associated with the conversation
+                // Step 3: Remove from participants table
                 var participants = context.Participants.Where(p => p.ConversationId == conversationId);
                 context.Participants.RemoveRange(participants);
 
