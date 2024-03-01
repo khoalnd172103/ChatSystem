@@ -1,0 +1,32 @@
+﻿@using Repository.DTOs
+
+@model ConversationDto
+
+@if (Model.isGroup)
+{
+    <div class="py-2 px-4 border-bottom d-none d-lg-block">
+        <div class="d-flex align-items-center py-1">
+            <div class="position-relative">
+                <img src="https://bootdey.com/img/Content/avatar/avatar5.png" class="rounded-circle me-1" alt="@Model.ConversationName" width="40" height="40" />
+            </div>
+            <div class="flex-grow-1 ps-3">
+                <strong>@Model.ConversationName</strong>
+                <div class="text-muted small"><em>Typing...</em></div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="py-2 px-4 border-bottom d-none d-lg-block">
+        <div class="d-flex align-items-center py-1">
+            <div class="position-relative">
+                <img src="@Model.Avatar" class="rounded-circle me-1" alt="@Model.OtherUserName" width="40" height="40" />
+            </div>
+            <div class="flex-grow-1 ps-3">
+                <strong>@Model.OtherUserName</strong>
+                <div class="text-muted small"><em>Typing...</em></div>
+            </div>
+        </div>
+    </div>
+}

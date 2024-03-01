@@ -2,6 +2,9 @@
 @model ChatSystem.Pages.Chat.ChatMasterModel
 @{
 }
+
+<link rel="stylesheet" href="~/css/chatMaster.css">
+
 <div class="container chat-section">
     <div class="row g-0">
 
@@ -66,69 +69,11 @@
 
 
             <div class="col-12 col-md-7">
-                @if (Model.conversationDto.isGroup)
-                {
-                    <div class="py-2 px-4 border-bottom d-none d-lg-block">
-                        <div class="d-flex align-items-center py-1">
-                            <div class="position-relative">
-                                <img src="https://bootdey.com/img/Content/avatar/avatar5.png" class="rounded-circle me-1" alt="@Model.conversationDto.ConversationName" width="40" height="40" />
-                            </div>
-                            <div class="flex-grow-1 ps-3">
-                                <strong>@Model.conversationDto.ConversationName</strong>
-                                <div class="text-muted small"><em>Typing...</em></div>
-                            </div>
-                        </div>
-                    </div>
-                }
-                else
-                {
-                    <div class="py-2 px-4 border-bottom d-none d-lg-block">
-                        <div class="d-flex align-items-center py-1">
-                            <div class="position-relative">
-                                <img src="@Model.conversationDto.Avatar" class="rounded-circle me-1" alt="@Model.conversationDto.OtherUserName" width="40" height="40" />
-                            </div>
-                            <div class="flex-grow-1 ps-3">
-                                <strong>@Model.conversationDto.OtherUserName</strong>
-                                <div class="text-muted small"><em>Typing...</em></div>
-                            </div>
-                        </div>
-                    </div>
-                }
-                
+                @await Html.PartialAsync("_ChatHeader", Model.conversationDto)
 
-            
             <div class="chat-messages-section p-4">
                 <div class="all-chat-message">
-                    
-                @foreach(var messageDto in Model.MessageDtoList){
-                    if (messageDto.SenderId == Model.UserDto.UserId){
-                    <div class="chat-message-right mb-4">
-                        <div class="message-time-content">
-                            <div class="flex-shrink-1 bg-light rounded px-3 me-3">
-                                <p class="message-content" style="background-color: #78c2ad; border-radius: 6px">@messageDto.Content</p>
-                            </div>
-                                <div class="d-flex flex-row-reverse ">
-                                <div class="text-muted small text-nowrap mt-2 ">@messageDto.DisplaySendTime</div>
-                            </div>
-                        </div>  
-                    </div>
-                    }else{
-                    <div class="chat-message-left pb-4">
-                        <div>
-                            <img src="@messageDto.Avatar" class="rounded-circle me-1" alt="@messageDto.SenderUserName" width="40" height="40" />
-                        </div>
-                        <div class="message-time-content">
-                            <div class="flex-shrink-1 bg-light rounded py-2 px-3 ms-3">
-                                <div class="fw-bold mb-1 message-content">@messageDto.SenderUserName</div>
-                                        @messageDto.Content
-                                </div>
-                                <div class="d-flex flex-row ">
-                                    <div class="text-muted small text-nowrap mt-2 ">@messageDto.DisplaySendTime</div>
-                                </div>
-                        </div>
-                    </div>
-                    }
-                }
+                     @await Html.PartialAsync("_ChatContent", Model.ChatContentModel)
                 </div>
 
                 <div class="flex-grow-0 py-3 px-4 border-top">
@@ -157,101 +102,6 @@
 </div>
 
 
-<style>
-    html, body {
-        margin: 0;
-        height: 120%;
-        overflow: hidden
-    }
-
-    textarea {
-        resize: none;
-    }
-
-    .message-content{
-        padding : 0 6px;
-        margin : 0;
-        white-space: pre-wrap;
-    }
-
-	.chat-online {
-		color: #34ce57
-	}
-
-	.chat-offline {
-		color: #e4606d
-	}
-
-
-    .chat-list{
-        max-height: 80vh;
-        overflow-y: scroll
-    }   
-    .chat-list > * {
-        margin: 20px 0;
-        padding: 0 10px;
-    }
-
-    .chat-list > *:first-child {
-        margin-top: 0px;
-    }
-
-	.chat-messages-section {
-		display: flex;
-		flex-direction: column;
-		max-height: 80vh;
-		overflow: hidden;
-        padding-bottom: 10px
-	}
-    .all-chat-message{
-        grid-column: 2;
-        grid-row: 2;
-        overflow-y: scroll;
-        align-content: end;
-        display: flex;
-        flex-direction: column-reverse;
-        min-height: 65vh;
-    }
-
-	.chat-message-left,
-	.chat-message-right {
-		display: flex;
-		flex-shrink: 0;
-        margin-bottom: 10px !important;
-	}
-
-	.chat-message-left {
-		margin-right: auto
-	}
-
-	.chat-message-right {
-		flex-direction: row-reverse;
-		margin-left: auto
-	}
-
-	.py-3 {
-		padding-top: 1rem !important;
-		padding-bottom: 1rem !important;
-	}
-
-	.px-4 {
-		padding-right: 1.5rem !important;
-		padding-left: 1.5rem !important;
-	}
-
-    .px-3 {
-        padding-right: 0.5rem !important;
-        padding-left: 0.5rem !important;
-    }
-
-	.flex-grow-0 {
-		flex-grow: 0 !important;
-	}
-
-	.border-top {
-		border-top: 1px solid #dee2e6 !important;
-	}
-</style>
 
 <script src="~/lib/jquery/dist/jquery.js"></script>
 <script>

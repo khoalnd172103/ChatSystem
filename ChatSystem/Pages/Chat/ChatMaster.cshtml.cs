@@ -44,6 +44,8 @@ namespace ChatSystem.Pages.Chat
         public ConversationDto conversationDto { get; set; }
 
         [BindProperty]
+        public ChatContentModelDto ChatContentModel { get; set; }
+
         public List<MessageDto> MessageDtoList { get; set; } = default!;
 
         [BindProperty]
@@ -143,9 +145,19 @@ namespace ChatSystem.Pages.Chat
 
                 _messageRepository.Create(message);
             }
+            GetConversationDetail(conversationDto.ConversationId);
+
+            UserDto = _userRepository.GetUserDtoWithPhoto(userId);
+            GroupChatParticipants = _userRepository.GetUserInGroupChat(conversationDto.ConversationId);
+            MessageDtoList = _messageRepository.GetMessagesFromConversation(currentConversation, GroupChatParticipants);
+            ChatContentModel = new ChatContentModelDto
+            {
+                MessageDtoList = MessageDtoList,
+                UserDto = UserDto
+            };
 
 
-            return OnGetAgain(conversationDto.ConversationId);
+            return Partial("_ChatContent", ChatContentModel);
         }
 
         public IActionResult LoadConversation(int conversationId)
@@ -173,7 +185,11 @@ namespace ChatSystem.Pages.Chat
             conversationDto = MapConversationToDto(currentConversation, UserDto.UserId);
 
             MessageDtoList = _messageRepository.GetMessagesFromConversation(currentConversation, GroupChatParticipants);
-
+            ChatContentModel = new ChatContentModelDto
+            {
+                MessageDtoList = MessageDtoList,
+                UserDto = UserDto
+            };
 
             return Page();
         }
