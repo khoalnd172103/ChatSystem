@@ -71,5 +71,28 @@ namespace DataAccessLayer
             }
             return conversation;
         }
+
+        public void DeleteConversation(int conversationId)
+        {
+            using (var context = new DataContext())
+            {
+                // Step 1: Remove associated messages
+                var messages = context.Messages.Where(m => m.ConversationId == conversationId);
+                context.Messages.RemoveRange(messages);
+
+                // Step 2: Remove conversation entry
+                var conversation = context.Conversations.FirstOrDefault(c => c.ConversationId == conversationId);
+                if (conversation != null)
+                {
+                    context.Conversations.Remove(conversation);
+                }
+
+                // Step 3: Remove participants associated with the conversation
+                var participants = context.Participants.Where(p => p.ConversationId == conversationId);
+                context.Participants.RemoveRange(participants);
+
+                context.SaveChanges();
+            }
+        }
     }
 }

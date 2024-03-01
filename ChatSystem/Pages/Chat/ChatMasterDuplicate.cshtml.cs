@@ -229,6 +229,21 @@ namespace ChatSystem.Pages.Chat
             }
         }
 
+        public IActionResult OnPostDeleteGroup(int conversationId)
+        {
+            try
+            {
+                _conversationRepository.DeleteConversation(conversationId);
+                TempData["success"] = "Delete Group Successfully";
+                return RedirectToPage("/Chat/ChatMasterDuplicate", new { id = conversationId });
+            }
+            catch (Exception ex)
+            {
+                TempData["error"] = "An error occurred: " + ex.Message + ". Please try again.";
+                return LoadConversation(conversationId);
+            }
+        }
+
 
 
 

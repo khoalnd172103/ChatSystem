@@ -125,5 +125,8 @@ namespace Repository
 
         public void UpdateConversation(Conversation conversation)
         => ConversationDAO.Instance.Update(conversation);
+        
+        public void DeleteConversation(int conversationId)
+        => ConversationDAO.Instance.DeleteConversation(conversationId);
     }
 }
