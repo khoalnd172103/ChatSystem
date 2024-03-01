@@ -8,7 +8,7 @@ namespace Repository
     {
         public void Create(Message entity)
         {
-            throw new NotImplementedException();
+            MessageDAO.Instance.Create(entity);
         }
 
         public bool Delete(Message entity)
@@ -70,23 +70,41 @@ namespace Repository
 
             foreach (var message in messages)
             {
-                UserDto sender = userDtos.FirstOrDefault(u => u.UserId == message.SenderId);
-                MessageDto messageDto = new MessageDto
+                if (!message.SenderDelete)
                 {
-                    MessageId = message.MessageId,
-                    SenderId = message.SenderId,
-                    SenderUserName = sender.UserName,
-                    Content = message.Content,
-                    DateSend = message.DateSend,
-                    DateRead = message.DateRead,
-                    SenderDelete = message.SenderDelete,
-                    Avatar = sender.Avatar,
+                    UserDto sender = userDtos.FirstOrDefault(u => u.UserId == message.SenderId);
+                    MessageDto messageDto = new MessageDto
+                    {
+                        MessageId = message.MessageId,
+                        SenderId = message.SenderId,
+                        SenderUserName = sender.UserName,
+                        Content = message.Content,
+                        DateSend = message.DateSend.ToLocalTime(),
+                        DateRead = message.DateRead,
+                        SenderDelete = message.SenderDelete,
+                        Avatar = sender.Avatar,
+                    };
 
-                };
-                messageDtos.Add(messageDto);
+                    TimeSpan timeSpan = DateTime.Now.ToLocalTime() - messageDto.DateSend;
+
+                    messageDto.DisplaySendTime = (int)(timeSpan.TotalMinutes) + " minute(s) ago";
+                    if (timeSpan.TotalMinutes > 60)
+                    {
+                        if (timeSpan.TotalHours > 24)
+                            messageDto.DisplaySendTime = (int)(timeSpan.TotalDays) + " day(s) ago";
+                        else
+                            messageDto.DisplaySendTime = (int)(int)(timeSpan.TotalHours) + " hour(s) ago";
+                    }
+                    if (timeSpan.TotalMinutes < 1)
+                    {
+                        messageDto.DisplaySendTime = "recently";
+                    }
+
+                    messageDtos.Add(messageDto);
+                }
             }
 
-            return messageDtos.OrderBy(m => m.DateSend).ToList();
+            return messageDtos.OrderByDescending(m => m.DateSend).ToList();
         }
     }
 }
