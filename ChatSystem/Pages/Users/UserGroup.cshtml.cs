@@ -2,6 +2,7 @@ using BusinessObject;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Repository;
+using Repository.DTOs;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -19,7 +20,7 @@ namespace ChatSystem.Pages.Users
             _userRepository = userRepository;
         }
         public Conversation Conversation1 { get; set; }
-        public List<User> GroupChatParticipants { get; set; }
+        public List<UserDto> GroupChatParticipants { get; set; }
         public List<Conversation> Conversations { get; set; }
         public User UserObj { get; set; }
 
