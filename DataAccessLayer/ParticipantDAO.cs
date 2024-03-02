@@ -39,5 +39,16 @@ namespace DataAccessLayer
             return otherUser;
 
         }
+
+        public Participants GetParticipantByConversationIdAndUserId(int conversationId, int userId)
+        {
+            Participants participants = null;
+            using (var context = new DataContext())
+            {
+                participants = context.Participants
+                .SingleOrDefault(p => p.ConversationId == conversationId && p.UserId == userId);
+            }
+            return participants;
+        }
     }
 }

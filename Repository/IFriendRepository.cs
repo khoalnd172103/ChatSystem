@@ -1,10 +1,5 @@
 ﻿using BusinessObject;
 using Repository.DTOs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Repository
 {
@@ -19,5 +14,6 @@ namespace Repository
         Task SendFriendRequest(int senderId, int recipientId, string senderUsername, string recipientUsername);
         void UpdateFriendRequest(Friend friend);
         void DeclineFriendRequest(Friend friend);
+        Task<List<Friend>> GetFriendsNotInGroupAsync(int userId, int convarsationId);
     }
 }

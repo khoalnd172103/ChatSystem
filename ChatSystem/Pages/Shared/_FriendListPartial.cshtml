@@ -1,0 +1,53 @@
+﻿@using Repository.DTOs
+@model List<FriendDto>
+
+<div class="friend-list-container" style="max-height: 450px; overflow-y: auto; overflow-x: hidden;">
+    @if (Model.Count == 0)
+    {
+        <p>No friends available.</p>
+    }
+    else
+    {
+        <ul class="list-group">
+            @foreach (var friend in Model)
+            {
+                <div class="people-nearby">
+                    <div class="nearby-user">
+                        <div class="row align-items-center">
+                            <div class="col-md-4 col-sm-4 text-center">
+                                <img src="@friend.Avatar" alt="@friend.UserName" class="profile-photo-lg">
+                            </div>
+                            <div class="col-md-5 col-sm-5">
+                                <h5>@friend.UserName</h5>
+                            </div>
+                            <div class="col-md-3 col-sm-3">
+                                <div class="d-flex">
+                                    <input type="checkbox" name="selectedFriends" value="@friend.UserId" onclick="addOrRemoveFriend(this)">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </ul>
+    }
+</div>
+
+
+<style>
+     .people-nearby .nearby-user{
+      padding: 20px 0;
+      margin-bottom: 20px;
+    }
+
+    img.profile-photo-lg{
+      height: 80px;
+      width: 80px;
+      border-radius: 50%;
+    }
+
+    input[type="checkbox"] {
+       width: 24px;
+       height: 24px;
+    }
+</style>

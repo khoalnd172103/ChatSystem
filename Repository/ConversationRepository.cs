@@ -18,6 +18,7 @@ namespace Repository
                 UserId = creatorId,
                 CreateAt = DateTime.Now,
                 isGroup = true,
+                MessagesReceived = new List<Message>(),
                 Participants = new List<Participants>()
             };
 
@@ -40,6 +41,31 @@ namespace Repository
             ConversationDAO.Instance.Create(conversation);
         }
 
+        public void AddUserToGroup(int creatorId, int conversationId, List<string> memberIdList)
+        {
+            var currentConversation = ConversationDAO.Instance.GetConversationById(conversationId);
+
+            var conversation = new Conversation
+            {
+                ConversationId = conversationId,
+                ConversationName = currentConversation.ConversationName,
+                UserId = creatorId,
+                CreateAt = DateTime.Now,
+                isGroup = true,
+                Participants = new List<Participants>()
+            };
+
+            conversation.Participants.AddRange(memberIdList.Select(friendId => new Participants
+            {
+                UserId = int.Parse(friendId),
+                status = 1,
+                isAdmin = false,
+                Conversation = conversation
+            }));
+
+            ConversationDAO.Instance.Update(conversation);
+        }
+
         public bool Delete(Conversation entity)
         {
             throw new NotImplementedException();
@@ -50,9 +76,10 @@ namespace Repository
             return (List<Conversation>)ConversationDAO.Instance.GetAll();
         }
 
-        public async Task<List<Conversation>> GetAllUserConversation(int userId)
+        public List<Conversation> GetAllUserConversation(int userId)
         {
-            return await ConversationDAO.Instance.GetConverstationsOfUser(userId);
+            List<Conversation> list = ConversationDAO.Instance.GetConverstationsOfUser(userId);
+            return list;
         }
 
         public Conversation GetById(int entityId)
@@ -74,5 +101,33 @@ namespace Repository
         {
             throw new NotImplementedException();
         }
+
+        public async Task<List<Conversation>> GetAllConversationById(int userID)
+        {
+            return await ConversationDAO.Instance.GetUserGroupConversationsByUserId(userID);
+        }
+
+        public bool IsUserInConversation(int conversationId, int userId)
+        {
+            bool result = false;
+
+            Conversation conversation = ConversationDAO.Instance.GetConversationAndParticipantById(conversationId);
+
+            foreach (var participant in conversation.Participants)
+            {
+                if (participant.UserId == userId)
+                {
+                    return true;
+                }
+            }
+
+            return result;
+        }
+
+        public void UpdateConversation(Conversation conversation)
+        => ConversationDAO.Instance.Update(conversation);
+        
+        public void DeleteConversation(int conversationId)
+        => ConversationDAO.Instance.DeleteConversation(conversationId);
     }
 }

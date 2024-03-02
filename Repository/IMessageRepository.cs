@@ -1,13 +1,11 @@
 ﻿using BusinessObject;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Repository.DTOs;
 
 namespace Repository
 {
     public interface IMessageRepository : IBaseRepository<Message>
     {
+        Message GetLastestMessageFromConversation(Conversation conversation);
+        List<MessageDto> GetMessagesFromConversation(Conversation conversation, List<UserDto> userDtos);
     }
 }

@@ -26,26 +26,73 @@ namespace DataAccessLayer
             }
         }
 
-        public async Task<List<Conversation>> GetConverstationsOfUser(int userId)
+
+        public List<Conversation> GetConverstationsOfUser(int userId)
         {
             List<Conversation> conversations = new List<Conversation>();
             using (var context = new DataContext())
             {
-                var participants = await context.Participants
+                var participants = context.Participants
                     .Where(p => p.UserId == userId)
-                    .ToListAsync();
+                    .ToList();
 
                 foreach (Participants participant in participants)
                 {
-                    Conversation c = context.Conversations.FirstOrDefault(c => c.ConversationId == participant.ConversationId);
+                    Conversation c = context.Conversations.Include(c => c.MessagesReceived).FirstOrDefault(c => c.ConversationId == participant.ConversationId);
                     conversations.Add(c);
                 }
             }
             return conversations;
-            }
+        }
         public Conversation GetConversationById(int conversationId)
         {
             return GetAll().FirstOrDefault(c => c.ConversationId == conversationId);
+        }
+
+        public async Task<List<Conversation>> GetUserGroupConversationsByUserId(int userId)
+        {
+            List<Conversation> groupConversations = new List<Conversation>();
+            using (var context = new DataContext())
+            {
+                 groupConversations = context.Conversations
+                .Where(c => c.UserId == userId && c.isGroup)
+                .ToList();
+            }
+            return groupConversations;
+        }
+        
+
+        public Conversation GetConversationAndParticipantById(int conversationId)
+        {
+            Conversation conversation = new Conversation();
+            using (var context = new DataContext())
+            {
+                conversation = context.Conversations.Include(c => c.Participants).FirstOrDefault(c => c.ConversationId == conversationId);
+            }
+            return conversation;
+        }
+
+        public void DeleteConversation(int conversationId)
+        {
+            using (var context = new DataContext())
+            {
+                // Step 1: Remove from messages table
+                var messages = context.Messages.Where(m => m.ConversationId == conversationId);
+                context.Messages.RemoveRange(messages);
+
+                // Step 2: Remove from conversation table
+                var conversation = context.Conversations.FirstOrDefault(c => c.ConversationId == conversationId);
+                if (conversation != null)
+                {
+                    context.Conversations.Remove(conversation);
+                }
+
+                // Step 3: Remove from participants table
+                var participants = context.Participants.Where(p => p.ConversationId == conversationId);
+                context.Participants.RemoveRange(participants);
+
+                context.SaveChanges();
+            }
         }
     }
 }

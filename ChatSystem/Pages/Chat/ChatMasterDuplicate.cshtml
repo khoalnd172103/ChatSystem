@@ -1,10 +1,7 @@
 ﻿@page 
-@model ChatSystem.Pages.Chat.ChatMasterModel
+@model ChatSystem.Pages.Chat.ChatMasterDuplicateModel
 @{
 }
-
-<link rel="stylesheet" href="~/css/chatMaster.css">
-
 <div class="container chat-section">
     <div class="row g-0">
 
@@ -24,9 +21,9 @@
                 {
 
 
-                    <a asp-page="/Chat/ChatMaster" asp-route-id="@conversationDtoMember.ConversationId"
+                    <a asp-page="/Chat/ChatMasterDuplicate" asp-route-id="@conversationDtoMember.ConversationId"
                         class="list-group-item list-group-item-action border-0">
-                        <div class="badge bg-success float-end">5</div>
+                        <div class="badge bg-success float-end">5</div> 
                         <div class="d-flex align-items-start">
                                 <img src="https://bootdey.com/img/Content/avatar/avatar5.png" class="rounded-circle me-1" alt="@conversationDtoMember.ConversationName" width="40" height="40" />
                             <div class="flex-grow-1 ms-3">
@@ -40,7 +37,7 @@
                 else
                 {
 
-                    <a asp-page="/Chat/ChatMaster" asp-route-id="@conversationDtoMember.ConversationId"
+                    <a asp-page="/Chat/ChatMasterDuplicate" asp-route-id="@conversationDtoMember.ConversationId"
                         class="list-group-item list-group-item-action border-0">
                         <div class="badge bg-success float-end">5</div>
                         <div class="d-flex align-items-start">
@@ -69,30 +66,62 @@
 
 
             <div class="col-12 col-md-7">
-                @await Html.PartialAsync("_ChatHeader", Model.conversationDto)
+                @if (Model.conversationDto.isGroup)
+                {
+                    <div class="py-2 px-4 border-bottom d-none d-lg-block">
+                        <div class="d-flex align-items-center py-1">
+                            <div class="position-relative">
+                                <img src="https://bootdey.com/img/Content/avatar/avatar5.png" class="rounded-circle me-1" alt="@Model.conversationDto.ConversationName" width="40" height="40" />
+                            </div>
+                            <div class="flex-grow-1 ps-3">
+                                <strong>@Model.conversationDto.ConversationName</strong>
+                                <div class="text-muted small"><em>Typing...</em></div>
+                            </div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="py-2 px-4 border-bottom d-none d-lg-block">
+                        <div class="d-flex align-items-center py-1">
+                            <div class="position-relative">
+                                <img src="@Model.conversationDto.Avatar" class="rounded-circle me-1" alt="@Model.conversationDto.OtherUserName" width="40" height="40" />
+                            </div>
+                            <div class="flex-grow-1 ps-3">
+                                <strong>@Model.conversationDto.OtherUserName</strong>
+                                <div class="text-muted small"><em>Typing...</em></div>
+                            </div>
+                        </div>
+                    </div>
+                }
+                
 
-            <div class="chat-messages-section p-4">
-                <div class="all-chat-message">
-                     @await Html.PartialAsync("_ChatContent", Model.ChatContentModel)
-                </div>
+            
+                <div class="chat-messages-section p-4">
+                    <div class="all-chat-message">
+                    <div class="chat-message-left pb-4">
+                        <div>
+                            <img src="https://bootdey.com/img/Content/avatar/avatar3.png" class="rounded-circle me-1" alt="Sharon Lessman" width="40" height="40" />
+                            <div class="text-muted small text-nowrap mt-2">2:42 am</div>
+                        </div>
+                        <div class="flex-shrink-1 bg-light rounded py-2 px-3 ms-3">
+                            <div class="fw-bold mb-1">Sharon Lessman</div>
+                            Sed pulvinar, massa vitae interdum pulvinar, risus lectus porttitor magna, vitae commodo lectus mauris et velit. Proin ultricies placerat imperdiet. Morbi varius quam
+                            ac venenatis tempus.
+                            </div>
+                        </div>
+                    </div>
 
                 <div class="flex-grow-0 py-3 px-4 border-top">
-                    <form method="post" asp-page-handler="SendMessage" id="sendMessageForm">
-                        <input type="hidden" asp-for="conversationDto.ConversationId"/>
-                        <div class="input-group">
-                                <textarea asp-for="@Model.MessageContent" id="messageTextArea" type="text" class="form-control" placeholder="Type your message" rows="2"></textarea>
-                            
-                            <button id="sendBtn" type="submit" class="btn btn-primary">Send</button>
-                        </div>
-                    </form>
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Type your message" />
+                        <button class="btn btn-primary">Send</button>
+                    </div>
                 </div>
             </div>
-
-
-
         </div>
-        
-      
+
+
             <div class="col-12 col-md-2">
                 @if (Model.conversationDto.isGroup)
                 {
@@ -118,129 +147,111 @@
                                 </li>
 
                             }
-                            <button type="button" class="btn btn-primary mt-3"
-                                    onclick="showAddUserModal(@Model.conversationDto.ConversationId)">
+                            <button type="button" class="btn btn-primary mt-3" 
+                            onclick="showAddUserModal(@Model.conversationDto.ConversationId)">
                                 Invite
                             </button>
                             <button type="button" class="btn btn-primary mt-3 delete-group" data-conversation-id="@Model.conversationDto.ConversationId">Delete group</button>
                             <button type="button" class="btn btn-primary mt-3 edit-group-name" data-conversation-id="@Model.conversationDto.ConversationId">Edit group name</button>
+                            <button type="button" class="btn btn-primary mt-3">Delete Group</button>
+                            <button type="button" class="btn btn-primary mt-3" id="editGroupButton">Edit Group Name</button>
                             <button type="button" class="btn btn-danger mt-3" 
-                                    onclick="outGroupModal(@Model.conversationDto.ConversationId)">
+                            onclick="outGroupModal(@Model.conversationDto.ConversationId)">
                                 Out
                             </button>
                         </div>
                     </div>
 
-                }
+                } 
                 else
                 {
-
+                    
                 }
-
+                
             </div>
         }
         
     </div>
-</div>
+    <script>
+        // Function to handle click on "Promote"
+        const handlePromoteParticipantClick = (event) => {
+            event.preventDefault();
 
+            const participantId = parseInt(event.target.dataset.participantId);
+            const conversationId = parseInt(event.target.dataset.conversationId);
 
+            document.getElementById('conversationIdInput').value = conversationId;
+            document.getElementById('userIdInput').value = participantId;
 
-<script src="~/lib/jquery/dist/jquery.js"></script>
-<script>
-    //String.prototype.nl2br = function () {
-    //    return this.replace(/\r\n/g, "<br />");
-    //}
+            $("#promoteConfirmationModal").modal("show");
+        };
 
-    var $j = jQuery.noConflict();
-                $j("#messageTextArea").val('');
-        $j("textarea").keypress(function (event) {
-            console.log("press")
-            if (event.keyCode == 13 && !event.shiftKey) {
-                $j("#sendMessageForm").submit();
-                return false;
+        document.addEventListener("click", (event) => {
+            if (event.target.classList.contains("promote-participant")) {
+                handlePromoteParticipantClick(event);
             }
         });
 
-    
-</script>
-<script>
-    // Function to handle click on "Promote"
-    const handlePromoteParticipantClick = (event) => {
-        event.preventDefault();
-
-        const participantId = parseInt(event.target.dataset.participantId);
-        const conversationId = parseInt(event.target.dataset.conversationId);
-
-        document.getElementById('conversationIdInput').value = conversationId;
-        document.getElementById('userIdInput').value = participantId;
-
-        $("#promoteConfirmationModal").modal("show");
-    };
-
-    document.addEventListener("click", (event) => {
-        if (event.target.classList.contains("promote-participant")) {
-            handlePromoteParticipantClick(event);
-        }
-    });
 
 
+        // Function to handle click events on kick participant links
+        const handleKickParticipantClick = (event) => {
+            event.preventDefault();
 
-    // Function to handle click events on kick participant links
-    const handleKickParticipantClick = (event) => {
-        event.preventDefault();
+            const participantId = parseInt(event.target.dataset.participantId);
+            const conversationId = parseInt(event.target.dataset.conversationId);
 
-        const participantId = parseInt(event.target.dataset.participantId);
-        const conversationId = parseInt(event.target.dataset.conversationId);
+            document.getElementById('conversationId').value = conversationId;
+            document.getElementById('userId').value = participantId;
 
-        document.getElementById('conversationId').value = conversationId;
-        document.getElementById('userId').value = participantId;
+            $("#kickConfirmationModal").modal("show");
+        };
 
-        $("#kickConfirmationModal").modal("show");
-    };
-
-    document.addEventListener("click", (event) => {
-        if (event.target.classList.contains("kick-participant")) {
-            handleKickParticipantClick(event);
-        }
-    });
+        document.addEventListener("click", (event) => {
+            if (event.target.classList.contains("kick-participant")) {
+                handleKickParticipantClick(event);
+            }
+        });
 
 
-    //show Edit Modal
+        //show Edit Modal
 
-    const handleEditGroupNameClick = (event) => {
-        event.preventDefault();
+        const handleEditGroupNameClick = (event) => {
+            event.preventDefault();
 
-        const conversationId = parseInt(event.target.dataset.conversationId);
+            const conversationId = parseInt(event.target.dataset.conversationId);
 
-        document.getElementById('conversationIdGroup').value = conversationId;
+            document.getElementById('conversationIdGroup').value = conversationId;
 
-        $('#editGroupModal').modal('show');
-    };
+            $('#editGroupModal').modal('show');
+        };
 
-    document.addEventListener("click", (event) => {
-        if (event.target.classList.contains("edit-group-name")) {
-            handleEditGroupNameClick(event);
-        }
-    });
+        document.addEventListener("click", (event) => {
+            if (event.target.classList.contains("edit-group-name")) {
+                handleEditGroupNameClick(event);
+            }
+        });
 
-    //show delete Modal
-    const handleDeleteGroupClick = (event) => {
-        event.preventDefault();
+        //show delete Modal
+        const handleDeleteGroupClick = (event) => {
+            event.preventDefault();
 
-        const conversationId = parseInt(event.target.dataset.conversationId);
+            const conversationId = parseInt(event.target.dataset.conversationId);
 
-        document.getElementById('conversationIdDelete').value = conversationId;
+            document.getElementById('conversationIdDelete').value = conversationId;
 
-        $('#deleteGroupModal').modal('show');
-    };
+            $('#deleteGroupModal').modal('show');
+        };
 
-    document.addEventListener("click", (event) => {
-        if (event.target.classList.contains("delete-group")) {
-            handleDeleteGroupClick(event);
-        }
-    });
+        document.addEventListener("click", (event) => {
+            if (event.target.classList.contains("delete-group")) {
+                handleDeleteGroupClick(event);
+            }
+        });
 
-</script>
+    </script>
+
+</div>
 
 <div class="modal fade" id="promoteConfirmationModal" tabindex="-1" aria-labelledby="promoteConfirmationModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -343,7 +354,7 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-                <input type="hidden" id="conversationIdInviteGroup" name="conversationId" />
+                <input type="hidden" id="conversationIdInput" name="conversationId" />
                 <div id="friendListContainer">
                     <input type="hidden" asp-for="SelectedFriends" id="selectedFriendsInput"/>
                     <!--  -->
@@ -406,13 +417,13 @@
 
 <script>
     function showAddUserModal(conversationId) {
-        document.getElementById('conversationIdInviteGroup').value = conversationId;
+        document.getElementById('conversationIdInput').value = conversationId;
         $('#addUserModal').modal('show');
 
-        $('#conversationIdInviteGroup').val(conversationId);
+        $('#conversationIdInput').val(conversationId);
         console.log(conversationId);
 
-        $('#friendListContainer').load('/Chat/ChatMaster?handler=FriendListPartial&conversationId=' + conversationId);
+        $('#friendListContainer').load('/Chat/ChatMasterDuplicate?handler=FriendListPartial&conversationId=' + conversationId);
         console.log("LOADED");
     }
 
@@ -462,85 +473,85 @@
 
     </script>
 }
-    <style>
-        html, body {
-            margin: 0;
-            height: 120%;
-            overflow: hidden
-        }
+
+
+<style>
+    html, body {
+        margin: 0;
+        height: 120%;
+        overflow: hidden
+    }
 
 
 
-        .chat-online {
-            color: #34ce57
-        }
+	.chat-online {
+		color: #34ce57
+	}
 
-        .chat-offline {
-            color: #e4606d
-        }
+	.chat-offline {
+		color: #e4606d
+	}
 
 
-        .chat-list {
-            max-height: 80vh;
-            overflow-y: scroll
-        }
+    .chat-list{
+        max-height: 80vh;
+        overflow-y: scroll
+    }   
+    .chat-list > * {
+        margin: 20px 0;
+        padding: 0 10px;
+    }
 
-            .chat-list > * {
-                margin: 20px 0;
-                padding: 0 10px;
-            }
+    .chat-list > *:first-child {
+        margin-top: 0px;
+    }
 
-                .chat-list > *:first-child {
-                    margin-top: 0px;
-                }
+	.chat-messages-section {
+		display: flex;
+		flex-direction: column;
+		max-height: 80vh;
+		overflow: hidden;
+        padding-bottom: 10px
+	}
+    .all-chat-message{
+        grid-column: 2;
+        grid-row: 2;
+        overflow-y: scroll;
+        align-content: end;
+        display: flex;
+        flex-direction: column-reverse;
+    }
 
-        .chat-messages-section {
-            display: flex;
-            flex-direction: column;
-            max-height: 80vh;
-            overflow: hidden;
-            padding-bottom: 10px
-        }
+	.chat-message-left,
+	.chat-message-right {
+		display: flex;
+		flex-shrink: 0
+	}
 
-        .all-chat-message {
-            grid-column: 2;
-            grid-row: 2;
-            overflow-y: scroll;
-            align-content: end;
-            display: flex;
-            flex-direction: column-reverse;
-        }
+	.chat-message-left {
+		margin-right: auto
+	}
 
-        .chat-message-left,
-        .chat-message-right {
-            display: flex;
-            flex-shrink: 0
-        }
+	.chat-message-right {
+		flex-direction: row-reverse;
+		margin-left: auto
+	}
 
-        .chat-message-left {
-            margin-right: auto
-        }
+	.py-3 {
+		padding-top: 1rem !important;
+		padding-bottom: 1rem !important;
+	}
 
-        .chat-message-right {
-            flex-direction: row-reverse;
-            margin-left: auto
-        }
+	.px-4 {
+		padding-right: 1.5rem !important;
+		padding-left: 1.5rem !important;
+	}
 
-        .py-3 {
-            padding-top: 1rem !important;
-            padding-bottom: 1rem !important;
-        }
+	.flex-grow-0 {
+		flex-grow: 0 !important;
+	}
 
-        .px-4 {
-            padding-right: 1.5rem !important;
-            padding-left: 1.5rem !important;
-        }
-
-        .flex-grow-0 {
-            flex-grow: 0 !important;
-        }
-
-        .border-top {
-            border-top: 1px solid #dee2e6 !important;
-        }
-    </style>
+	.border-top {
+		border-top: 1px solid #dee2e6 !important;
+	}
+</style>

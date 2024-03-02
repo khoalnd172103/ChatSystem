@@ -42,5 +42,43 @@ namespace Repository
         {
             throw new NotImplementedException();
         }
+
+        public Participants GetParticipantByConversationIdAndUserId(int conversationId, int userId)
+        {
+            return ParticipantDAO.Instance.GetParticipantByConversationIdAndUserId(conversationId, userId);
+        }
+
+        public void UpdateParticipants(Participants participants)
+        => ParticipantDAO.Instance.Update(participants);
+        public void OutConversation(int conversationId, int userId)
+        {
+            var participant = ParticipantDAO.Instance.GetParticipantByConversationIdAndUserId(conversationId, userId);
+
+            if (participant != null)
+            {
+                ParticipantDAO.Instance.Remove(participant);
+            }
+        }
+
+        public bool IsLastAdminInConversation(int conversationId, int userId)
+        {
+            return ParticipantDAO.Instance
+                .GetAll()
+                .Count(p => p.ConversationId == conversationId && p.isAdmin) <= 1 &&
+                    ParticipantDAO.Instance
+                .GetAll()
+                .Any(p => p.UserId == userId &&
+                          p.ConversationId == conversationId &&
+                          p.isAdmin);
+        }
+
+        public bool IsLastMemberInConversation(int conversationId)
+        {
+            int participantCount = ParticipantDAO.Instance
+                .GetAll()
+                .Count(p => p.ConversationId == conversationId);
+
+            return participantCount == 1;
+        }
     }
 }
