@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.SignalR;
 using Repository;
 using Repository.DTOs;
 
@@ -22,7 +21,7 @@ namespace ChatSystem.Pages.Users
 
         public IActionResult OnGet(string searchString, int? pageIndex)
         {
-            const int pageSize = 5;
+            const int pageSize = 4;
             var idClaim = User.Claims.FirstOrDefault(claims => claims.Type == "UserId", null);
             if (idClaim != null)
             {

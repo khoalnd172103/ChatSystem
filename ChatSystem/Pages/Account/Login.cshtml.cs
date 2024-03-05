@@ -73,7 +73,6 @@ namespace ChatSystem.Pages.Account
 
                     await HttpContext.SignInAsync("CookieAuth", claimsPrincipal, authProperties);
                     HttpContext.Session.SetInt32("UserId", user.UserId);
-                    TempData["success"] = "Login Successful";
                     return RedirectToPage("/Users/UserList");
                 }
                 else
