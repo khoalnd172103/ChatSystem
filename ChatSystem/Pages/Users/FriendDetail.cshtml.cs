@@ -12,14 +12,14 @@ namespace ChatSystem.Pages.Users
     {
         private readonly IFriendRepository _friendRepository;
         private readonly IUserRepository _userRepository;
-        public UserProfile UserProfile { get; set; }
+        public UserProfileDto UserProfile { get; set; }
 
 
         public FriendDetailModel(IFriendRepository friendRepository, IUserRepository userRepository)
         {
             _friendRepository = friendRepository;
             _userRepository = userRepository;
-            UserProfile = new UserProfile();
+            UserProfile = new UserProfileDto();
         }
 
 
@@ -28,7 +28,7 @@ namespace ChatSystem.Pages.Users
             var user = _userRepository.GetUser(id);
             if (user != null)
             {
-                UserProfile = new UserProfile
+                UserProfile = new UserProfileDto
                 {
                     UserId = user.UserId,
                     UserName = user.UserName,

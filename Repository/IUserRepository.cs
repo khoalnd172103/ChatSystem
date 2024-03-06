@@ -20,5 +20,7 @@ namespace Repository
         List<UserDto> GetUserInGroupChat(int conversationId);
         UserDto GetUserDtoWithPhoto(int userId);
 
+        bool CheckFriendUser(int userId, int otherUserId);
+
     }
 }

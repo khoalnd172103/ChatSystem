@@ -112,8 +112,21 @@ namespace Repository
                 City = user.City,
                 Avatar = user.photos.FirstOrDefault(p => p.isMain)?.PhotoUrl
             };
-
-
         }
+
+        public bool CheckFriendUser(int userId, int otherUserId)
+        {
+            List<Friend> friendList = FriendDAO.Instance.GetFriendsForUser(userId);
+
+            var friend = friendList.FirstOrDefault(l => l.RecipientId == otherUserId);
+
+            if (friend != null)
+            {
+                return true;
+            }
+            return false;
+        }
+
     }
 }
+

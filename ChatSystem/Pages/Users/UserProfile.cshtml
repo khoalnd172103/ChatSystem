@@ -42,7 +42,7 @@
             <div class="row mt-4">
                 <div class="col-lg-11 mx-auto">
                     <div class="nav nav-pills justify-content-end">
-                        @if (Model.IsLogined)
+                        @if (Model.IsLogined && Model.IsFriend)
                         {
                             <form method="post">
                                  <input type="hidden" name="userId" value="@Model.UserProfile.UserId" />
