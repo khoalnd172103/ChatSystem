@@ -13,18 +13,20 @@ namespace ChatSystem.Pages.Users
             _userRepository = userRepository;
         }
 
-        public UserProfile UserProfile { get; set; }
+        public UserProfileDto UserProfile { get; set; }
         public bool IsLogined { get; set; } = false;
+        public bool IsFriend { get; set; } = false;
 
-        public IActionResult OnGet(int userId)
+        public IActionResult OnGet(int UserId)
         {
             var idClaim = User.Claims.FirstOrDefault(claims => claims.Type == "UserId", null);
             if (idClaim != null)
             {
                 IsLogined = true;
             }
+            int loginUserId = int.Parse(idClaim.Value);
 
-            var user = _userRepository.GetUserWithPhoto(userId);
+            var user = _userRepository.GetUserWithPhoto(UserId);
             if (user == null)
             {
                 return NotFound();
@@ -32,7 +34,9 @@ namespace ChatSystem.Pages.Users
 
             if (user != null)
             {
-                UserProfile = new UserProfile
+                IsFriend = _userRepository.CheckFriendUser(loginUserId, UserId);
+
+                UserProfile = new UserProfileDto
                 {
                     UserId = user.UserId,
                     UserName = user.UserName,

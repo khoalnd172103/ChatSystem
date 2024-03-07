@@ -1,6 +1,6 @@
 ﻿namespace ChatSystem.Pages.Users
 {
-    public class UserProfile
+    public class UserProfileDto
     {
         public int UserId { get; set; }
         public string UserName { get; set; }

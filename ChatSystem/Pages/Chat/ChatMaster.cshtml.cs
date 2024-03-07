@@ -178,7 +178,7 @@ namespace ChatSystem.Pages.Chat
             };
 
 
-            return Partial("_ChatContent", ChatContentModel);
+            return OnGetAgain(conversationDto.ConversationId);
         }
 
         public IActionResult LoadConversation(int conversationId)
