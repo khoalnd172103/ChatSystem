@@ -156,6 +156,25 @@ namespace ChatSystem.Pages.Chat
 
         }
 
+        public IActionResult OnGetLoadConversationList()
+        {
+            var idClaim = User.Claims.FirstOrDefault(claims => claims.Type == "UserId", null);
+            int userId = int.Parse(idClaim.Value);
+
+            List<Conversation> conversationList = _conversationRepository.GetAllUserConversation(userId);
+            List<Conversation> conversationOrderList = conversationList.OrderByDescending(c => _messageRepository.GetLastestMessageFromConversation(c).DateSend.Ticks).ThenByDescending(c => c.CreateAt.Ticks).ToList();
+            //List<Conversation> conversationOrderList = conversationList.OrderByDescending(c => c.CreateAt.Ticks).ToList();
+
+            foreach (var conversation in conversationOrderList)
+            {
+                ConversationDto conversationDto = MapConversationToDto(conversation, userId);
+
+                ConversationDtoList.Add(conversationDto);
+            }
+
+            return Partial("_ChatConversationList", ConversationDtoList);
+        }
+
         public IActionResult OnGetLoadMessage(int conversationId)
         {
             var idClaim = User.Claims.FirstOrDefault(claims => claims.Type == "UserId", null);
@@ -191,7 +210,8 @@ namespace ChatSystem.Pages.Chat
                 _messageRepository.Create(message);
             }
 
-            await _messageHubContext.Clients.All.SendAsync("OnSendMessage", conversationDto.ConversationId);
+            await _messageHubContext.Clients.Group(conversationDto.ConversationId.ToString()).SendAsync("OnSendMessageInConversation", conversationDto.ConversationId);
+            await _messageHubContext.Clients.All.SendAsync("OnNeedToUploadConversationList", conversationDto.ConversationId);
 
             GetConversationDetail(conversationDto.ConversationId);
 
