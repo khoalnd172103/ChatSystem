@@ -1,4 +1,3 @@
-using ChatSystem;
 using ChatSystem.Hubs;
 using DataAccessLayer;
 using DataAccessLayer.Data;
@@ -81,5 +80,6 @@ app.MapRazorPages();
 
 app.UseSession();
 app.MapHub<NotificationHub>("/friendRequest");
+app.MapHub<MessageHub>("/message");
 
 app.Run();
