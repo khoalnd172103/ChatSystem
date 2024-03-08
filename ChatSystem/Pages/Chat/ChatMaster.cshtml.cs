@@ -1,8 +1,10 @@
 using AutoMapper;
 using BusinessObject;
+using ChatSystem.Hubs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.IdentityModel.Tokens;
 using Repository;
 using Repository.DTOs;
@@ -20,12 +22,14 @@ namespace ChatSystem.Pages.Chat
 
         private readonly IFriendRepository _friendRepository;
         private readonly IPhotoRepository _photoRepository;
+        private readonly IHubContext<MessageHub> _messageHubContext;
+
         public ChatMasterModel(IConversationRepository conversationRepository,
             IParticipantRepository participantRepository,
             IUserRepository userRepository,
             IMapper mapper, IMessageRepository messageRepository,
             IFriendRepository friendRepository,
-            IPhotoRepository photoRepository)
+            IPhotoRepository photoRepository, IHubContext<MessageHub> messageHubContext)
         {
             _conversationRepository = conversationRepository;
             _participantRepository = participantRepository;
@@ -35,6 +39,7 @@ namespace ChatSystem.Pages.Chat
             _messageRepository = messageRepository;
             _friendRepository = friendRepository;
             _photoRepository = photoRepository;
+            _messageHubContext = messageHubContext;
         }
 
         public List<UserDto> GroupChatParticipants
@@ -151,7 +156,26 @@ namespace ChatSystem.Pages.Chat
 
         }
 
-        public IActionResult OnPostSendMessage()
+        public IActionResult OnGetLoadMessage(int conversationId)
+        {
+            var idClaim = User.Claims.FirstOrDefault(claims => claims.Type == "UserId", null);
+            int userId = int.Parse(idClaim.Value);
+
+            GetConversationDetail(conversationId);
+
+            UserDto = _userRepository.GetUserDtoWithPhoto(userId);
+            GroupChatParticipants = _userRepository.GetUserInGroupChat(conversationId);
+            MessageDtoList = _messageRepository.GetMessagesFromConversation(currentConversation, GroupChatParticipants);
+            ChatContentModel = new ChatContentModelDto
+            {
+                MessageDtoList = MessageDtoList,
+                UserDto = UserDto
+            };
+
+            return Partial("_ChatContent", ChatContentModel);
+        }
+
+        public async Task OnPostSendMessage()
         {
             var idClaim = User.Claims.FirstOrDefault(claims => claims.Type == "UserId", null);
             int userId = int.Parse(idClaim.Value);
@@ -166,6 +190,9 @@ namespace ChatSystem.Pages.Chat
 
                 _messageRepository.Create(message);
             }
+
+            await _messageHubContext.Clients.All.SendAsync("OnSendMessage", conversationDto.ConversationId);
+
             GetConversationDetail(conversationDto.ConversationId);
 
             UserDto = _userRepository.GetUserDtoWithPhoto(userId);
@@ -176,9 +203,6 @@ namespace ChatSystem.Pages.Chat
                 MessageDtoList = MessageDtoList,
                 UserDto = UserDto
             };
-
-
-            return OnGetAgain(conversationDto.ConversationId);
         }
 
         public IActionResult LoadConversation(int conversationId)

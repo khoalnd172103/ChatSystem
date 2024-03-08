@@ -66,7 +66,7 @@
                 @await Html.PartialAsync("_ChatHeader", Model.conversationDto)
 
             <div class="chat-messages-section p-4">
-                <div class="all-chat-message">
+                <div class="all-chat-message" id="all-chat-message">
                      @await Html.PartialAsync("_ChatContent", Model.ChatContentModel)
                 </div>
 
@@ -140,23 +140,82 @@
 
 
 <script src="~/lib/jquery/dist/jquery.js"></script>
+<script src="~/js/signalr.js"></script>
 <script>
     //String.prototype.nl2br = function () {
     //    return this.replace(/\r\n/g, "<br />");
     //}
 
-                $("#messageTextArea").val('');
+    $(function () {
+        // Handle form submission on Enter key press
         $("textarea").keypress(function (event) {
-            console.log("press")
             if (event.keyCode == 13 && !event.shiftKey) {
-                $("#sendMessageForm").submit();
-                return false;
+                $("#sendMessageForm").submit(); // Submit the form when Enter key is pressed
+                return false; // Prevent default form submission
             }
         });
+
+         //Handle form submission
+        $('#sendMessageForm').submit(function (event) {
+            event.preventDefault(); 
+            var formData = $(this).serialize();  
+
+          
+            $.ajax({
+                url: '/Chat/ChatMaster?handler=SendMessage', 
+                method: 'POST',
+                data: formData, 
+                success: function (data) {
+     
+                    console.log("Message sent successfully");
+                
+                    $("#messageTextArea").val('');
+                },
+                error: function (err) {
+                    console.error('Failed to send message:', err);
+                }
+            });
+        });
+    });
+
 
     
 </script>
 <script>
+    //send message 
+    "use strict";
+
+    var connection = new signalR.HubConnectionBuilder().withUrl("/message").build();
+
+    connection.start()
+        .then(() => console.log("SignalR Connected"))
+        .catch(err => console.error("SignalR Connection Error: ", err));
+
+    connection.on("OnSendMessage", (conversationId, message) => {
+        console.log("success");
+        console.log(conversationId, message);
+        loadMessage(conversationId);
+    });
+
+    function loadMessage(conversationId) {
+        $.ajax({
+            url: '/Chat/ChatMaster?handler=LoadMessage&conversationId=' + conversationId,
+            method: 'GET',
+            success: function (data) {
+                console.log(data);
+                $('#all-chat-message').html(data);
+                console.log("Messages loaded successfully.");
+            },
+            error: function (err) {
+                console.error('Failed to fetch message list:', err);
+            }
+        });
+    }
+    
+
+
+
+
     // Function to handle click on "Promote"
     const handlePromoteParticipantClick = (event) => {
         event.preventDefault();
