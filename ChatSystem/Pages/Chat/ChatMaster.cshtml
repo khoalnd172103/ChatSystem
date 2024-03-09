@@ -6,6 +6,8 @@
 <link rel="stylesheet" href="~/css/chatMaster.css">
 <script src="~/lib/jquery/dist/jquery.js"></script>
 <script src="~/js/signalr.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
 
 <div class="container chat-section" style="width: 1920px">
     <div class="row g-0">
@@ -33,10 +35,11 @@
                         return parseInt(id, 10);
                     });
 
-                    console.log('Conversation IDs:', conversationIds);
-
                     //send message
                     "use strict";
+
+                    var conversationIdFromModelString = @((Model.conversationDto != null) ? Model.conversationDto.ConversationId : 0);
+                    var conversationIdFromModel = parseInt(conversationIdFromModelString, 10);
 
                     var connection = new signalR.HubConnectionBuilder().withUrl("/message").build();
                     connection.start()
@@ -46,8 +49,13 @@
                     connection.on("OnNeedToUploadConversationList", (conversationId, message) => {
                         console.log("Load Converstaion List");
                         if (conversationIds.includes(conversationId)) {
-                            console.log("Conversation ID matches:", conversationId);
+                            console.log("Conversation ID matches: ", conversationId);
                             loadConversationList();
+                            console.log("conversationIdFromModel: " + conversationIdFromModel);
+                            if (conversationIdFromModel != conversationId) {
+                                console.log("new message here! toaster should appear");
+                                toastr.success('You have new message')
+                            }   
                         }
                     });
 
