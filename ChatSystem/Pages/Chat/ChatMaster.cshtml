@@ -199,9 +199,10 @@
                             <h5 class="card-title text-center">@Model.currentConversation.ConversationName</h5>
                             <hr class="mb-4">
                             <button type="button" class="btn btn-primary mt-3 edit-group-name" data-conversation-id="@Model.conversationDto.ConversationId">Edit nick name</button>
-
+                            <a class="btn btn-primary mt-3" asp-page="/Users/UserProfile" asp-route-userId="@Model.conversationDto.OtherUserId">Profile Page</a>
                         </div>
                     </div>
+
                 }
 
             </div>
