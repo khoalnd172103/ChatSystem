@@ -429,7 +429,7 @@ namespace ChatSystem.Pages.Chat
                     _conversationRepository.DeleteConversation(conversationId);
                 }
 
-                TempData["success"] = "Out Successful";
+                TempData["success"] = "Bye bye";
 
                 return RedirectToPage("/Chat/ChatMaster");
             }

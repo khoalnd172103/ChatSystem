@@ -56,7 +56,8 @@ namespace Repository
 
             if (participant != null)
             {
-                ParticipantDAO.Instance.Remove(participant);
+                participant.status = 0;
+                ParticipantDAO.Instance.Update(participant);
             }
         }
 

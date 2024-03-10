@@ -18,6 +18,7 @@ namespace Repository
         User GetUserWithPhoto(int userId);
         bool IsUserNameValidForUpdate(int userId, string username);
         List<UserDto> GetUserInGroupChat(int conversationId);
+        List<UserDto> GetCurrentUserInGroupChat(int conversationId);
         UserDto GetUserDtoWithPhoto(int userId);
 
         bool CheckFriendUser(int userId, int otherUserId);
