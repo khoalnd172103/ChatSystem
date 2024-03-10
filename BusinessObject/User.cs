@@ -27,17 +27,16 @@ namespace BusinessObject
         [Required]
         public DateTime CreateAt { get; set; }
 
-        [Required]
-        public DateTime LastActive { get; set; }
+        public DateTime? LastActive { get; set; }
         public string? Gender { get; set; }
         public string? Introduction { get; set; }
         public string? Interest { get; set; }
         public string? City { get; set; }
 
-        public List<Photo> photos { get; set; } = new();
+        public List<Photo>? photos { get; set; } = new();
         public List<Friend>? SentByUsers { get; set; }
         public List<Friend>? SentUsers { get; set; }
         public List<Message>? MessagesSent { get; set; }
-        public List<Participants> ParticipatedConversations { get; set; }
+        public List<Participants>? ParticipatedConversations { get; set; }
     }
 }

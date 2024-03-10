@@ -69,7 +69,7 @@ namespace ChatSystem.Pages.Account
             //HttpContext.Session.SetInt32("UserId", user.UserId);
             TempData["success"] = "Register successful";
 
-            return RedirectToPage("/index");
+            return RedirectToPage("/Users/UserList");
 
         }
     }
