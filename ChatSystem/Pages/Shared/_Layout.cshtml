@@ -54,5 +54,37 @@
     <script src="~/js/signalr.js"></script>
 
     @await RenderSectionAsync("Scripts", required: false)
+
+    <!-- Scripts -->
+    
+    @if (ViewData["PageName"] == null || ViewData["PageName"].ToString() != "Chat/ChatMaster")
+    {
+        var userIdClaim = User.Claims.FirstOrDefault(claims => claims.Type == "UserId", null);
+        if (userIdClaim != null)
+        {
+            var userIdInt = int.Parse(userIdClaim.Value);
+            <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+            <script>
+                console.log("out chat page");
+            var connection = new signalR.HubConnectionBuilder().withUrl("/message-notification").build();
+
+            connection.start().then(res => {
+                    connection.invoke("JoinGroup", "@userIdInt")
+                        .then(() => console.log("SignalR message-notification " + @userIdInt))
+                    .catch(err => {
+                        console.log(err);
+                    });
+            }).catch(err => {
+                console.log(err);
+            });
+
+            connection.on("OnNewMessageReceived", (message, conversationId) => {
+                console.log(conversationId);
+                toastr.success(message);
+            });
+
+        </script>
+        }
+    }
 </body>
 </html>
