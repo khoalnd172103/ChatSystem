@@ -15,5 +15,6 @@ namespace Repository
         void UpdateFriendRequest(Friend friend);
         void DeclineFriendRequest(Friend friend);
         Task<List<Friend>> GetFriendsNotInGroupAsync(int userId, int convarsationId);
+        bool CheckIsFriendAsync(int userId, int otherUserId);
     }
 }

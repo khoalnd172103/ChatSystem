@@ -9,11 +9,13 @@ namespace ChatSystem.Pages.Users
     {
         private readonly IUserRepository _userRepository;
         private readonly IConversationRepository _conversationRepository;
+        private readonly IFriendRepository _friendRepository;
 
-        public UserProfileModel(IUserRepository userRepository, IConversationRepository conversationRepository)
+        public UserProfileModel(IUserRepository userRepository, IConversationRepository conversationRepository, IFriendRepository friendRepository)
         {
             _userRepository = userRepository;
             _conversationRepository = conversationRepository;
+            _friendRepository = friendRepository;
         }
 
         public UserProfileDto UserProfile { get; set; }
@@ -28,7 +30,7 @@ namespace ChatSystem.Pages.Users
             if (idClaim != null)
             {
                 IsLogined = true;
-                IsFriend = _userRepository.CheckFriendUser(int.Parse(idClaim.Value), UserId);
+                IsFriend = _friendRepository.CheckIsFriendAsync(int.Parse(idClaim.Value), UserId);
             }
             //int loginUserId = int.Parse(idClaim.Value);
 

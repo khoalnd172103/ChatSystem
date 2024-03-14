@@ -43,6 +43,19 @@ namespace DataAccessLayer
             }
         }
 
+        public bool CheckIsFriend(int userId, int otherUserId)
+        {
+            using (var context = new DataContext())
+            {
+                var isFriend = context.Friend
+                    .Where(f => (f.SenderId == userId && f.RecipientId == otherUserId && f.status == true) ||
+                                (f.RecipientId == userId && f.SenderId == otherUserId && f.status == true))
+                    .Any();
+
+                return isFriend;
+            }
+        }
+
         public async Task<List<Friend>> SearchFriendsForUserAsync(int userId, string searchKey)
         {
             using (var context = new DataContext())

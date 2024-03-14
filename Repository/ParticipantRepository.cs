@@ -57,6 +57,7 @@ namespace Repository
             if (participant != null)
             {
                 participant.status = 0;
+                participant.isAdmin = false;
                 ParticipantDAO.Instance.Update(participant);
             }
         }
@@ -77,7 +78,7 @@ namespace Repository
         {
             int participantCount = ParticipantDAO.Instance
                 .GetAll()
-                .Count(p => p.ConversationId == conversationId);
+                .Count(p => p.ConversationId == conversationId && p.status == 1);
 
             return participantCount == 1;
         }
