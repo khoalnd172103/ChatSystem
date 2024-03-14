@@ -1,6 +1,8 @@
 ﻿@page 
 @model ChatSystem.Pages.Chat.ChatMasterModel
 @{
+    ViewData["Title"] = "Chat";
+    ViewData["PageName"] = "Chat/ChatMaster";
 }
 
 <link rel="stylesheet" href="~/css/chatMaster.css">
@@ -19,7 +21,9 @@
                 
             }else{
 
-               
+                var userIdClaim = User.Claims.FirstOrDefault(claims => claims.Type == "UserId", null);
+                var userIdInt = int.Parse(userIdClaim.Value);
+
 
                 <script>
                     var conversationIdsString = [
@@ -41,21 +45,31 @@
                     var conversationIdFromModelString = @((Model.conversationDto != null) ? Model.conversationDto.ConversationId : 0);
                     var conversationIdFromModel = parseInt(conversationIdFromModelString, 10);
 
-                    var connection = new signalR.HubConnectionBuilder().withUrl("/message").build();
-                    connection.start()
-                        .then(() => console.log("SignalR Connected"))
-                        .catch(err => console.error("SignalR Connection Error: ", err));
+                    var connection1 = new signalR.HubConnectionBuilder().withUrl("/message-notification").build();
 
-                    connection.on("OnNeedToUploadConversationList", (conversationId, message) => {
-                        console.log("Load Converstaion List");
-                        if (conversationIds.includes(conversationId)) {
-                            console.log("Conversation ID matches: ", conversationId);
+                    connection1.start().then(res => {
+                        connection1.invoke("JoinGroup", "@userIdInt")
+                            .then(() => console.log("message-notification group" + @userIdInt))
+                            .catch(err => {
+                                console.log(err);
+                            });
+                    }).catch(err => {
+                        console.log(err);
+                    });
+
+                    connection1.on("OnNewMessageReceived", (message, conversationId) => {
+                        console.log("new messag from" + conversationId);
+                        console.log("message contemt" + message);
+
+                        //if (conversationIds.includes(conversationId)) {
+                            console.log("Conversation ID matches in loaf conversation list: ", conversationId);
                             loadConversationList();
-                            console.log("conversationIdFromModel: " + conversationIdFromModel);
-                            if (conversationIdFromModel != conversationId) {
-                                console.log("new message here! toaster should appear");
-                                toastr.success('You have new message')
-                            }   
+                           console.log("conversationIdFromModel: " + conversationIdFromModel);
+                           
+                        //}
+                        if (conversationIdFromModel != conversationId) {
+                            console.log("new message here! toaster should appear");
+                            toastr.success(message);
                         }
                     });
 

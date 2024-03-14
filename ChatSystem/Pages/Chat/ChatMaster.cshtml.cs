@@ -23,13 +23,14 @@ namespace ChatSystem.Pages.Chat
         private readonly IFriendRepository _friendRepository;
         private readonly IPhotoRepository _photoRepository;
         private readonly IHubContext<MessageHub> _messageHubContext;
+        private readonly IHubContext<MessageNotificationHub> _messageNotificationHubContext;
 
         public ChatMasterModel(IConversationRepository conversationRepository,
             IParticipantRepository participantRepository,
             IUserRepository userRepository,
             IMapper mapper, IMessageRepository messageRepository,
             IFriendRepository friendRepository,
-            IPhotoRepository photoRepository, IHubContext<MessageHub> messageHubContext)
+            IPhotoRepository photoRepository, IHubContext<MessageHub> messageHubContext, IHubContext<MessageNotificationHub> messageNotificationHubContext)
         {
             _conversationRepository = conversationRepository;
             _participantRepository = participantRepository;
@@ -40,6 +41,7 @@ namespace ChatSystem.Pages.Chat
             _friendRepository = friendRepository;
             _photoRepository = photoRepository;
             _messageHubContext = messageHubContext;
+            _messageNotificationHubContext = messageNotificationHubContext;
         }
 
         public List<UserDto> GroupChatParticipants
@@ -210,13 +212,32 @@ namespace ChatSystem.Pages.Chat
                 _messageRepository.Create(message);
             }
 
-            await _messageHubContext.Clients.Group(conversationDto.ConversationId.ToString()).SendAsync("OnSendMessageInConversation", conversationDto.ConversationId);
-            await _messageHubContext.Clients.All.SendAsync("OnNeedToUploadConversationList", conversationDto.ConversationId);
 
             GetConversationDetail(conversationDto.ConversationId);
+            conversationDto = MapConversationToDto(currentConversation, userId);
+
+            await _messageHubContext.Clients.Group(conversationDto.ConversationId.ToString()).SendAsync("OnSendMessageInConversation", conversationDto.ConversationId);
+
+            //await _messageHubContext.Clients.All.SendAsync("OnNeedToUploadConversationList");
+
 
             UserDto = _userRepository.GetUserDtoWithPhoto(userId);
             GroupChatParticipants = _userRepository.GetUserInGroupChat(conversationDto.ConversationId);
+
+            foreach (var par in GroupChatParticipants)
+            {
+                if (conversationDto.isGroup)
+                {
+                    await _messageNotificationHubContext.Clients.Group(par.UserId.ToString()).SendAsync("OnNewMessageReceived", "You receive new message from group " + conversationDto.ConversationName, conversationDto.ConversationId);
+                }
+                else
+                {
+                    await _messageNotificationHubContext.Clients.Group(par.UserId.ToString()).SendAsync("OnNewMessageReceived", "You receive new message from " + UserDto.UserName, conversationDto.ConversationId);
+                }
+
+            }
+            //await _messageNotificationHubContext.Clients.All.SendAsync("OnNewMessageReceived", "You receive new message from ", 100);
+
             MessageDtoList = _messageRepository.GetMessagesFromConversation(currentConversation, GroupChatParticipants);
             ChatContentModel = new ChatContentModelDto
             {
