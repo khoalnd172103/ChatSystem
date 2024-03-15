@@ -15,6 +15,10 @@ namespace Repository
         void UpdateFriendRequest(Friend friend);
         void DeclineFriendRequest(Friend friend);
         Task<List<Friend>> GetFriendsNotInGroupAsync(int userId, int convarsationId);
+        PaginatedList<FriendListDto> GetFriendListForUser(string searchString, int? pageIndex, int pageSize, int userId);
+        int CheckFriendForUser(int userId, int otherUserId);
+        Task AcceptFriendRequest(int senderId, int recipientId);
+        Task DeclineFriendRequest(int senderId, int recipientId);
         bool CheckIsFriendAsync(int userId, int otherUserId);
     }
 }

@@ -52,6 +52,21 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="~/js/signalr.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script>
+        "use strict";
+        var connection = new signalR.HubConnectionBuilder().withUrl("/friendRequest").build();
+
+        connection.start().then(res => {
+        }).catch(err => {
+            console.error(err);
+        });
+
+        connection.on("OnSendFriendRequest", function () {
+            console.log("OnSendFriendRequest work");
+            toastr.info("You have received a new friend request.");
+        });
+    </script>
 
     @await RenderSectionAsync("Scripts", required: false)
 

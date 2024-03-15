@@ -116,11 +116,11 @@ namespace Repository
 
         public bool CheckFriendUser(int userId, int otherUserId)
         {
-            List<Friend> friendList = FriendDAO.Instance.GetFriendsForUser(userId);
+            List<Friend> friendList = FriendDAO.Instance.CheckRequestFriend(userId, otherUserId);
 
-            var friend = friendList.FirstOrDefault(l => l.RecipientId == otherUserId);
+            //var friend = friendList.FirstOrDefault(l => l.RecipientId == otherUserId);
 
-            if (friend != null)
+            if (friendList.Count() != 0)
             {
                 return true;
             }

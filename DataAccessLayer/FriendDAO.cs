@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace DataAccessLayer
 {
-    public class FriendDAO: BaseDAO<Friend>
+    public class FriendDAO : BaseDAO<Friend>
     {
         public FriendDAO() { }
 
@@ -41,6 +41,38 @@ namespace DataAccessLayer
 
                 return friends;
             }
+        }
+
+        public List<Friend> CheckRequestFriend(int loginedId, int userId)
+        {
+            using (var context = new DataContext())
+            {
+                var friendRequest = context.Friend
+                    .Where(f => (f.SenderId == loginedId && f.RecipientId == userId && f.status == true) || (f.SenderId == userId && f.RecipientId == loginedId && f.status == true))
+                    .ToList();
+
+                return friendRequest;
+            }
+        }
+
+        public List<Friend> CheckFriendForUser(int userId)
+        {
+            using (var context = new DataContext())
+            {
+                var friends = context.Friend
+                    .Where(f => (f.SenderId == userId) || (f.RecipientId == userId))
+                    .ToList();
+                return friends;
+            }
+        }
+
+        public IEnumerable<Friend> GetFriendsListForUser(int userId)
+        {
+            var db = new DataContext();
+            return db.Friend
+                .Include(f => f.SenderUser).ThenInclude(u => u.photos)
+                .Include(f => f.RecipientUser).ThenInclude(u => u.photos)
+                .Where(f => (f.SenderId == userId && f.status == true) || (f.RecipientId == userId && f.status == true)).ToList();
         }
 
         public bool CheckIsFriend(int userId, int otherUserId)
@@ -118,7 +150,35 @@ namespace DataAccessLayer
                     friend.status = false;
                     await context.SaveChangesAsync();
                 }
-            }  
+            }
+        }
+
+        public async Task AcceptFriendRequestAsync(int senderId, int recipientId)
+        {
+            using (var context = new DataContext())
+            {
+                var request = await context.Friend.FirstOrDefaultAsync(f => (f.SenderId == senderId && f.RecipientId == recipientId && f.status == false));
+
+                if (request != null)
+                {
+                    request.status = true;
+                    await context.SaveChangesAsync();
+                }
+            }
+        }
+
+        public async Task DeclineFriendRequestAsysc(int senderId, int recipientId)
+        {
+            using (var context = new DataContext())
+            {
+                var request = await context.Friend.FirstOrDefaultAsync(f => (f.SenderId == senderId && f.RecipientId == recipientId && f.status == false));
+
+                if(request != null)
+                {
+                    context.Friend.Remove(request);
+                    await context.SaveChangesAsync();
+                }
+            }
         }
 
         public async Task SendFriendRequest(int senderId, int recipientId, string senderUsername, string recipientUsername)

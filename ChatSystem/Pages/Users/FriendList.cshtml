@@ -27,14 +27,14 @@
         </div>
     </div>
     <div class="row">
-        @foreach (var friend in Model.Friends)
+        @foreach (var friend in Model.FriendLists)
         {
             <div class="col-md-6 mb-5">
                 <div class="friend-box p-3 border rounded">
                     <div class="d-flex align-items-center">
-                        <img src="http://bootdey.com/img/Content/avatar/avatar1.png" alt="Friend Photo" class="mr-7" style="max-width: 100px; max-height: 100px;">
+                        <img src="@friend.Avatar" alt="Friend Photo" class="mr-7" style="max-width: 100px; max-height: 100px;">
                         <div>
-                            <h5><a href="/Users/FriendDetail/@(friend.RecipientId == userId ? friend.SenderId : friend.RecipientId)">@((friend.RecipientId == userId ? friend.SenderUserName : friend.RecipientUserName))</a></h5>
+                            <h5><a asp-page="UserProfile" asp-route-userId="@(friend.RecipientId == userId ? friend.SenderId : friend.RecipientId)">@((friend.RecipientId == userId ? friend.SenderUserName : friend.RecipientUserName))</a></h5>
                             <p>Date Added: @friend.DateSend.ToShortDateString()</p>
                         </div>
                     </div>
