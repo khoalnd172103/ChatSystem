@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Repository;
+using Repository.DTOs;
 
 namespace ChatSystem.Pages.Users
 {
@@ -18,6 +19,7 @@ namespace ChatSystem.Pages.Users
         }
 
         public List<Friend> Friends { get; set; }
+        public PaginatedList<FriendListDto> FriendLists { get; set; }
 
         public async Task<IActionResult> OnGetAsync(string searchTerm, string sortDirection)
         {
@@ -35,13 +37,14 @@ namespace ChatSystem.Pages.Users
                 Friends = await _friendRepository.SearchFriendsForUserAsync(userId, searchTerm);
             }
             else if (!string.IsNullOrEmpty(sortDirection))
+
             {   
                 bool isAscending = sortDirection != "desc";
                 Friends = await _friendRepository.SortByDateAsync(userId, isAscending);
             }
             else
             {
-                Friends = await _friendRepository.GetFriendsForUserAsync(userId);
+                FriendLists = _friendRepository.GetFriendListForUser(searchTerm, 1, 4, userId);
             }
 
             return Page();

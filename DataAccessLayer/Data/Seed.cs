@@ -20,7 +20,7 @@ public class Seed
         foreach (var user in users)
         {
             user.UserName = user.UserName.ToLower();
-            user.UserPassword = "Pa$$w0rd";
+            user.UserPassword = "$2a$10$I9RoqF2B3XKTlhdkuFti4.SPg9BT4LQqEgKyiPkbCi.pM4yoa1bqm";
 
             context.Users.Add(user);
         }

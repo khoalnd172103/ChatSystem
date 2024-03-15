@@ -7,8 +7,12 @@ connection.on("ReceiveFriendRequestNotification", function () {
     toastr.info("You have received a new friend request.");
 });
 
+connection.on("OnSendFriendRequest", function () {
+    console.log("ReceiveFriendRequestNotification work");
+    toastr.info("You have received a new friend request.");
+});
+
 function fulfilled() {
-    console.log("Friend request connection established.");
 }
 
 function rejected() {
@@ -19,12 +23,11 @@ connection.start()
     .then(fulfilled, rejected)
     .catch(err => console.error(err.toString()));
 
-document.addEventListener("click", function (event) {
-    if (event.target && event.target.id === "addFriend") {
-        console.log("connect to function success");
-        var userId = event.target.value; // Get the userId from the button's value attribute
-        connection.invoke("SendFriendRequestNotification").catch(function (err) {
-            return console.error(err.toString());
-        });
-    }
-});
+//document.addEventListener("click", function (event) {
+//    if (event.target && event.target.id === "addFriend") {
+//        var recipientUserId = event.target.dataset.recipientUserId;
+//        connection.invoke("SendFriendRequestNotification", recipientUserId).catch(function (err) {
+//            return console.error(err.toString());
+//        });
+//    }
+//});

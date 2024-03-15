@@ -94,5 +94,46 @@ namespace Repository
         {
             return friendDAO.GetFriendsNotInGroup(userId, convarsationId);
         }
+
+        public PaginatedList<FriendListDto> GetFriendListForUser(string searchString, int? pageIndex, int pageSize, int userId)
+        {
+            var friendList = FriendDAO.Instance.GetFriendsListForUser(userId);
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                friendList = friendList.Where(u => (u.RecipientUserName.Contains(searchString)) || (u.SenderUserName.Contains(searchString)));
+            }
+
+            var friendListDto = friendList.Select(friend => new FriendListDto
+            {
+                RecipientId = friend.RecipientId,
+                RecipientUserName = friend.RecipientUserName,
+                SenderId = friend.SenderId,
+                SenderUserName = friend.SenderUserName,
+                DateSend = friend.DateSend,
+                Avatar = friend.RecipientId == userId ? (friend.SenderUser.photos.FirstOrDefault()?.PhotoUrl) : (friend.RecipientUser.photos.FirstOrDefault()?.PhotoUrl)
+            });
+            return PaginatedList<FriendListDto>.CreateAsync(
+                friendListDto.AsQueryable(), pageIndex ?? 1, pageSize);
+        }
+
+        public int CheckFriendForUser(int userId, int otherUserId)
+        {
+            List<Friend> friendList = FriendDAO.Instance.CheckFriendForUser(userId);
+
+            var isSender = friendList.FirstOrDefault(l => l.RecipientId == otherUserId);
+            var isRecipient = friendList.FirstOrDefault(l => l.SenderId == otherUserId);
+
+            if (isSender != null) return 1;
+            if (isRecipient != null) return 2;
+
+            return 0;
+        }
+
+        public Task AcceptFriendRequest(int senderId, int recipientId)
+            => FriendDAO.Instance.AcceptFriendRequestAsync(senderId, recipientId);
+
+        public Task DeclineFriendRequest(int senderId, int recipientId)
+            => FriendDAO.Instance.DeclineFriendRequestAsysc(senderId, recipientId);
     }
 }
