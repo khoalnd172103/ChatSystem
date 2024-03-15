@@ -16,5 +16,6 @@ namespace Repository
         void UpdateConversation(Conversation conversation);
         void DeleteConversation(int conversationId);
 
+        Conversation GetConversationBySenderIdAndReceiverId(int senderId, int receiverId);
     }
 }

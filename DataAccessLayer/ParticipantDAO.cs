@@ -50,5 +50,11 @@ namespace DataAccessLayer
             }
             return participants;
         }
+
+        public List<Participants> GetParticipantsByConversationId(int conversationId)
+        {
+            var context = new DataContext();
+            return context.Participants.Where(p => p.ConversationId == conversationId).ToList();
+        }
     }
 }

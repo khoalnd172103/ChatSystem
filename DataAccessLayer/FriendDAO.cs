@@ -36,7 +36,7 @@ namespace DataAccessLayer
             using (var context = new DataContext())
             {
                 var friends = context.Friend
-                    .Where(f => (f.SenderId == userId && f.status == true) || (f.RecipientId == userId && f.status == true))
+                    .Where(f => (f.SenderId == userId && f.status == true))
                     .ToList();
 
                 return friends;
@@ -73,6 +73,19 @@ namespace DataAccessLayer
                 .Include(f => f.SenderUser).ThenInclude(u => u.photos)
                 .Include(f => f.RecipientUser).ThenInclude(u => u.photos)
                 .Where(f => (f.SenderId == userId && f.status == true) || (f.RecipientId == userId && f.status == true)).ToList();
+        }
+
+        public bool CheckIsFriend(int userId, int otherUserId)
+        {
+            using (var context = new DataContext())
+            {
+                var isFriend = context.Friend
+                    .Where(f => (f.SenderId == userId && f.RecipientId == otherUserId && f.status == true) ||
+                                (f.RecipientId == userId && f.SenderId == otherUserId && f.status == true))
+                    .Any();
+
+                return isFriend;
+            }
         }
 
         public async Task<List<Friend>> SearchFriendsForUserAsync(int userId, string searchKey)
@@ -200,12 +213,34 @@ namespace DataAccessLayer
 
         public async Task<List<Friend>> GetFriendsNotInGroup(int userId, int conversationId)
         {
-            var context = new DataContext();
+            using (var context = new DataContext())
+            {
+                var participantUserIds = await context.Participants
+                    .Where(p => p.ConversationId == conversationId)
+                    .Select(p => p.UserId)
+                    .ToListAsync();
 
-            return await context.Friend
-                    .Where(f => f.SenderId == userId && !context.Participants
-                    .Where(p => p.ConversationId == conversationId && p.UserId != userId)
-                    .Any(p => p.UserId == f.RecipientId)).ToListAsync();
+                var friendsNotInGroup = await context.Friend
+                    .Where(f =>
+                        f.SenderId == userId &&
+                        !participantUserIds.Contains(f.RecipientId))
+                    .ToListAsync();
+
+                var participantsWithStatusZero = await context.Participants
+                    .Where(p => p.ConversationId == conversationId && p.status == 0)
+                    .Select(p => p.UserId)
+                    .ToListAsync();
+
+                var friendsOutOfGroup = await context.Friend
+                    .Where(f =>
+                        f.SenderId == userId &&
+                        participantsWithStatusZero.Contains(f.RecipientId))
+                    .ToListAsync();
+
+                friendsNotInGroup.AddRange(friendsOutOfGroup);
+
+                return friendsNotInGroup;
+            }
         }
     }
 }

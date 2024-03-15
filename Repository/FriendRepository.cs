@@ -135,5 +135,10 @@ namespace Repository
 
         public Task DeclineFriendRequest(int senderId, int recipientId)
             => FriendDAO.Instance.DeclineFriendRequestAsysc(senderId, recipientId);
+
+        public bool CheckIsFriendAsync(int userId, int otherUserId)
+        {
+            return friendDAO.CheckIsFriend(userId, otherUserId);
+        }
     }
 }

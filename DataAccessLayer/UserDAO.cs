@@ -74,7 +74,7 @@ namespace DataAccessLayer
             using (var context = new DataContext())
             {
                 var participants = context.Participants
-                    .Where(p => p.ConversationId == conversationId && p.status == 1)
+                    .Where(p => p.ConversationId == conversationId)
                     .ToList();
 
                 using (var context1 = new DataContext())
@@ -90,6 +90,25 @@ namespace DataAccessLayer
                         }
                     }
                 }
+            }
+            return users;
+        }
+
+        public List<User> GetCurrentUserInGroupChat(int conversationId)
+        {
+            List<User> users = new();
+
+            using (var context = new DataContext())
+            {
+                var participants = context.Participants
+                    .Where(p => p.ConversationId == conversationId && p.status == 1)
+                    .ToList();
+
+                var userIds = participants.Select(p => p.UserId).ToList();
+
+                users = context.Users.Include(u => u.photos)
+                    .Where(u => userIds.Contains(u.UserId))
+                    .ToList();
             }
             return users;
         }

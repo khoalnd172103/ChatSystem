@@ -55,16 +55,34 @@ namespace Repository
                 Participants = new List<Participants>()
             };
 
-            conversation.Participants.AddRange(memberIdList.Select(friendId => new Participants
+            var existingParticipants = ParticipantDAO.Instance.GetParticipantsByConversationId(conversationId);
+
+            foreach (var memberId in memberIdList)
             {
-                UserId = int.Parse(friendId),
-                status = 1,
-                isAdmin = false,
-                Conversation = conversation
-            }));
+                var friendId = int.Parse(memberId);
+
+                var existingParticipant = existingParticipants.FirstOrDefault(p => p.UserId == friendId && p.status == 0);
+
+                if (existingParticipant != null)
+                {
+                    existingParticipant.status = 1;
+                    ParticipantDAO.Instance.Update(existingParticipant);
+                }
+                else
+                {
+                    conversation.Participants.Add(new Participants
+                    {
+                        UserId = friendId,
+                        status = 1,
+                        isAdmin = false,
+                        Conversation = conversation
+                    });
+                }
+            }
 
             ConversationDAO.Instance.Update(conversation);
         }
+
 
         public bool Delete(Conversation entity)
         {
@@ -129,5 +147,10 @@ namespace Repository
         
         public void DeleteConversation(int conversationId)
         => ConversationDAO.Instance.DeleteConversation(conversationId);
+
+        public Conversation GetConversationBySenderIdAndReceiverId(int senderId, int receiverId)
+        {
+            return ConversationDAO.Instance.GetConversationBySenderIdAndReceiverId(senderId, receiverId);
+        }
     }
 }
