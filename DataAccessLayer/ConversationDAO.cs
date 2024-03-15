@@ -33,7 +33,7 @@ namespace DataAccessLayer
             using (var context = new DataContext())
             {
                 var participants = context.Participants
-                    .Where(p => p.UserId == userId)
+                    .Where(p => p.UserId == userId && p.status == 1)
                     .ToList();
 
                 foreach (Participants participant in participants)
@@ -93,6 +93,18 @@ namespace DataAccessLayer
 
                 context.SaveChanges();
             }
+        }
+
+        public Conversation GetConversationBySenderIdAndReceiverId(int senderId, int receiverId)
+        {
+            var context = new DataContext();
+
+            return context.Conversations
+            .Include(c => c.Participants)
+            .FirstOrDefault(c =>
+                c.Participants.Any(p => p.UserId == senderId) &&
+                c.Participants.Any(p => p.UserId == receiverId) &&
+                c.isGroup == false);
         }
     }
 }

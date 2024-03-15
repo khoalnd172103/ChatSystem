@@ -94,5 +94,10 @@ namespace Repository
         {
             return friendDAO.GetFriendsNotInGroup(userId, convarsationId);
         }
+
+        public bool CheckIsFriendAsync(int userId, int otherUserId)
+        {
+            return friendDAO.CheckIsFriend(userId, otherUserId);
+        }
     }
 }

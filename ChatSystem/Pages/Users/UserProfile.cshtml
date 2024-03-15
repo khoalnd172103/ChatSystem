@@ -34,8 +34,6 @@
                 <div class="col-lg-12">
                     <ul class="nav nav-pills justify-content-center">
                         <li class="nav-item"><a class="nav-link active" asp-page="/Users/UserProfile">About</a></li>
-                        <li><a href="#">Friends</a></li>
-                        <li><a href="#">Photos</a></li>
                     </ul>
                 </div>
             </div>
@@ -47,6 +45,13 @@
                             <form method="post">
                                  <input type="hidden" name="userId" value="@Model.UserProfile.UserId" />
                                  <button type="submit" name="addFriend" value="@Model.UserProfile.UserId" class="btn btn-outline-primary">Add Friend</button>
+                            </form>
+                        }
+                        else if (Model.IsLogined && Model.IsFriend)
+                        {
+                            <form method="post" asp-page-handler="StartConversation">
+                                <input type="hidden" name="UserId" value="@Model.UserProfile.UserId" />
+                                <button type="submit" class="btn btn-outline-primary">Chat</button>
                             </form>
                         }
                     </div>
