@@ -43,36 +43,34 @@
             <div class="row mt-4">
                 <div class="col-lg-11 mx-auto">
                     <div class="nav nav-pills justify-content-end">
+                        
                         @if (Model.IsLogined && !Model.IsFriend)
                         {
+                            var userIdClaim = User.Claims.FirstOrDefault(claims => claims.Type == "UserId", null);
+                            var userIdInt = int.Parse(userIdClaim.Value);
+                            <script>
+                                var friendConnection = new signalR.HubConnectionBuilder().withUrl("/friendRequest").build();
+
+                                friendConnection.start().then(res => {
+                                    friendConnection.invoke("JoinGroup", "@userIdInt")
+                                        .then(() => console.log("friend group" + @userIdInt))
+                                        .catch(err => {
+                                            console.log(err);
+                                        });
+                                }).catch(err => {
+                                    console.log(err);
+                                });
+
+                                friendConnection.on("OnSendFriendRequest", (message) => {
+                                    toastr.success(message);
+                                }
+                            </script>
                             if (Model.FriendStatus == 0)
                             {
                                 <form method="post" asp-page-handler="AddFriend" id="addFriendForm">
                                     <input type="hidden" name="UserId" value="@Model.UserProfile.UserId" />
                                     <button type="submit" id="addFriend" name="addFriend" value="@Model.UserProfile.UserId" class="btn btn-outline-primary" data-recipientUserId="@Model.UserProfile.UserId">Add Friend</button>
                                 </form>
-                                <script>
-                                    "use strict";
-                                    var connection = new signalR.HubConnectionBuilder().withUrl("/friendRequest").build();
-
-                                    connection.start().then(res => {
-                                        connection.invoke("JoinGroup", "@Model.UserProfile.UserId")
-                                            .then(() => console.log("friend-notification group" + @Model.UserProfile.UserId))
-                                            .catch(err => {
-                                                console.log(err);
-                                            });
-                                    }).catch(err => {
-                                        console.error(err);
-                                    });
-
-                                    connection.on("OnSendFriendRequest", function () {
-                                        console.log("OnSendFriendRequest work");
-                                        document.getElementById("addFriend").innerHTML = "Waiting for response";
-                                        document.getElementById("addFriend").setAttribute("disabled", "disabled");
-                                    });
-                                </script>
-
-
                             }
                             else if (Model.FriendStatus == 1)
                             {

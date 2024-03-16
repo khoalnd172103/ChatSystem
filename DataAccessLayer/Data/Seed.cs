@@ -27,4 +27,21 @@ public class Seed
 
         await context.SaveChangesAsync();
     }
+
+    public static async Task SeedPhotos(DataContext context)
+    {
+        if (await context.Photos.AnyAsync()) return;
+
+        var photoData = await File.ReadAllTextAsync("PhotoSeedData.json");
+
+        var photos = JsonSerializer.Deserialize<List<Photo>>(photoData);
+
+        
+        foreach (var photo in photos)
+        {
+            context.Photos.Add(photo);
+        }
+
+        await context.SaveChangesAsync();
+    }
 }
