@@ -181,6 +181,20 @@ namespace DataAccessLayer
             }
         }
 
+        public async Task DeleteFriendAsync(int senderId, int recipientId)
+        {
+            using (var context = new DataContext())
+            {
+                var request = await context.Friend.FirstOrDefaultAsync(f => (f.SenderId == senderId && f.RecipientId == recipientId && f.status == true));
+
+                if (request != null)
+                {
+                    context.Friend.Remove(request);
+                    await context.SaveChangesAsync();
+                }
+            }
+        }
+
         public async Task SendFriendRequest(int senderId, int recipientId, string senderUsername, string recipientUsername)
         {
             using (var context = new DataContext())

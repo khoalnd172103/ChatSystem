@@ -5,10 +5,11 @@
 
 <div class="container">
     <div class="row">
-        @foreach(var request in Model.Request)
+        @foreach (var request in Model.Request)
         {
-            <a asp-page="UserProfile" asp-route-userId="@request.SenderId" class="text-decoration-none">
-                <div class="card" style="width: 18rem;">
+
+            <div class="card" style="width: 18rem;">
+                <a asp-page="UserProfile" asp-route-userId="@request.SenderId" class="text-decoration-none">
                     <img class="card-img-top" src="@request.AvatarUrl" alt="Card image cap">
                     <div class="card-body">
                         <p class="card-text text-uppercase text-muted">@request.SenderName</p>
@@ -21,8 +22,9 @@
                             </form>
                         </div>
                     </div>
-                </div>
-            </a>            
+                </a>
+            </div>
+
         }
     </div>
 </div>

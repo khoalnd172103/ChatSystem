@@ -19,6 +19,7 @@ namespace Repository
         int CheckFriendForUser(int userId, int otherUserId);
         Task AcceptFriendRequest(int senderId, int recipientId);
         Task DeclineFriendRequest(int senderId, int recipientId);
+        Task DeleteFriendAsync(int senderId, int recipientId);
         bool CheckIsFriendAsync(int userId, int otherUserId);
     }
 }

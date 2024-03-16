@@ -103,6 +103,10 @@
                 friendConnection.on("OnSendFriendRequest", (message) => {
                     toastr.success(message);
                 });
+
+                friendConnection.on("OnAcceptFriendRequest", (message) => {
+                    toastr.success(message);
+                });
             </script>
         }
     }

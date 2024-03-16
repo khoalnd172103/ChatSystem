@@ -140,5 +140,8 @@ namespace Repository
         {
             return friendDAO.CheckIsFriend(userId, otherUserId);
         }
+
+        public Task DeleteFriendAsync(int senderId, int recipientId)
+         => FriendDAO.Instance.DeleteFriendAsync(senderId, recipientId);
     }
 }

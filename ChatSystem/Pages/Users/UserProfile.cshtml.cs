@@ -139,6 +139,7 @@ namespace ChatSystem.Pages.Users
             }
             int loginUserId = int.Parse(idClaim.Value);
             await friendRepository.AcceptFriendRequest(UserId, loginUserId);
+            await notificationContext.Clients.Group(UserId.ToString()).SendAsync("OnAcceptFriendRequest", "accept your friend request");
             return RedirectToPage("/Users/UserProfile", new { userId = UserId });
         }
 
@@ -162,7 +163,7 @@ namespace ChatSystem.Pages.Users
                 IsLogined = true;
             }
             int loginUserId = int.Parse(idClaim.Value);
-            //await friendRepository.DeclineFriendRequest(UserId, loginUserId);
+            await friendRepository.DeleteFriendAsync(UserId, loginUserId);
             return RedirectToPage("/Users/UserProfile", new { userId = UserId });
         }
 
