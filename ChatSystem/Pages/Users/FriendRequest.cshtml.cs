@@ -1,6 +1,8 @@
 using BusinessObject;
+using ChatSystem.Hubs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.SignalR;
 using Repository;
 using Repository.DTOs;
 
@@ -10,17 +12,21 @@ namespace ChatSystem.Pages.Users
     {
         private readonly IFriendRepository friendRepository;
         private readonly IUserRepository userRepository;
+        private readonly IHubContext<NotificationHub> notificationContext;
         public int? userId { get; set; } = 0;
         public PaginatedList<FriendRequestDto> Request { get; set; }
-        public FriendRequestModel(IFriendRepository friendRepository, IUserRepository userRepository, IPhotoRepository photoRepository)
+        public FriendRequestModel(IFriendRepository friendRepository, IUserRepository userRepository, IPhotoRepository photoRepository, IHubContext<NotificationHub> notificationContext)
         {
             this.friendRepository = friendRepository;
             this.userRepository = userRepository;
+            this.notificationContext = notificationContext;
         }
 
         public void OnGet()
         {
-            userId = HttpContext.Session.GetInt32("UserId");
+            var userIdClaim = User.Claims.FirstOrDefault(claims => claims.Type == "UserId", null);
+            userId = int.Parse(userIdClaim.Value);
+
             LoadRequest();
         }
 
@@ -51,7 +57,7 @@ namespace ChatSystem.Pages.Users
             // Accept friend request logic here
             friendRequest.status = true;
             friendRepository.UpdateFriendRequest(friendRequest);
-
+            await notificationContext.Clients.Group(friendRequest.SenderId.ToString()).SendAsync("OnAcceptFriendRequest", "accept your friend request");
             return RedirectToPage("FriendRequest");
         }
 
