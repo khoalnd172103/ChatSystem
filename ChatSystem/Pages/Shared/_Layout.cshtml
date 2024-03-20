@@ -29,8 +29,8 @@
                         </li>
                     </ul>
                 </div>
-               
-                
+
+
                 <div class="mr-2">
                     <partial name="_LoginStatus" />
                 </div>
@@ -57,7 +57,6 @@
     @await RenderSectionAsync("Scripts", required: false)
 
     <!-- Scripts -->
-    
     @if (ViewData["PageName"] == null || ViewData["PageName"].ToString() != "Chat/ChatMaster")
     {
         var userIdClaim = User.Claims.FirstOrDefault(claims => claims.Type == "UserId", null);
@@ -67,24 +66,48 @@
             <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
             <script>
                 console.log("out chat page");
-            var connection = new signalR.HubConnectionBuilder().withUrl("/message-notification").build();
+                var connection = new signalR.HubConnectionBuilder().withUrl("/message-notification").build();
 
-            connection.start().then(res => {
+                connection.start().then(res => {
                     connection.invoke("JoinGroup", "@userIdInt")
                         .then(() => console.log("SignalR message-notification " + @userIdInt))
-                    .catch(err => {
-                        console.log(err);
-                    });
-            }).catch(err => {
-                console.log(err);
-            });
+                        .catch(err => {
+                            console.log(err);
+                        });
+                }).catch(err => {
+                    console.log(err);
+                });
 
-            connection.on("OnNewMessageReceived", (message, conversationId) => {
-                console.log(conversationId);
-                toastr.success(message);
-            });
+                connection.on("OnNewMessageReceived", (message, conversationId) => {
+                    console.log(conversationId);
+                    toastr.success(message);
+                });
 
-        </script>
+                
+
+            </script>
+
+            <script>
+                var friendConnection = new signalR.HubConnectionBuilder().withUrl("/friendRequest").build();
+
+                friendConnection.start().then(res => {
+                    friendConnection.invoke("JoinGroup", "@userIdInt")
+                        .then(() => console.log("Friend Request " + @userIdInt))
+                        .catch(err => {
+                            console.log(err);
+                        });
+                }).catch(err => {
+                    console.log(err);
+                });
+
+                friendConnection.on("OnSendFriendRequest", (message) => {
+                    toastr.success(message);
+                });
+
+                friendConnection.on("OnAcceptFriendRequest", (message) => {
+                    toastr.success(message);
+                });
+            </script>
         }
     }
 </body>

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.SignalR;
 using Repository;
+using Repository.DTOs;
 
 namespace ChatSystem.Pages.Users
 {
@@ -113,7 +114,7 @@ namespace ChatSystem.Pages.Users
 
         public async Task<IActionResult> OnPostAddFriend()
         {
-            await notificationContext.Clients.All.SendAsync("OnSendFriendRequest");
+            
 
             var idClaim = User.Claims.FirstOrDefault(claims => claims.Type == "UserId", null);
             if (idClaim != null)
@@ -125,6 +126,7 @@ namespace ChatSystem.Pages.Users
             var recipientUserName = _userRepository.GetUser(UserId).UserName;
             var senderUserName = _userRepository.GetUser(currentUserId).UserName;
             await friendRepository.SendFriendRequest(currentUserId, UserId, senderUserName, recipientUserName);
+            await notificationContext.Clients.Group(UserId.ToString()).SendAsync("OnSendFriendRequest", "You receive a friend request from " + senderUserName);
             return RedirectToPage("/Users/UserProfile", new { userId = UserId });
         }
 
@@ -137,6 +139,7 @@ namespace ChatSystem.Pages.Users
             }
             int loginUserId = int.Parse(idClaim.Value);
             await friendRepository.AcceptFriendRequest(UserId, loginUserId);
+            await notificationContext.Clients.Group(UserId.ToString()).SendAsync("OnAcceptFriendRequest", "accept your friend request");
             return RedirectToPage("/Users/UserProfile", new { userId = UserId });
         }
 
@@ -160,7 +163,7 @@ namespace ChatSystem.Pages.Users
                 IsLogined = true;
             }
             int loginUserId = int.Parse(idClaim.Value);
-            //await friendRepository.DeclineFriendRequest(UserId, loginUserId);
+            await friendRepository.DeleteFriendAsync(UserId, loginUserId);
             return RedirectToPage("/Users/UserProfile", new { userId = UserId });
         }
 
