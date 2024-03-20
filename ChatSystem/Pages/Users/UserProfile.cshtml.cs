@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.SignalR;
 using Repository;
-using Repository.DTOs;
 
 namespace ChatSystem.Pages.Users
 {

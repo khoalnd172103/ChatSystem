@@ -10,7 +10,7 @@ namespace Repository
             ConversationDAO.Instance.Create(entity);
         }
 
-        public void CreateGroup(int creatorId, string groupName, List<string> memberIdList)
+        public Conversation CreateGroup(int creatorId, string groupName, List<string> memberIdList)
         {
             var conversation = new Conversation
             {
@@ -39,6 +39,8 @@ namespace Repository
             }));
 
             ConversationDAO.Instance.Create(conversation);
+
+            return conversation;
         }
 
         public void AddUserToGroup(int creatorId, int conversationId, List<string> memberIdList)

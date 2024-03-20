@@ -4,7 +4,7 @@ namespace Repository
 {
     public interface IConversationRepository : IBaseRepository<Conversation>
     {
-        void CreateGroup(int creatorId, string groupName, List<string> memberIdList);
+        Conversation CreateGroup(int creatorId, string groupName, List<string> memberIdList);
         void AddUserToGroup(int creatorId, int conversationId, List<string> memberIdList);
 
         List<Conversation> GetAllUserConversation(int userId);

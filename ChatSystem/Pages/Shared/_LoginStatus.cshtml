@@ -7,7 +7,6 @@
             <a class="dropdown-item" asp-page="/Users/FriendList">Friend List</a>
             <div class="dropdown-divider"></div>
             <a class="dropdown-item" asp-page="/Chat/CreateGroupChat">Create Group</a>
-            <a class="dropdown-item" href="#">Something else here</a>
             <div class="dropdown-divider"></div>
             <form method="post" class="form-inline" asp-page="/Account/Logout">
                 <button type="submit" class="ml-2 dropdown-item">Logout</button>
@@ -16,7 +15,13 @@
     </li>
 
 }else{
-    <a class="nav-link" asp-page="/Account/Login">Login</a>
+    <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Welcome @User.Identity.Name</a>
+        <div class="dropdown-menu">
+            <a class="dropdown-item" asp-page="/Account/Login">Login</a>
+            <a class="dropdown-item" asp-page="/Account/Register">Register</a>
+        </div>
+    </li>
 }
 
 <partial name="_Notification" />

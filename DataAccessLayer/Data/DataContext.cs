@@ -1,5 +1,4 @@
 ﻿using BusinessObject;
-using CloudinaryDotNet;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
