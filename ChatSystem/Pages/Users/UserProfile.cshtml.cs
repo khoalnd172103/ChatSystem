@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.SignalR;
 using Repository;
-using Repository.DTOs;
 
 namespace ChatSystem.Pages.Users
 {
@@ -39,7 +38,7 @@ namespace ChatSystem.Pages.Users
                 IsLogined = true;
                 IsFriend = friendRepository.CheckIsFriendAsync(int.Parse(idClaim.Value), UserId);
             }
-            int loginUserId = int.Parse(idClaim.Value);
+            //int loginUserId = int.Parse(idClaim.Value);
 
             var user = _userRepository.GetUserWithPhoto(UserId);
             if (user == null)
@@ -49,10 +48,10 @@ namespace ChatSystem.Pages.Users
 
             if (user != null)
             {
-                IsFriend = _userRepository.CheckFriendUser(loginUserId, UserId);
-
-                if (!IsFriend)
+                if (!IsFriend && IsLogined)
                 {
+                    int loginUserId = int.Parse(idClaim.Value);
+                    IsFriend = _userRepository.CheckFriendUser(loginUserId, UserId);
                     FriendStatus = friendRepository.CheckFriendForUser(loginUserId, UserId);
                 }
                 UserProfile = new UserProfileDto

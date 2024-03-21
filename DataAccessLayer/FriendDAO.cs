@@ -1,11 +1,6 @@
 ﻿using BusinessObject;
 using Microsoft.EntityFrameworkCore;
 using PRN221ProjectGroup.Data;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DataAccessLayer
 {
@@ -28,18 +23,6 @@ namespace DataAccessLayer
                     }
                     return instance;
                 }
-            }
-        }
-
-        public List<Friend> GetFriendsForUser(int userId)
-        {
-            using (var context = new DataContext())
-            {
-                var friends = context.Friend
-                    .Where(f => (f.SenderId == userId && f.status == true))
-                    .ToList();
-
-                return friends;
             }
         }
 
