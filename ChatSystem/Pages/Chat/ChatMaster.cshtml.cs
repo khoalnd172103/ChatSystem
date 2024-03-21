@@ -79,6 +79,9 @@ namespace ChatSystem.Pages.Chat
         [BindProperty]
         public bool IsLastMemberLogined { get; set; } = false;
 
+        [BindProperty]
+        public bool IsUserAdminInConversation { get; set; }
+
         //private Dictionary<int, UserDto> UserDtoDictionary { get; set; }
 
         public IActionResult OnGet()
@@ -113,6 +116,7 @@ namespace ChatSystem.Pages.Chat
 
                     IsLastAdminLogined = _participantRepository.IsLastAdminInConversation(conversationId, userId);
                     IsLastMemberLogined = _participantRepository.IsLastMemberInConversation(conversationId);
+                    //IsUserAdminInConversation = _participantRepository.IsUserAdminInConversation(conversationId, userId);
 
                     return Page();
                 }
@@ -273,6 +277,8 @@ namespace ChatSystem.Pages.Chat
             GetConversationDetail(conversationId);
 
             conversationDto = MapConversationToDto(currentConversation, UserDto.UserId);
+            IsUserAdminInConversation = _participantRepository.IsUserAdminInConversation(conversationId, userId);
+
 
             MessageDtoList = _messageRepository.GetMessagesFromConversation(currentConversation, GroupChatParticipants);
             ChatContentModel = new ChatContentModelDto
@@ -338,6 +344,8 @@ namespace ChatSystem.Pages.Chat
                     participant.status = 0;
 
                     _participantRepository.UpdateParticipants(participant);
+
+                    _groupChatHubContext.Clients.All.SendAsync("UserKickedFromGroup", conversationId, userId);
                 }
                 TempData["success"] = "User kicked from the group successfully.";
                 return RedirectToPage("/Chat/ChatMaster", new { id = conversationId });
