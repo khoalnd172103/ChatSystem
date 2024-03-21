@@ -24,13 +24,16 @@ namespace ChatSystem.Pages.Chat
         private readonly IPhotoRepository _photoRepository;
         private readonly IHubContext<MessageHub> _messageHubContext;
         private readonly IHubContext<MessageNotificationHub> _messageNotificationHubContext;
+        private readonly IHubContext<GroupChatHub> _groupChatHubContext;
 
         public ChatMasterModel(IConversationRepository conversationRepository,
             IParticipantRepository participantRepository,
             IUserRepository userRepository,
             IMapper mapper, IMessageRepository messageRepository,
             IFriendRepository friendRepository,
-            IPhotoRepository photoRepository, IHubContext<MessageHub> messageHubContext, IHubContext<MessageNotificationHub> messageNotificationHubContext)
+            IPhotoRepository photoRepository, IHubContext<MessageHub> messageHubContext, 
+            IHubContext<MessageNotificationHub> messageNotificationHubContext,
+            IHubContext<GroupChatHub> groupChatHubContext)
         {
             _conversationRepository = conversationRepository;
             _participantRepository = participantRepository;
@@ -42,6 +45,7 @@ namespace ChatSystem.Pages.Chat
             _photoRepository = photoRepository;
             _messageHubContext = messageHubContext;
             _messageNotificationHubContext = messageNotificationHubContext;
+            _groupChatHubContext = groupChatHubContext;
         }
 
         public List<UserDto> GroupChatParticipants
@@ -357,6 +361,8 @@ namespace ChatSystem.Pages.Chat
 
                     _conversationRepository.UpdateConversation(conversation);
                 }
+                _groupChatHubContext.Clients.All.SendAsync("ReceiveUpdatedConversationName", conversationId, newGroupName);
+
                 TempData["success"] = "Group Name Updated Successfully";
                 return RedirectToPage("/Chat/ChatMaster", new { id = conversationId });
             }
