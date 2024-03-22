@@ -175,33 +175,33 @@
                             <h5 class="card-title text-center">@Model.currentConversation.ConversationName</h5>
                             <hr class="mb-4">
                             <h6>Group Members:</h6>
-                            @foreach (var participant in Model.GroupChatParticipants)
+                            <ul id="group-members-list">
+                                @foreach (var participant in Model.GroupChatParticipants)
+                                {
+                                    <li class="list-group-item d-flex justify-content-between align-items-center" id="user-list">
+                                        @participant.KnownAs
+                                        <div class="dropdown">
+                                            <button class="btn btn-sm btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false"></button>
+                                            <ul class="dropdown-menu">
+                                                <li><a class="dropdown-item kick-participant" data-participant-id="@participant.UserId" data-conversation-id="@Model.conversationDto.ConversationId" href="#">Kick</a></li>
+                                                @if (Model.IsUserAdminInConversation)
+                                                {
+                                                    <li><a class="dropdown-item promote-participant" data-participant-id="@participant.UserId" data-conversation-id="@Model.conversationDto.ConversationId" href="#">Promote</a></li>
+                                                }
+                                            </ul>
+                                        </div>
+                                    </li>
+                                }
+                            </ul>
+                            <button type="button" class="btn btn-primary mt-3" onclick="showAddUserModal(@Model.conversationDto.ConversationId)">Invite</button>
+                            @if (Model.IsUserAdminInConversation)
                             {
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    @participant.KnownAs
-                                    <div class="dropdown">
-                                        <button class="btn btn-sm btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false"></button>
-                                        <ul class="dropdown-menu">
-                                            <li><a class="dropdown-item kick-participant" data-participant-id="@participant.UserId" data-conversation-id="@Model.conversationDto.ConversationId" href="#">Kick</a></li>
-                                            <li><a class="dropdown-item promote-participant" data-participant-id="@participant.UserId" data-conversation-id="@Model.conversationDto.ConversationId" href="#">Promote</a></li>
-                                        </ul>
-                                    </div>
-                                </li>
-
+                                <button type="button" class="btn btn-primary mt-3 delete-group" data-conversation-id="@Model.conversationDto.ConversationId">Delete group</button>
                             }
-                            <button type="button" class="btn btn-primary mt-3"
-                                    onclick="showAddUserModal(@Model.conversationDto.ConversationId)">
-                                Invite
-                            </button>
-                            <button type="button" class="btn btn-primary mt-3 delete-group" data-conversation-id="@Model.conversationDto.ConversationId">Delete group</button>
                             <button type="button" class="btn btn-primary mt-3 edit-group-name" data-conversation-id="@Model.conversationDto.ConversationId">Edit group name</button>
-                            <button type="button" class="btn btn-danger mt-3" 
-                                    onclick="outGroupModal(@Model.conversationDto.ConversationId)">
-                                Quit
-                            </button>
+                            <button type="button" class="btn btn-danger mt-3" onclick="outGroupModal(@Model.conversationDto.ConversationId)">Quit</button>
                         </div>
                     </div>
-
                 }
                 else
                 {
@@ -532,7 +532,6 @@
     }
 </script>
 
-
 @section Scripts {
     <script>
         var selectedFriends = [];
@@ -570,4 +569,7 @@
 
     </script>
 }
-    
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="~/lib/microsoft/signalr/dist/browser/signalr.js"></script>
+<script src="~/js/GroupChat.js"></script>

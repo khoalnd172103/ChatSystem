@@ -1,4 +1,3 @@
-using BusinessObject;
 using ChatSystem.Hubs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;

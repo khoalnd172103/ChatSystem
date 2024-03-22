@@ -46,6 +46,14 @@ namespace ChatSystem.Pages.Account
             }
             try
             {
+                User.photos = new List<Photo>();
+                Photo avatar = new()
+                {
+                    isMain = true,
+                    PhotoUrl = "https://res.cloudinary.com/dfdwupiah/image/upload/v1710478629/PRN221_GroupProject/ypaevnm6q25itsooevct.png",
+                };
+                User.photos.Add(avatar);
+
                 _userRepository.CreateUser(User);
                 TempData["success"] = "Register successful";
             }

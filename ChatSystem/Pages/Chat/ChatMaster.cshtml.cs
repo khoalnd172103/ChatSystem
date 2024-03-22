@@ -24,13 +24,16 @@ namespace ChatSystem.Pages.Chat
         private readonly IPhotoRepository _photoRepository;
         private readonly IHubContext<MessageHub> _messageHubContext;
         private readonly IHubContext<MessageNotificationHub> _messageNotificationHubContext;
+        private readonly IHubContext<GroupChatHub> _groupChatHubContext;
 
         public ChatMasterModel(IConversationRepository conversationRepository,
             IParticipantRepository participantRepository,
             IUserRepository userRepository,
             IMapper mapper, IMessageRepository messageRepository,
             IFriendRepository friendRepository,
-            IPhotoRepository photoRepository, IHubContext<MessageHub> messageHubContext, IHubContext<MessageNotificationHub> messageNotificationHubContext)
+            IPhotoRepository photoRepository, IHubContext<MessageHub> messageHubContext, 
+            IHubContext<MessageNotificationHub> messageNotificationHubContext,
+            IHubContext<GroupChatHub> groupChatHubContext)
         {
             _conversationRepository = conversationRepository;
             _participantRepository = participantRepository;
@@ -42,6 +45,7 @@ namespace ChatSystem.Pages.Chat
             _photoRepository = photoRepository;
             _messageHubContext = messageHubContext;
             _messageNotificationHubContext = messageNotificationHubContext;
+            _groupChatHubContext = groupChatHubContext;
         }
 
         public List<UserDto> GroupChatParticipants
@@ -74,6 +78,9 @@ namespace ChatSystem.Pages.Chat
 
         [BindProperty]
         public bool IsLastMemberLogined { get; set; } = false;
+
+        [BindProperty]
+        public bool IsUserAdminInConversation { get; set; }
 
         //private Dictionary<int, UserDto> UserDtoDictionary { get; set; }
 
@@ -109,6 +116,7 @@ namespace ChatSystem.Pages.Chat
 
                     IsLastAdminLogined = _participantRepository.IsLastAdminInConversation(conversationId, userId);
                     IsLastMemberLogined = _participantRepository.IsLastMemberInConversation(conversationId);
+                    //IsUserAdminInConversation = _participantRepository.IsUserAdminInConversation(conversationId, userId);
 
                     return Page();
                 }
@@ -269,6 +277,8 @@ namespace ChatSystem.Pages.Chat
             GetConversationDetail(conversationId);
 
             conversationDto = MapConversationToDto(currentConversation, UserDto.UserId);
+            IsUserAdminInConversation = _participantRepository.IsUserAdminInConversation(conversationId, userId);
+
 
             MessageDtoList = _messageRepository.GetMessagesFromConversation(currentConversation, GroupChatParticipants);
             ChatContentModel = new ChatContentModelDto
@@ -334,6 +344,8 @@ namespace ChatSystem.Pages.Chat
                     participant.status = 0;
 
                     _participantRepository.UpdateParticipants(participant);
+
+                    _groupChatHubContext.Clients.All.SendAsync("UserKickedFromGroup", conversationId, userId);
                 }
                 TempData["success"] = "User kicked from the group successfully.";
                 return RedirectToPage("/Chat/ChatMaster", new { id = conversationId });
@@ -357,6 +369,8 @@ namespace ChatSystem.Pages.Chat
 
                     _conversationRepository.UpdateConversation(conversation);
                 }
+                _groupChatHubContext.Clients.All.SendAsync("ReceiveUpdatedConversationName", conversationId, newGroupName);
+
                 TempData["success"] = "Group Name Updated Successfully";
                 return RedirectToPage("/Chat/ChatMaster", new { id = conversationId });
             }

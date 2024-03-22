@@ -1,5 +1,6 @@
 ﻿using BusinessObject;
 using DataAccessLayer;
+using Microsoft.EntityFrameworkCore;
 
 namespace Repository
 {
@@ -81,6 +82,16 @@ namespace Repository
                 .Count(p => p.ConversationId == conversationId && p.status == 1);
 
             return participantCount == 1;
+        }
+
+        public bool IsUserAdminInConversation(int conversationId, int userId)
+        {
+            var participants = ParticipantDAO.Instance.GetAll();
+
+            bool isAdmin = participants.Any(p => p.ConversationId == conversationId &&
+                                                  p.UserId == userId &&
+                                                  p.isAdmin);
+            return isAdmin;
         }
     }
 }

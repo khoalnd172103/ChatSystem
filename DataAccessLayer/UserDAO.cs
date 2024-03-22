@@ -74,8 +74,9 @@ namespace DataAccessLayer
             using (var context = new DataContext())
             {
                 var participants = context.Participants
-                    .Where(p => p.ConversationId == conversationId)
-                    .ToList();
+                .Where(p => p.ConversationId == conversationId && p.status == 1)
+                .ToList();
+
 
                 using (var context1 = new DataContext())
                 {
