@@ -176,20 +176,30 @@
                             <hr class="mb-4">
                             <h6>Group Members:</h6>
                             <ul id="group-members-list">
-                                @foreach (var participant in Model.GroupChatParticipants)
+                                @foreach (var participant in Model.CurrentGroupChatParticipant)
                                 {
                                     <li class="list-group-item d-flex justify-content-between align-items-center" id="user-list">
                                         @participant.KnownAs
-                                        <div class="dropdown">
-                                            <button class="btn btn-sm btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false"></button>
-                                            <ul class="dropdown-menu">
-                                                <li><a class="dropdown-item kick-participant" data-participant-id="@participant.UserId" data-conversation-id="@Model.conversationDto.ConversationId" href="#">Kick</a></li>
-                                                @if (Model.IsUserAdminInConversation)
-                                                {
-                                                    <li><a class="dropdown-item promote-participant" data-participant-id="@participant.UserId" data-conversation-id="@Model.conversationDto.ConversationId" href="#">Promote</a></li>
-                                                }
-                                            </ul>
-                                        </div>
+                                        @if (Model.IsUserAdminInConversation)
+                                        {
+                                            var userIdClaim = User.Claims.FirstOrDefault(claims => claims.Type == "UserId", null);
+                                            var userIdInt = int.Parse(userIdClaim.Value);
+                                            @if (participant.UserId != userIdInt)
+                                            {
+                                                <div class="dropdown">
+                                                    <button class="btn btn-sm btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false"></button>
+
+                                                    <ul class="dropdown-menu">
+
+                                                        <li><a class="dropdown-item kick-participant" data-participant-id="@participant.UserId" data-conversation-id="@Model.conversationDto.ConversationId" href="#">Kick</a></li>
+
+                                                        <li><a class="dropdown-item promote-participant" data-participant-id="@participant.UserId" data-conversation-id="@Model.conversationDto.ConversationId" href="#">Promote</a></li>
+
+                                                    </ul>
+
+                                                </div>
+                                            }   
+                                        }
                                     </li>
                                 }
                             </ul>
