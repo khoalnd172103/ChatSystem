@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.VisualBasic;
 using Repository;
 using Repository.DTOs;
 
@@ -435,6 +436,15 @@ namespace ChatSystem.Pages.Chat
 
                 int userId = int.Parse(idClaim.Value);
                 _conversationRepository.AddUserToGroup(userId, conversationId, SelectedFriends);
+
+                Conversation conversation = _conversationRepository.GetConversationById(conversationId);
+
+                foreach (var par in SelectedFriends)
+                {
+                    await _messageNotificationHubContext.Clients.Group(par).SendAsync("OnNewMessageReceived", "You are invited into "
+                    + conversation.ConversationName, conversationId);
+                }
+
                 TempData["success"] = "Invite Successful";
 
                 return RedirectToPage("/Chat/ChatMaster", new { id = conversationId });
