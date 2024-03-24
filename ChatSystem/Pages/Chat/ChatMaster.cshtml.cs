@@ -83,6 +83,9 @@ namespace ChatSystem.Pages.Chat
         [BindProperty]
         public bool IsUserAdminInConversation { get; set; }
 
+        [BindProperty]
+        public List<UserDto> CurrentGroupChatParticipant { get; set; }
+
         //private Dictionary<int, UserDto> UserDtoDictionary { get; set; }
 
         public IActionResult OnGet()
@@ -278,6 +281,7 @@ namespace ChatSystem.Pages.Chat
             }
 
             GetConversationDetail(conversationId);
+            CurrentGroupChatParticipant = _userRepository.GetActiveUserInGroupChat(conversationId);
 
             conversationDto = MapConversationToDto(currentConversation, UserDto.UserId);
             IsUserAdminInConversation = _participantRepository.IsUserAdminInConversation(conversationId, userId);
