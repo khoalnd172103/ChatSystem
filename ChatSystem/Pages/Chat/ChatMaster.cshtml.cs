@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.VisualBasic;
 using Repository;
 using Repository.DTOs;
 
@@ -449,6 +448,16 @@ namespace ChatSystem.Pages.Chat
                     + conversation.ConversationName, conversationId);
                 }
 
+                var CurrentMemberInConversation = _userRepository.GetActiveUserInGroupChat(conversationId);
+                var usersNotInSelectedFriends = CurrentMemberInConversation
+                    .Where(user => !SelectedFriends.Contains(user.UserId.ToString()))
+                    .ToList();
+                foreach (var par in usersNotInSelectedFriends)
+                {
+                    await _messageNotificationHubContext.Clients.Group(par.UserId.ToString()).SendAsync("OnNewMessageReceived", "New member is invited into "
+                    + conversation.ConversationName, conversationId);
+                }
+
                 TempData["success"] = "Invite Successful";
 
                 return RedirectToPage("/Chat/ChatMaster", new { id = conversationId });
@@ -475,6 +484,17 @@ namespace ChatSystem.Pages.Chat
                 IsLastMemberLogined = _participantRepository.IsLastMemberInConversation(conversationId);
 
                 _participantRepository.OutConversation(conversationId, userId);
+
+                var CurrentMemberInConversation = _userRepository.GetActiveUserInGroupChat(conversationId);
+                Conversation conversation = _conversationRepository.GetConversationById(conversationId);
+                var userQuit = _userRepository.GetUser(userId);
+                foreach (var par in CurrentMemberInConversation)
+                {
+                    await _messageNotificationHubContext.Clients.Group(par.UserId.ToString()).SendAsync("OnNewMessageReceived", 
+                        $"User {userQuit.UserName} has left the "
+                    + conversation.ConversationName, conversationId);
+                }
+
                 if (IsLastMemberLogined)
                 {
                     _conversationRepository.DeleteConversation(conversationId);
