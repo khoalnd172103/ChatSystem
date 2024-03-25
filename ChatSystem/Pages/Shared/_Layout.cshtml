@@ -130,6 +130,10 @@
                         toastr.error("You have been kick out of group " + conversationName);
                     }
                 });
+
+                connectionGroupChat.on("DeleteConversation", function (conversationId) {
+                    toastr.error("A group of yours has been deleted by the group admininstator");
+                });
             </script>
         }
     }

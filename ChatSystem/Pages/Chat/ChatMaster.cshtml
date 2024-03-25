@@ -105,6 +105,11 @@
                         $(".card-title").text(newGroupName);
                     });
 
+                    function loadPageWithConversationId(conversationId) {
+                        var url = '/Chat/ChatMaster?id=' + conversationId;
+
+                        window.location.href = url;
+                    }
 
                     var razorPageUserId = @userIdInt;
                     connectionGroupChat.on("UserKickedFromGroup", function (conversationId, userId, conversationName) {
@@ -116,7 +121,7 @@
                         }
 
                         // Find the li element containing the kicked participant's information
-                        const participantLi = $(`#group-members-list li[id="user-list"] a.kick-participant[data-participant-id="${userId}"][data-conversation-id="${conversationId}"]`).closest("li");
+                        const participantLi = $("#group-members-list").find(`[data-user-id="${userId}"]`);
 
                         console.log("Element to remove:", participantLi);
 
@@ -127,7 +132,8 @@
                         } else {
                             console.error("Error: Element not found or unable to remove.");
                         }
-                    });
+@*                         loadPageWithConversationId();
+ *@                    });
 
                 </script>
 
@@ -202,6 +208,28 @@
                     }
 
                 });
+
+                connectionGroupChat1.on("DeleteConversation", function (conversationId) {
+                    if (@Model.currentConversation.ConversationId != conversationId) {
+                        loadConversationList();
+                    } else {
+                        window.location.href = '/Chat/ChatMaster';
+                    }
+                });
+
+                function loadConversationList() {
+                    $.ajax({
+                        url: '/Chat/ChatMaster?handler=LoadConversationList',
+                        method: 'GET',
+                        success: function (data) {
+                            $('#conversation-list').html(data);
+                            console.log("Conversation list loaded successfully.");
+                        },
+                        error: function (err) {
+                            console.error('Failed to fetch message list:', err);
+                        }
+                    });
+                }
             </script>
 
             <div class="col-12 col-md-8">
@@ -235,7 +263,7 @@
                     <div style="margin-left: 7px">
                         <div class="card-body">
                             <div class="position-relative text-center mb-3">
-                                <img src="https://bootdey.com/img/Content/avatar/avatar3.png" class="rounded-circle me-1" width="60" height="60">
+                                <img src="/image/group-conversation.jpg" class="rounded-circle me-1" width="60" height="60">
                             </div>
                             <h5 class="card-title text-center">@Model.currentConversation.ConversationName</h5>
                             <hr class="mb-4">
@@ -243,8 +271,9 @@
                             <ul id="group-members-list">
                                 @foreach (var participant in Model.CurrentGroupChatParticipant)
                                 {
-                                    <li class="list-group-item d-flex justify-content-between align-items-center" id="user-list">
+                                    <li class="list-group-item d-flex justify-content-between align-items-center" id="user-list" data-user-id="@participant.UserId">
                                         @participant.KnownAs
+                                        
                                         @if (Model.IsUserAdminInConversation)
                                         {
                                             var userIdClaim = User.Claims.FirstOrDefault(claims => claims.Type == "UserId", null);

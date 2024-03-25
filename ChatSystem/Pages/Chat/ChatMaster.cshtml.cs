@@ -410,6 +410,8 @@ namespace ChatSystem.Pages.Chat
             {
                 _conversationRepository.DeleteConversation(conversationId);
                 TempData["success"] = "Delete Group Successfully";
+                _groupChatHubContext.Clients.All.SendAsync("DeleteConversation", conversationId);
+
                 return RedirectToPage("/Chat/ChatMaster", new { id = conversationId });
             }
             catch (Exception ex)
