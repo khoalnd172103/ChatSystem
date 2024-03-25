@@ -417,12 +417,28 @@ namespace ChatSystem.Pages.Chat
 
             var friends = await _friendRepository.GetFriendsNotInGroupAsync(userId, conversationId);
 
-            Friends = friends.Select(friend => new FriendDto
+            var friendsCurrentUserIsRecipient = friends.Where(f => f.RecipientId == userId).ToList();
+            Friends = new List<FriendDto>();
+            Friends.AddRange(friendsCurrentUserIsRecipient.Select(friend => new FriendDto
+            {
+                UserId = friend.SenderId,
+                UserName = friend.SenderUserName,
+                Avatar = _photoRepository.GetUserPhotoIsMain(friend.SenderId).PhotoUrl
+            }));
+
+            var friendsCurrentUserIsSender = friends.Where(f => f.SenderId == userId).ToList();
+            Friends.AddRange(friendsCurrentUserIsSender.Select(friend => new FriendDto
             {
                 UserId = friend.RecipientId,
                 UserName = friend.RecipientUserName,
                 Avatar = _photoRepository.GetUserPhotoIsMain(friend.RecipientId).PhotoUrl
-            }).ToList();
+            }));
+            //Friends = friends.Select(friend => new FriendDto
+            //{
+            //    UserId = friend.RecipientId,
+            //    UserName = friend.RecipientUserName,
+            //    Avatar = _photoRepository.GetUserPhotoIsMain(friend.RecipientId).PhotoUrl
+            //}).ToList();
 
             return Partial("_FriendListPartial", Friends);
         }
