@@ -87,6 +87,48 @@
                         });
                     }
 
+                    const connectionGroupChat = new signalR.HubConnectionBuilder()
+                        .withUrl("/groupChat")
+                        .build();
+
+                    connectionGroupChat.start().then(function () {
+                        console.log("SignalR connection established.");
+                    }).catch(function (err) {
+                        console.error("Error starting SignalR connection:", err.toString());
+                    });
+
+                    connectionGroupChat.on("ReceiveUpdatedConversationName", function (conversationId, newGroupName) {
+                        console.log("Received updated conversation name:", newGroupName);
+
+                        console.log($(".card-title"));
+
+                        $(".card-title").text(newGroupName);
+                    });
+
+
+                    var razorPageUserId = @userIdInt;
+                    connectionGroupChat.on("UserKickedFromGroup", function (conversationId, userId, conversationName) {
+                        console.log("User kicked from group. Conversation ID:", conversationId, "User ID:", userId);
+
+                        if (userId === razorPageUserId) {
+                            loadConversationList();
+                            toastr.error("You have been kick out of group " + conversationName);
+                        }
+
+                        // Find the li element containing the kicked participant's information
+                        const participantLi = $(`#group-members-list li[id="user-list"] a.kick-participant[data-participant-id="${userId}"][data-conversation-id="${conversationId}"]`).closest("li");
+
+                        console.log("Element to remove:", participantLi);
+
+                        if (participantLi.length > 0) {
+                            // Remove the li element from the DOM
+                            participantLi.remove();
+                            console.log("Element removed successfully.");
+                        } else {
+                            console.error("Error: Element not found or unable to remove.");
+                        }
+                    });
+
                 </script>
 
                 @await Html.PartialAsync("_ChatConversationList", Model.ConversationDtoList)
@@ -95,8 +137,7 @@
             }
             
             <hr class="d-block d-lg-none mt-1 mb-0" />
-        </div>
-
+        </div> 
         @if (Model.conversationDto == null)
         {
             <div class="container col-12 col-md-7">
@@ -104,6 +145,9 @@
             </div>
         }
         else{
+
+            var userIdClaim1 = User.Claims.FirstOrDefault(claims => claims.Type == "UserId", null);
+            var userIdInt1 = int.Parse(userIdClaim1.Value);
             <script>
 
                 var connection = new signalR.HubConnectionBuilder().withUrl("/message").build();
@@ -137,6 +181,27 @@
                         }
                     });
                 }
+
+                const connectionGroupChat1 = new signalR.HubConnectionBuilder()
+                    .withUrl("/groupChat")
+                    .build();
+
+                connectionGroupChat1.start().then(function () {
+                    console.log("SignalR connection established. connectionGroupChat1");
+                }).catch(function (err) {
+                    console.error("Error starting SignalR connection:", err.toString());
+                });
+
+                var razorPageUserId = @userIdInt1;
+                var conversationIdPage = @Model.conversationDto.ConversationId;
+                connectionGroupChat1.on("UserKickedFromGroup", function (conversationId, userId, conversationName) {
+
+                    if (userId === razorPageUserId && conversationId === conversationIdPage) {
+                        console.log("You are being kicked and this chat content should be replaced");
+                            window.location.href = '/Chat/ChatMaster';
+                    }
+
+                });
             </script>
 
             <div class="col-12 col-md-8">
@@ -183,7 +248,7 @@
                                         @if (Model.IsUserAdminInConversation)
                                         {
                                             var userIdClaim = User.Claims.FirstOrDefault(claims => claims.Type == "UserId", null);
-                                            var userIdInt = int.Parse(userIdClaim.Value);
+                                            var userIdInt= int.Parse(userIdClaim.Value);
                                             @if (participant.UserId != userIdInt)
                                             {
                                                 <div class="dropdown">

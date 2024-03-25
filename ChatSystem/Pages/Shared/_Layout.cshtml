@@ -108,6 +108,29 @@
                     toastr.success(message);
                 });
             </script>
+
+            <script>
+
+                const connectionGroupChat = new signalR.HubConnectionBuilder()
+                    .withUrl("/groupChat")
+                    .build();
+
+                connectionGroupChat.start().then(function () {
+                    console.log("SignalR connection established group chat.");
+                }).catch(function (err) {
+                    console.error("Error starting SignalR connection:", err.toString());
+                });
+
+                var razorPageUserId = @userIdInt;
+                console.log("Test signalR in layout " + razorPageUserId);
+                connectionGroupChat.on("UserKickedFromGroup", function (conversationId, userId, conversationName) {
+
+                    if (userId === razorPageUserId) {
+                    console.log("User kicked from group. Conversation ID:", conversationId, "User ID:", userId);
+                        toastr.error("You have been kick out of group " + conversationName);
+                    }
+                });
+            </script>
         }
     }
 </body>
