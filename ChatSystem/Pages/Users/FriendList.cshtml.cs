@@ -18,8 +18,10 @@ namespace ChatSystem.Pages.Users
         public List<Friend> Friends { get; set; }
         public PaginatedList<FriendListDto> FriendLists { get; set; }
 
-        public async Task<IActionResult> OnGetAsync(string searchTerm, string sortDirection)
+        public async Task<IActionResult> OnGetAsync(string searchTerm, string sortDirection, int? pageIndex)
         {
+            const int pageSize = 2;
+
             var idClaim = User.Claims.FirstOrDefault(claims => claims.Type == "UserId");
             if (idClaim == null)
             {
@@ -29,20 +31,19 @@ namespace ChatSystem.Pages.Users
             int userId = int.Parse(idClaim.Value);
             HttpContext.Session.SetInt32("UserId", userId);
 
-            if (!string.IsNullOrEmpty(searchTerm))
+            if(searchTerm != null)
             {
-                Friends = await _friendRepository.SearchFriendsForUserAsync(userId, searchTerm);
+                pageIndex = 1; 
             }
-            else if (!string.IsNullOrEmpty(sortDirection))
 
-            {   
-                bool isAscending = sortDirection != "desc";
-                Friends = await _friendRepository.SortByDateAsync(userId, isAscending);
-            }
-            else
-            {
-                FriendLists = _friendRepository.GetFriendListForUser(searchTerm, 1, 4, userId);
-            }
+            //if (!string.IsNullOrEmpty(sortDirection))
+            //{
+            //    bool isAscending = sortDirection != "desc";
+            //    Friends = await _friendRepository.SortByDateAsync(userId, isAscending);
+            //}
+
+            FriendLists = _friendRepository.GetFriendListForUser(searchTerm, pageIndex ?? 1, pageSize, userId);
+            
 
             return Page();
         }
