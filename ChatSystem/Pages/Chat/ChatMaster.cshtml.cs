@@ -211,10 +211,10 @@ namespace ChatSystem.Pages.Chat
         {
             var idClaim = User.Claims.FirstOrDefault(claims => claims.Type == "UserId", null);
             int userId = int.Parse(idClaim.Value);
-            MessageContent = MessageContent.TrimEnd();
 
             if (!MessageContent.IsNullOrEmpty())
             {
+                MessageContent = MessageContent.TrimEnd();
                 Message message = new Message();
 
                 message.ConversationId = conversationDto.ConversationId;
