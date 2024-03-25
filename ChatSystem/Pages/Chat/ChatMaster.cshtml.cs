@@ -31,7 +31,7 @@ namespace ChatSystem.Pages.Chat
             IUserRepository userRepository,
             IMapper mapper, IMessageRepository messageRepository,
             IFriendRepository friendRepository,
-            IPhotoRepository photoRepository, IHubContext<MessageHub> messageHubContext, 
+            IPhotoRepository photoRepository, IHubContext<MessageHub> messageHubContext,
             IHubContext<MessageNotificationHub> messageNotificationHubContext,
             IHubContext<GroupChatHub> groupChatHubContext)
         {
@@ -82,6 +82,9 @@ namespace ChatSystem.Pages.Chat
         [BindProperty]
         public bool IsUserAdminInConversation { get; set; }
 
+        [BindProperty]
+        public List<UserDto> CurrentGroupChatParticipant { get; set; }
+
         //private Dictionary<int, UserDto> UserDtoDictionary { get; set; }
 
         public IActionResult OnGet()
@@ -96,7 +99,7 @@ namespace ChatSystem.Pages.Chat
                     int userId = int.Parse(idClaim.Value);
 
                     List<Conversation> conversationList = _conversationRepository.GetAllUserConversation(userId);
-                    List<Conversation> conversationOrderList = conversationList.OrderByDescending(c => _messageRepository.GetLastestMessageFromConversation(c).DateSend.Ticks).ThenByDescending(c => c.CreateAt.Ticks).ToList();
+                    List<Conversation> conversationOrderList = conversationList.OrderByDescending(c => _messageRepository.GetLastestMessageFromConversation(c).DateSend.Ticks).ToList();
                     //List<Conversation> conversationOrderList = conversationList.OrderByDescending(c => c.CreateAt.Ticks).ToList();
 
                     foreach (var conversation in conversationOrderList)
@@ -142,7 +145,7 @@ namespace ChatSystem.Pages.Chat
                     int userId = int.Parse(idClaim.Value);
 
                     List<Conversation> conversationList = _conversationRepository.GetAllUserConversation(userId);
-                    List<Conversation> conversationOrderList = conversationList.OrderByDescending(c => _messageRepository.GetLastestMessageFromConversation(c).DateSend.Ticks).ThenByDescending(c => c.CreateAt.Ticks).ToList();
+                    List<Conversation> conversationOrderList = conversationList.OrderByDescending(c => _messageRepository.GetLastestMessageFromConversation(c).DateSend.Ticks).ToList();
                     //List<Conversation> conversationOrderList = conversationList.OrderByDescending(c => c.CreateAt.Ticks).ToList();
 
                     foreach (var conversation in conversationOrderList)
@@ -172,7 +175,7 @@ namespace ChatSystem.Pages.Chat
             int userId = int.Parse(idClaim.Value);
 
             List<Conversation> conversationList = _conversationRepository.GetAllUserConversation(userId);
-            List<Conversation> conversationOrderList = conversationList.OrderByDescending(c => _messageRepository.GetLastestMessageFromConversation(c).DateSend.Ticks).ThenByDescending(c => c.CreateAt.Ticks).ToList();
+            List<Conversation> conversationOrderList = conversationList.OrderByDescending(c => _messageRepository.GetLastestMessageFromConversation(c).DateSend.Ticks).ToList();
             //List<Conversation> conversationOrderList = conversationList.OrderByDescending(c => c.CreateAt.Ticks).ToList();
 
             foreach (var conversation in conversationOrderList)
@@ -208,6 +211,8 @@ namespace ChatSystem.Pages.Chat
         {
             var idClaim = User.Claims.FirstOrDefault(claims => claims.Type == "UserId", null);
             int userId = int.Parse(idClaim.Value);
+            MessageContent = MessageContent.TrimEnd();
+
             if (!MessageContent.IsNullOrEmpty())
             {
                 Message message = new Message();
@@ -275,6 +280,7 @@ namespace ChatSystem.Pages.Chat
             }
 
             GetConversationDetail(conversationId);
+            CurrentGroupChatParticipant = _userRepository.GetActiveUserInGroupChat(conversationId);
 
             conversationDto = MapConversationToDto(currentConversation, UserDto.UserId);
             IsUserAdminInConversation = _participantRepository.IsUserAdminInConversation(conversationId, userId);
@@ -433,6 +439,25 @@ namespace ChatSystem.Pages.Chat
 
                 int userId = int.Parse(idClaim.Value);
                 _conversationRepository.AddUserToGroup(userId, conversationId, SelectedFriends);
+
+                Conversation conversation = _conversationRepository.GetConversationById(conversationId);
+
+                foreach (var par in SelectedFriends)
+                {
+                    await _messageNotificationHubContext.Clients.Group(par).SendAsync("OnNewMessageReceived", "You are invited into "
+                    + conversation.ConversationName, conversationId);
+                }
+
+                var CurrentMemberInConversation = _userRepository.GetActiveUserInGroupChat(conversationId);
+                var usersNotInSelectedFriends = CurrentMemberInConversation
+                    .Where(user => !SelectedFriends.Contains(user.UserId.ToString()))
+                    .ToList();
+                foreach (var par in usersNotInSelectedFriends)
+                {
+                    await _messageNotificationHubContext.Clients.Group(par.UserId.ToString()).SendAsync("OnNewMessageReceived", "New member is invited into "
+                    + conversation.ConversationName, conversationId);
+                }
+
                 TempData["success"] = "Invite Successful";
 
                 return RedirectToPage("/Chat/ChatMaster", new { id = conversationId });
@@ -459,6 +484,17 @@ namespace ChatSystem.Pages.Chat
                 IsLastMemberLogined = _participantRepository.IsLastMemberInConversation(conversationId);
 
                 _participantRepository.OutConversation(conversationId, userId);
+
+                var CurrentMemberInConversation = _userRepository.GetActiveUserInGroupChat(conversationId);
+                Conversation conversation = _conversationRepository.GetConversationById(conversationId);
+                var userQuit = _userRepository.GetUser(userId);
+                foreach (var par in CurrentMemberInConversation)
+                {
+                    await _messageNotificationHubContext.Clients.Group(par.UserId.ToString()).SendAsync("OnNewMessageReceived", 
+                        $"User {userQuit.UserName} has left the "
+                    + conversation.ConversationName, conversationId);
+                }
+
                 if (IsLastMemberLogined)
                 {
                     _conversationRepository.DeleteConversation(conversationId);

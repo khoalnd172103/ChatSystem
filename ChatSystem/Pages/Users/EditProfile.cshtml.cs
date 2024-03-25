@@ -18,7 +18,8 @@ namespace ChatSystem.Pages.Users
         [DataType(DataType.Date)]
         [BirthdayValidation(18)]
         public DateTime DateOfBirth { get; set; }
-        public string? KnownAs { get; set; }
+        [Required(ErrorMessage = "KnownAs is required")]
+        public string KnownAs { get; set; }
         public string? Gender { get; set; }
         public string? Introduction { get; set; }
         public string? Interest { get; set; }
@@ -90,24 +91,32 @@ namespace ChatSystem.Pages.Users
                 return NotFound();
             }
 
-            var isValidUserName = _userRepository.IsUserNameValidForUpdate(UserProfile.UserId, UserProfile.UserName);
-            if (isValidUserName)
+            try
             {
-                ViewData["Message"] = "This username is already used";
-                return OnGet();
+                var isValidUserName = _userRepository.IsUserNameValidForUpdate(UserProfile.UserId, UserProfile.UserName);
+                if (isValidUserName)
+                {
+                    ViewData["Message"] = "This username is already used";
+                    return OnGet();
+                }
+
+                user.UserName = UserProfile.UserName;
+                user.DateOfBirth = UserProfile.DateOfBirth;
+                user.KnownAs = UserProfile.KnownAs;
+                user.Gender = UserProfile.Gender;
+                user.Introduction = UserProfile.Introduction;
+                user.Interest = UserProfile.Interest;
+                user.City = UserProfile.City;
+
+                _userRepository.UpdateUser(user);
+
+                TempData["success"] = "Update Successful";
             }
-
-            user.UserName = UserProfile.UserName;
-            user.DateOfBirth = UserProfile.DateOfBirth;
-            user.KnownAs = UserProfile.KnownAs;
-            user.Gender = UserProfile.Gender;
-            user.Introduction = UserProfile.Introduction;
-            user.Interest = UserProfile.Interest;
-            user.City = UserProfile.City;
-
-            _userRepository.UpdateUser(user);
-
-            TempData["success"] = "Update Successful";
+            catch (Exception ex)
+            {
+                TempData["error"] = "Has error when update profile: " + ex.Message;
+            }
+            
             return RedirectToPage("/Users/EditProfile");
         }
 
@@ -120,17 +129,26 @@ namespace ChatSystem.Pages.Users
                 return OnGet();
             }
 
-            Photo photo = _photoRepository.GetUserPhotoIsMain(UserProfile.UserId);
-
-            var result = await _cloudinary.AddPhotoAsync(imageFile);
-            if (result.Error != null)
+            try
             {
-                ViewData["ChangeImageMessage"] = "Image upload failed. Please try again later.";
-                return Page();
-            }
+                Photo photo = _photoRepository.GetUserPhotoIsMain(UserProfile.UserId);
 
-            photo.PhotoUrl = result.SecureUrl.AbsoluteUri;
-            _photoRepository.UpdatePhoto(photo);
+                var result = await _cloudinary.AddPhotoAsync(imageFile);
+                if (result.Error != null)
+                {
+                    ViewData["ChangeImageMessage"] = "Image upload failed. Please try again later.";
+                    return Page();
+                }
+
+                photo.PhotoUrl = result.SecureUrl.AbsoluteUri;
+                _photoRepository.UpdatePhoto(photo);
+
+                TempData["success"] = "Change Successful";
+            }
+            catch (Exception ex)
+            {
+                TempData["error"] = "Has error when change avatar: " + ex.Message;
+            }
 
             return RedirectToPage("/Users/EditProfile");
         }

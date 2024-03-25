@@ -127,9 +127,9 @@ namespace Repository
             return false;
         }
 
-        public List<UserDto> GetCurrentUserInGroupChat(int conversationId)
+        public List<UserDto> GetActiveUserInGroupChat(int conversationId)
         {
-            List<User> users = UserDAO.Instance.GetCurrentUserInGroupChat(conversationId);
+            List<User> users = UserDAO.Instance.GetActiveUserInGroupChat(conversationId);
             List<UserDto> usersDto = new List<UserDto>();
             foreach (User user in users)
             {
