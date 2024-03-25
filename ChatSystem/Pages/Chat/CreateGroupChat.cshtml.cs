@@ -15,23 +15,17 @@ namespace ChatSystem.Pages.Chat
         private readonly IFriendRepository _friendRepository;
         private readonly IConversationRepository _conversationRepository;
         private readonly IPhotoRepository _photoRepository;
-        private readonly IUserRepository _userRepository;
-        private readonly IHubContext<MessageHub> _messageHubContext;
         private readonly IHubContext<MessageNotificationHub> _messageNotificationHubContext;
 
         public CreateGroupChatModel(IFriendRepository friendRepository, 
             IConversationRepository conversationRepository,
             IPhotoRepository photoRepository,
-            IHubContext<MessageHub> messageHubContext,
-            IHubContext<MessageNotificationHub> messageNotificationHubContext,
-            IUserRepository userRepository)
+            IHubContext<MessageNotificationHub> messageNotificationHubContext)
         {
             _friendRepository = friendRepository;
             _conversationRepository = conversationRepository;
             _photoRepository = photoRepository;
-            _messageHubContext = messageHubContext;
             _messageNotificationHubContext = messageNotificationHubContext;
-            _userRepository = userRepository;
         }
 
         [BindProperty]
@@ -42,8 +36,7 @@ namespace ChatSystem.Pages.Chat
         [BindProperty]
         public List<string> SelectedFriends { get; set; }
         public List<string> SelectedFriendIds { get; set; }
-        public List<UserDto> GroupChatParticipants { get; set; }
-        public Conversation conversation { get; set; }
+        public Conversation Conversation { get; set; }
 
         public async Task<IActionResult> OnGetAsync()
         {
@@ -99,7 +92,7 @@ namespace ChatSystem.Pages.Chat
 
                 if (SelectedFriendIds != null)
                 {
-                    conversation = _conversationRepository.CreateGroup(userId, GroupName, SelectedFriendIds);
+                    Conversation = _conversationRepository.CreateGroup(userId, GroupName, SelectedFriendIds);
                 }
                 else
                 {
@@ -107,16 +100,14 @@ namespace ChatSystem.Pages.Chat
                     return await OnGetAsync();
                 }
                 
-                if (conversation != null)
+                if (Conversation != null)
                 {
                     TempData["success"] = "Create Successful";
 
-                    GroupChatParticipants = _userRepository.GetUserInGroupChat(conversation.ConversationId);
-
-                    foreach (var par in GroupChatParticipants)
+                    foreach (var par in SelectedFriendIds)
                     {
-                        await _messageNotificationHubContext.Clients.Group(par.UserId.ToString()).SendAsync("OnNewMessageReceived", "You are invited into " 
-                            + conversation.ConversationName, conversation.ConversationId);
+                        await _messageNotificationHubContext.Clients.Group(par).SendAsync("OnNewMessageReceived", "You are invited into " 
+                            + Conversation.ConversationName, Conversation.ConversationId);
                     }
 
                     return RedirectToPage("/Chat/ChatMaster");

@@ -135,8 +135,10 @@
             var createButton = document.getElementById('createButton');
             if (selectedFriends.length === 0) {
                 createButton.disabled = true;
-            } else {
+            } else if (selectedFriends.length >= 2) {
                 createButton.disabled = false;
+            } else {
+                createButton.disabled = true;
             }
         }
         updateCreateButton();
