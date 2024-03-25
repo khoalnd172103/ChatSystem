@@ -1,3 +1,4 @@
+using BusinessObject;
 using ChatSystem.Hubs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -56,7 +57,9 @@ namespace ChatSystem.Pages.Users
             // Accept friend request logic here
             friendRequest.status = true;
             friendRepository.UpdateFriendRequest(friendRequest);
-            await notificationContext.Clients.Group(friendRequest.SenderId.ToString()).SendAsync("OnAcceptFriendRequest", "accept your friend request");
+            await notificationContext.Clients.Group(friendRequest.SenderId.ToString()).SendAsync("OnAcceptFriendRequest", friendRequest.RecipientUserName + " accept your friend request");
+            await notificationContext.Clients.Group(friendRequest.SenderId.ToString()).SendAsync("OnFriendRequestUpdate", 3);
+            await notificationContext.Clients.Group(friendRequest.RecipientId.ToString()).SendAsync("OnFriendRequestUpdate", 3);
             return RedirectToPage("FriendRequest");
         }
 
@@ -72,6 +75,7 @@ namespace ChatSystem.Pages.Users
                 return NotFound();
             }
             friendRepository.DeclineFriendRequest(friendRequest);
+            await notificationContext.Clients.Group(friendRequest.SenderId.ToString()).SendAsync("OnFriendRequestUpdate", 0);
             return RedirectToPage("FriendRequest");
         }
     }

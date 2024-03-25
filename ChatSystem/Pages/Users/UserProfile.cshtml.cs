@@ -48,7 +48,7 @@ namespace ChatSystem.Pages.Users
 
             if (user != null)
             {
-                if (!IsFriend && IsLogined)
+                if (IsLogined)
                 {
                     int loginUserId = int.Parse(idClaim.Value);
                     IsFriend = _userRepository.CheckFriendUser(loginUserId, UserId);
@@ -70,6 +70,8 @@ namespace ChatSystem.Pages.Users
 
             return Page();
         }
+
+
 
         public IActionResult OnPostStartConversationAsync()
         {
@@ -126,6 +128,8 @@ namespace ChatSystem.Pages.Users
             var senderUserName = _userRepository.GetUser(currentUserId).UserName;
             await friendRepository.SendFriendRequest(currentUserId, UserId, senderUserName, recipientUserName);
             await notificationContext.Clients.Group(UserId.ToString()).SendAsync("OnSendFriendRequest", "You receive a friend request from " + senderUserName);
+            await notificationContext.Clients.Group(UserId.ToString()).SendAsync("OnFriendRequestUpdate", 2);
+            await notificationContext.Clients.Group(currentUserId.ToString()).SendAsync("OnFriendRequestUpdate", 1);
             return RedirectToPage("/Users/UserProfile", new { userId = UserId });
         }
 
@@ -138,7 +142,10 @@ namespace ChatSystem.Pages.Users
             }
             int loginUserId = int.Parse(idClaim.Value);
             await friendRepository.AcceptFriendRequest(UserId, loginUserId);
-            await notificationContext.Clients.Group(UserId.ToString()).SendAsync("OnAcceptFriendRequest", "accept your friend request");
+            var recipientUserName = _userRepository.GetUser(loginUserId).UserName;
+            await notificationContext.Clients.Group(UserId.ToString()).SendAsync("OnAcceptFriendRequest", recipientUserName + " accept your friend request");
+            await notificationContext.Clients.Group(UserId.ToString()).SendAsync("OnFriendRequestUpdate", 3);
+            await notificationContext.Clients.Group(loginUserId.ToString()).SendAsync("OnFriendRequestUpdate", 3);
             return RedirectToPage("/Users/UserProfile", new { userId = UserId });
         }
 
@@ -151,6 +158,7 @@ namespace ChatSystem.Pages.Users
             }
             int loginUserId = int.Parse(idClaim.Value);
             await friendRepository.DeclineFriendRequest(UserId, loginUserId);
+            await notificationContext.Clients.Group(UserId.ToString()).SendAsync("OnFriendRequestUpdate", 0);
             return RedirectToPage("/Users/UserProfile", new { userId = UserId });
         }
 
@@ -163,6 +171,8 @@ namespace ChatSystem.Pages.Users
             }
             int loginUserId = int.Parse(idClaim.Value);
             await friendRepository.DeleteFriendAsync(UserId, loginUserId);
+            await notificationContext.Clients.Group(UserId.ToString()).SendAsync("OnFriendRequestUpdate", 0);
+            await notificationContext.Clients.Group(loginUserId.ToString()).SendAsync("OnFriendRequestUpdate", 0);
             return RedirectToPage("/Users/UserProfile", new { userId = UserId });
         }
 

@@ -168,7 +168,7 @@ namespace DataAccessLayer
         {
             using (var context = new DataContext())
             {
-                var request = await context.Friend.FirstOrDefaultAsync(f => (f.SenderId == senderId && f.RecipientId == recipientId && f.status == true));
+                var request = await context.Friend.FirstOrDefaultAsync(f => (f.SenderId == senderId && f.RecipientId == recipientId && f.status == true) || (f.SenderId == recipientId && f.RecipientId == senderId && f.status == true));
 
                 if (request != null)
                 {

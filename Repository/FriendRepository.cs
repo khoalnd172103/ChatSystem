@@ -124,12 +124,21 @@ namespace Repository
         public int CheckFriendForUser(int userId, int otherUserId)
         {
             List<Friend> friendList = FriendDAO.Instance.CheckFriendForUser(userId);
+            List<Friend> friendRequestList = FriendDAO.Instance.CheckRequestFriend(userId, otherUserId);
 
+            //var friend = friendList.FirstOrDefault(l => l.RecipientId == otherUserId);
+
+            if (friendRequestList.Count() != 0)
+            {
+                return 3;
+            }
             var isSender = friendList.FirstOrDefault(l => l.RecipientId == otherUserId);
             var isRecipient = friendList.FirstOrDefault(l => l.SenderId == otherUserId);
 
             if (isSender != null) return 1;
             if (isRecipient != null) return 2;
+
+            
 
             return 0;
         }
