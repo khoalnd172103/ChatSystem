@@ -282,6 +282,21 @@ namespace ChatSystem.Pages.Chat
             GetConversationDetail(conversationId);
             CurrentGroupChatParticipant = _userRepository.GetActiveUserInGroupChat(conversationId);
 
+            bool userFound = false;
+            foreach (var user in CurrentGroupChatParticipant)
+            {
+                if (user.UserId == userId)
+                {
+                    userFound = true;
+                    break;
+                }
+            }
+
+            if (!userFound)
+            {
+                return Page();
+            }
+
             conversationDto = MapConversationToDto(currentConversation, UserDto.UserId);
             IsUserAdminInConversation = _participantRepository.IsUserAdminInConversation(conversationId, userId);
 
