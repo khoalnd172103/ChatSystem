@@ -1,6 +1,5 @@
 ﻿using BusinessObject;
 using DataAccessLayer;
-using Microsoft.EntityFrameworkCore;
 
 namespace Repository
 {

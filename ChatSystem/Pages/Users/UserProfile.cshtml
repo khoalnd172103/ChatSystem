@@ -40,59 +40,99 @@
                     </ul>
                 </div>
             </div>
+
             <div class="row mt-4">
                 <div class="col-lg-11 mx-auto">
                     <div class="nav nav-pills justify-content-end">
-                        
-                        @if (Model.IsLogined && !Model.IsFriend)
+
+                        @* @if (Model.IsLogined && !Model.IsFriend)
                         {
-                            var userIdClaim = User.Claims.FirstOrDefault(claims => claims.Type == "UserId", null);
-                            var userIdInt = int.Parse(userIdClaim.Value);
-                            <script>
-                                var friendConnection = new signalR.HubConnectionBuilder().withUrl("/friendRequest").build();
 
-                                friendConnection.start().then(res => {
-                                    friendConnection.invoke("JoinGroup", "@userIdInt")
-                                        .then(() => console.log("friend group" + @userIdInt))
-                                        .catch(err => {
-                                            console.log(err);
-                                        });
-                                }).catch(err => {
-                                    console.log(err);
-                                });
-
-                                friendConnection.on("OnSendFriendRequest", (message) => {
-                                    toastr.success(message);
-                                }
-                            </script>
-                            if (Model.FriendStatus == 0)
-                            {
-                                <form method="post" asp-page-handler="AddFriend" id="addFriendForm">
-                                    <input type="hidden" name="UserId" value="@Model.UserProfile.UserId" />
-                                    <button type="submit" id="addFriend" name="addFriend" value="@Model.UserProfile.UserId" class="btn btn-outline-primary" data-recipientUserId="@Model.UserProfile.UserId">Add Friend</button>
-                                </form>
-                            }
-                            else if (Model.FriendStatus == 1)
-                            {
-                                <form method="post" asp-page-handler="Unfriend">
-                                    <input type="hidden" name="UserId" value="@Model.UserProfile.UserId" />
-                                    <button type="submit" class="btn btn-danger" disabled>Waiting for response</button>
-                                </form>
-                            }
-                            else if (Model.FriendStatus == 2)
-                            {
-                                <form method="post" asp-page-handler="AcceptFriend">
-                                    <input type="hidden" name="UserId" value="@Model.UserProfile.UserId" />
-                                    <button type="submit" class="btn btn-success">Accept</button>
-                                </form>
-                                <form method="post" asp-page-handler="DeclineFriend">
-                                    <input type="hidden" name="UserId" value="@Model.UserProfile.UserId" />
-                                    <button type="submit" class="btn btn-danger">Decline</button>
-                                </form>
-                            }
                         }
                         else if (Model.IsLogined && Model.IsFriend)
                         {
+                        <form method="post" asp-page-handler="StartConversation">
+                        <input type="hidden" name="UserId" value="@Model.UserProfile.UserId" />
+                        <button type="submit" class="btn btn-outline-primary">Chat</button>
+                        </form>
+
+                        <form method="post" asp-page-handler="Unfriend">
+                        <input type="hidden" name="UserId" value="@Model.UserProfile.UserId" />
+                        <button type="submit" class="btn btn-danger">Unfriend</button>
+                        </form>
+                        } *@
+                        @{
+                            var userIdClaim = User.Claims.FirstOrDefault(claims => claims.Type == "UserId", null);
+                            var userIdInt = int.Parse(userIdClaim.Value);
+                            var initialFriendStatus = @Model.FriendStatus;
+                        }
+
+                        <script>
+                            var friendConnection1 = new signalR.HubConnectionBuilder().withUrl("/friendRequest").build();
+
+                            friendConnection1.start().then(res => {
+                                friendConnection1.invoke("JoinGroup", "@userIdInt")
+                                    .then(() => console.log("friend group " + @userIdInt))
+                                    .catch(err => {
+                                        console.log(err);
+                                    });
+                            }).catch(err => {
+                                console.log(err);
+                            });
+
+                            friendConnection1.on("OnFriendRequestUpdate", (status) => {
+                                switch (status) {
+                                    case 0: // add friend available
+                                        $('#addFriendDiv').show();
+                                        $('#waitingForm').hide();
+                                        $('#acceptDeclineForm').hide();
+                                        $('#chatUnfriendDiv').hide();
+                                        break;
+                                    case 1: // waiting
+                                        $('#addFriendDiv').hide();
+                                        $('#waitingForm').show();
+                                        $('#acceptDeclineForm').hide();
+                                        $('#chatUnfriendDiv').hide();
+                                        break;
+                                    case 2: // receive request
+                                        $('#addFriendDiv').hide();
+                                        $('#waitingForm').hide();
+                                        $('#acceptDeclineForm').show();
+                                        $('#chatUnfriendDiv').hide();
+                                        break;
+                                    case 3: // accepted
+                                        $('#addFriendDiv').hide();
+                                        $('#waitingForm').hide();
+                                        $('#acceptDeclineForm').hide();
+                                        $('#chatUnfriendDiv').show();
+                                        break;
+                                }
+                            });
+
+                        </script>
+                        <div id="addFriendDiv">
+                            <form method="post" asp-page-handler="AddFriend" id="addFriendForm">
+                                <input type="hidden" name="UserId" value="@Model.UserProfile.UserId" />
+                                <button type="submit" id="addFriend" name="addFriend" value="@Model.UserProfile.UserId" class="btn btn-outline-primary">Add Friend</button>
+                            </form>
+                        </div>
+                        <div id="waitingForm">
+                            <form method="post" asp-page-handler="Unfriend">
+                                <input type="hidden" name="UserId" value="@Model.UserProfile.UserId" />
+                                <button type="submit" class="btn btn-danger" disabled>Waiting for response</button>
+                            </form>
+                        </div>
+                        <div id="acceptDeclineForm">
+                            <form method="post" asp-page-handler="AcceptFriend">
+                                <input type="hidden" name="UserId" value="@Model.UserProfile.UserId" />
+                                <button type="submit" class="btn btn-success">Accept</button>
+                            </form>
+                            <form method="post" asp-page-handler="DeclineFriend">
+                                <input type="hidden" name="UserId" value="@Model.UserProfile.UserId" />
+                                <button type="submit" class="btn btn-danger">Decline</button>
+                            </form>
+                        </div>
+                        <div id="chatUnfriendDiv">
                             <form method="post" asp-page-handler="StartConversation">
                                 <input type="hidden" name="UserId" value="@Model.UserProfile.UserId" />
                                 <button type="submit" class="btn btn-outline-primary">Chat</button>
@@ -102,7 +142,34 @@
                                 <input type="hidden" name="UserId" value="@Model.UserProfile.UserId" />
                                 <button type="submit" class="btn btn-danger">Unfriend</button>
                             </form>
-                        }
+                        </div>
+
+                        <script>
+                            console.log("friend request status check: " + "@initialFriendStatus");
+                            var initialFriendStatus = @initialFriendStatus;
+                            switch (initialFriendStatus) {
+                                case 0: // add friend available
+                                    document.getElementById("waitingForm").style.display = "none";
+                                    document.getElementById("acceptDeclineForm").style.display = "none";
+                                    document.getElementById("chatUnfriendDiv").style.display = "none";
+                                    break;
+                                case 1: // waiting
+                                    document.getElementById("addFriendDiv").style.display = "none";
+                                    document.getElementById("acceptDeclineForm").style.display = "none";
+                                    document.getElementById("chatUnfriendDiv").style.display = "none";
+
+                                    break;
+                                case 2: // receive request
+                                    document.getElementById("addFriendDiv").style.display = "none";
+                                    document.getElementById("waitingForm").style.display = "none";
+                                    document.getElementById("chatUnfriendDiv").style.display = "none";
+                                    break;
+                                case 3:
+                                    document.getElementById("addFriendDiv").style.display = "none";
+                                    document.getElementById("waitingForm").style.display = "none";
+                                    document.getElementById("acceptDeclineForm").style.display = "none";
+                            }
+                        </script>
                     </div>
                 </div>
             </div>
@@ -158,27 +225,3 @@
     </div>
 </div>
 
-<script>
-    $(function () {
-        $('#addFriendForm').submit(function (event) {
-            event.preventDefault(); // Prevent form submission
-            var formData = $(this).serialize(); // Serialize form data
-
-            $.ajax({
-                url: '/Users/UserProfile?handler=AddFriend', // URL to your server-side handler
-                method: 'POST',
-                data: formData, // Form data to send
-                success: function (response) {
-                    // Update UI based on the response
-                    toastr.success('Friend request sent successfully');
-                    console.log("send");
-                    $('#addFriend').text('Waiting for response').prop('disabled', true);
-                },
-                error: function (err) {
-                    console.error('Failed to send friend request:', err);
-                    toastr.error('Failed to send friend request');
-                }
-            });
-        });
-    });
-</script>
