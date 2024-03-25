@@ -219,8 +219,9 @@ namespace DataAccessLayer
 
                 var friendsNotInGroup = await context.Friend
                     .Where(f =>
-                        f.SenderId == userId &&
-                        !participantUserIds.Contains(f.RecipientId))
+                        (f.SenderId == userId || f.RecipientId == userId) &&
+                        (!participantUserIds.Contains(f.RecipientId) || !participantUserIds.Contains(f.SenderId)) && 
+                        f.status == true)
                     .ToListAsync();
 
                 var participantsWithStatusZero = await context.Participants
@@ -230,8 +231,9 @@ namespace DataAccessLayer
 
                 var friendsOutOfGroup = await context.Friend
                     .Where(f =>
-                        f.SenderId == userId &&
-                        participantsWithStatusZero.Contains(f.RecipientId))
+                        (f.SenderId == userId && participantsWithStatusZero.Contains(f.RecipientId)) || 
+                        (f.RecipientId == userId && participantsWithStatusZero.Contains(f.SenderId)) && 
+                        f.status == true)
                     .ToListAsync();
 
                 friendsNotInGroup.AddRange(friendsOutOfGroup);
