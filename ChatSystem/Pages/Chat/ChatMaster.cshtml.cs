@@ -282,6 +282,21 @@ namespace ChatSystem.Pages.Chat
             GetConversationDetail(conversationId);
             CurrentGroupChatParticipant = _userRepository.GetActiveUserInGroupChat(conversationId);
 
+            bool userFound = false;
+            foreach (var user in CurrentGroupChatParticipant)
+            {
+                if (user.UserId == userId)
+                {
+                    userFound = true;
+                    break;
+                }
+            }
+
+            if (!userFound)
+            {
+                return Page();
+            }
+
             conversationDto = MapConversationToDto(currentConversation, UserDto.UserId);
             IsUserAdminInConversation = _participantRepository.IsUserAdminInConversation(conversationId, userId);
 
@@ -339,11 +354,13 @@ namespace ChatSystem.Pages.Chat
             }
         }
 
-        public IActionResult OnPostKickUserFromGroup(int conversationId, int userId)
+        public async Task<IActionResult> OnPostKickUserFromGroup(int conversationId, int userId)
         {
             try
             {
                 var participant = _participantRepository.GetParticipantByConversationIdAndUserId(conversationId, userId);
+
+                var conversation = _conversationRepository.GetConversationById(conversationId);
 
                 if (participant != null)
                 {
@@ -351,7 +368,7 @@ namespace ChatSystem.Pages.Chat
 
                     _participantRepository.UpdateParticipants(participant);
 
-                    _groupChatHubContext.Clients.All.SendAsync("UserKickedFromGroup", conversationId, userId);
+                    await _groupChatHubContext.Clients.All.SendAsync("UserKickedFromGroup", conversationId, userId, conversation.ConversationName);
                 }
                 TempData["success"] = "User kicked from the group successfully.";
                 return RedirectToPage("/Chat/ChatMaster", new { id = conversationId });
@@ -506,7 +523,7 @@ namespace ChatSystem.Pages.Chat
                 var userQuit = _userRepository.GetUser(userId);
                 foreach (var par in CurrentMemberInConversation)
                 {
-                    await _messageNotificationHubContext.Clients.Group(par.UserId.ToString()).SendAsync("OnNewMessageReceived", 
+                    await _messageNotificationHubContext.Clients.Group(par.UserId.ToString()).SendAsync("OnNewMessageReceived",
                         $"User {userQuit.UserName} has left the "
                     + conversation.ConversationName, conversationId);
                 }
