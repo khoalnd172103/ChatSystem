@@ -493,6 +493,22 @@ namespace ChatSystem.Pages.Chat
                     + conversation.ConversationName, conversationId);
                 }
 
+                List<string> UserKnownAsList = new List<string>();
+
+                foreach (var friendIdString in SelectedFriends)
+                {
+                    if (int.TryParse(friendIdString, out int friendId))
+                    {
+                        var user = _userRepository.GetUser(friendId);
+                        string knownAs = user.KnownAs;
+                        UserKnownAsList.Add(knownAs); 
+                    }
+
+                }
+
+
+                await _groupChatHubContext.Clients.All.SendAsync("InviteUserToGroup", conversationId, SelectedFriends, UserKnownAsList);
+
                 TempData["success"] = "Invite Successful";
 
                 return RedirectToPage("/Chat/ChatMaster", new { id = conversationId });
@@ -534,6 +550,8 @@ namespace ChatSystem.Pages.Chat
                 {
                     _conversationRepository.DeleteConversation(conversationId);
                 }
+
+                await _groupChatHubContext.Clients.All.SendAsync("UserQuitGroup", conversationId, userId);
 
                 TempData["success"] = "Bye bye";
 
