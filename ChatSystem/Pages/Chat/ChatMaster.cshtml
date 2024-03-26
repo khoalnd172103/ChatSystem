@@ -14,9 +14,10 @@
 <div class="container chat-section" style="width: 1920px">
     <div class="row g-0">
 
+
         @*         <div class="container col-12 col-lg-5 col-xl-3 border-end chat-list">
         *@        <div class="col-12 col-md-2 border-end chat-list" id="conversation-list">
-            @if (Model.ConversationDtoList.Count < 1)
+            @if (Model.ConversationDtoList.Count < 0)
             {
 
             }
@@ -134,8 +135,27 @@
                         } else {
                             console.error("Error: Element not found or unable to remove.");
                         }
-                    @*                         loadPageWithConversationId();
-                        *@                    });
+                      });
+
+                    connectionGroupChat.on("UserQuitGroup", function (conversationId, userId) {
+
+                        if (userId === razorPageUserId) {
+                            loadConversationList();
+                            toastr.error("You left the group");
+                        }
+                        console.log("Quit");
+                        const participantLi = $("#group-members-list").find(`[data-user-id="${userId}"]`);
+
+                        console.log("Element to remove:", participantLi);
+
+                        if (participantLi.length > 0) {
+                            participantLi.remove();
+                            console.log("Element removed successfully.");
+                        } else {
+                            console.error("Error: Element not found or unable to remove.");
+                        }
+                    });
+
 
                 </script>
 
@@ -233,6 +253,39 @@
                         }
                     });
                 }
+
+                function addUserToGroup(conversationId, SelectedFriends, UserKnownAsList) {
+                    for (let i = 0; i < SelectedFriends.length; i++) {
+                        const userId = SelectedFriends[i];
+                        const knownAs = UserKnownAsList[i];
+
+                        const existingUser = $("#group-members-list").find(`[data-user-id="${userId}"]`);
+                        if (existingUser.length === 0) {
+                            const hiddenConversationId = @Model.conversationDto.ConversationId;
+                            if (conversationId === hiddenConversationId) {
+                                const newUserItem = `
+                                    <li class="list-group-item d-flex justify-content-between align-items-center" data-user-id="${userId}">
+                                        ${knownAs}
+                                    </li>
+                                `;
+                                $("#group-members-list").append(newUserItem);
+                            } else {
+                                console.error("Conversation ID does not match the hidden input value.");
+                            }
+                        }
+                    }
+
+                    // Optionally, you can perform additional actions related to the conversation ID here
+                    console.log(`Added users to conversation ${conversationId}`);
+                }
+
+
+                connectionGroupChat1.on("InviteUserToGroup", function (conversationId, SelectedFriends, UserKnownAsList) {
+                    addUserToGroup(conversationId, SelectedFriends, UserKnownAsList);
+                });
+
+
+
             </script>
 
             <div class="col-12 col-md-8">
