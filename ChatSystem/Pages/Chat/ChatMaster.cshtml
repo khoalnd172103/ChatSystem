@@ -1,4 +1,4 @@
-﻿@page 
+﻿@page
 @model ChatSystem.Pages.Chat.ChatMasterModel
 @{
     ViewData["Title"] = "Chat";
@@ -14,12 +14,14 @@
 <div class="container chat-section" style="width: 1920px">
     <div class="row g-0">
 
-@*         <div class="container col-12 col-lg-5 col-xl-3 border-end chat-list">
- *@        <div class="col-12 col-md-2 border-end chat-list" id="conversation-list">
-            @if(Model.ConversationDtoList.Count < 1)
+        @*         <div class="container col-12 col-lg-5 col-xl-3 border-end chat-list">
+        *@        <div class="col-12 col-md-2 border-end chat-list" id="conversation-list">
+            @if (Model.ConversationDtoList.Count < 1)
             {
-                
-            }else{
+
+            }
+            else
+            {
 
                 var userIdClaim = User.Claims.FirstOrDefault(claims => claims.Type == "UserId", null);
                 var userIdInt = int.Parse(userIdClaim.Value);
@@ -31,7 +33,7 @@
                     {
                         // Output each ConversationId as a JavaScript string literal
                         @: '@conversationDtoMember.ConversationId',
-                        
+
                     }];
 
                     // Now you have all ConversationIds in the conversationIds array
@@ -62,10 +64,10 @@
                         console.log("message contemt" + message);
 
                         //if (conversationIds.includes(conversationId)) {
-                            console.log("Conversation ID matches in loaf conversation list: ", conversationId);
-                            loadConversationList();
-                           console.log("conversationIdFromModel: " + conversationIdFromModel);
-                           
+                        console.log("Conversation ID matches in loaf conversation list: ", conversationId);
+                        loadConversationList();
+                        console.log("conversationIdFromModel: " + conversationIdFromModel);
+
                         //}
                         if (conversationIdFromModel != conversationId) {
                             console.log("new message here! toaster should appear");
@@ -132,25 +134,26 @@
                         } else {
                             console.error("Error: Element not found or unable to remove.");
                         }
-@*                         loadPageWithConversationId();
- *@                    });
+                    @*                         loadPageWithConversationId();
+                        *@                    });
 
                 </script>
 
                 @await Html.PartialAsync("_ChatConversationList", Model.ConversationDtoList)
-                
+
 
             }
-            
+
             <hr class="d-block d-lg-none mt-1 mb-0" />
-        </div> 
+        </div>
         @if (Model.conversationDto == null)
         {
             <div class="container col-12 col-md-7">
                 <div class="d-flex align-items-center justify-content-center">No Conversation Choosen</div>
             </div>
         }
-        else{
+        else
+        {
 
             var userIdClaim1 = User.Claims.FirstOrDefault(claims => claims.Type == "UserId", null);
             var userIdInt1 = int.Parse(userIdClaim1.Value);
@@ -160,11 +163,11 @@
 
 
                 connection.start().then(res => {
-                    connection.invoke("JoinGroup", "@Model.conversationDto.ConversationId") 
+                    connection.invoke("JoinGroup", "@Model.conversationDto.ConversationId")
                         .catch(err => {
                             console.log(err);
                         });
-                    }).catch (err => {
+                }).catch(err => {
                     console.log(err);
                 });;
 
@@ -204,7 +207,7 @@
 
                     if (userId === razorPageUserId && conversationId === conversationIdPage) {
                         console.log("You are being kicked and this chat content should be replaced");
-                            window.location.href = '/Chat/ChatMaster';
+                        window.location.href = '/Chat/ChatMaster';
                     }
 
                 });
@@ -235,28 +238,28 @@
             <div class="col-12 col-md-8">
                 @await Html.PartialAsync("_ChatHeader", Model.conversationDto)
 
-            <div class="chat-messages-section p-4">
-                <div class="all-chat-message" id="all-chat-message">
-                     @await Html.PartialAsync("_ChatContent", Model.ChatContentModel)
+                <div class="chat-messages-section p-4">
+                    <div class="all-chat-message" id="all-chat-message">
+                        @await Html.PartialAsync("_ChatContent", Model.ChatContentModel)
+                    </div>
+
+                    <div class="flex-grow-0 py-3 px-4 border-top">
+                        <form method="post" asp-page-handler="SendMessage" id="sendMessageForm">
+                            <input type="hidden" asp-for="conversationDto.ConversationId" />
+                            <div class="input-group">
+                                <textarea asp-for="@Model.MessageContent" id="messageTextArea" type="text" class="form-control" placeholder="Type your message" rows="2"></textarea>
+
+                                <button id="sendBtn" type="submit" class="btn btn-primary">Send</button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
 
-                <div class="flex-grow-0 py-3 px-4 border-top">
-                    <form method="post" asp-page-handler="SendMessage" id="sendMessageForm">
-                        <input type="hidden" asp-for="conversationDto.ConversationId"/>
-                        <div class="input-group">
-                                <textarea asp-for="@Model.MessageContent" id="messageTextArea" type="text" class="form-control" placeholder="Type your message" rows="2"></textarea>
-                            
-                            <button id="sendBtn" type="submit" class="btn btn-primary">Send</button>
-                        </div>
-                    </form>
-                </div>
+
+
             </div>
 
 
-
-        </div>
-        
-      
             <div class="col-12 col-md-2">
                 @if (Model.conversationDto.isGroup)
                 {
@@ -273,11 +276,11 @@
                                 {
                                     <li class="list-group-item d-flex justify-content-between align-items-center" id="user-list" data-user-id="@participant.UserId">
                                         @participant.KnownAs
-                                        
+
                                         @if (Model.IsUserAdminInConversation)
                                         {
                                             var userIdClaim = User.Claims.FirstOrDefault(claims => claims.Type == "UserId", null);
-                                            var userIdInt= int.Parse(userIdClaim.Value);
+                                            var userIdInt = int.Parse(userIdClaim.Value);
                                             @if (participant.UserId != userIdInt)
                                             {
                                                 <div class="dropdown">
@@ -292,7 +295,7 @@
                                                     </ul>
 
                                                 </div>
-                                            }   
+                                            }
                                         }
                                     </li>
                                 }
@@ -325,7 +328,7 @@
 
             </div>
         }
-        
+
     </div>
 </div>
 
@@ -346,20 +349,20 @@
             }
         });
 
-         //Handle form submission
+        //Handle form submission
         $('#sendMessageForm').submit(function (event) {
-            event.preventDefault(); 
-            var formData = $(this).serialize();  
+            event.preventDefault();
+            var formData = $(this).serialize();
 
-          
+
             $.ajax({
-                url: '/Chat/ChatMaster?handler=SendMessage', 
+                url: '/Chat/ChatMaster?handler=SendMessage',
                 method: 'POST',
-                data: formData, 
+                data: formData,
                 success: function (data) {
-     
+
                     console.log("Message sent successfully");
-                
+
                     $("#messageTextArea").val('');
                 },
                 error: function (err) {
@@ -370,7 +373,7 @@
     });
 
 
-    
+
 </script>
 
 
@@ -547,30 +550,29 @@
 
 <!-- Begin invite memeber modal  -->
 <div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-        <form method="post" >
-          <div class="modal-header text-center">
-            <h5 class="modal-title" id="addUserModalLabel">Invite your friends</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-                <input type="hidden" id="conversationIdInviteGroup" name="conversationId" />
-                <div id="friendListContainer">
-                    <input type="hidden" asp-for="SelectedFriends" id="selectedFriendsInput"/>
-                    <!--  -->
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post">
+                <div class="modal-header text-center">
+                    <h5 class="modal-title" id="addUserModalLabel">Invite your friends</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-          </div>
-          <div class="modal-footer">
-            <button id="addButton" type="submit" class="btn btn-primary" asp-page-handler="AddUserToGroup">Invite</button>
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          </div>
-      </form>
+                <div class="modal-body">
+                    <input type="hidden" id="conversationIdInviteGroup" name="conversationId" />
+                    <div id="friendListContainer">
+                        <input type="hidden" asp-for="SelectedFriends" id="selectedFriendsInput" />
+                        <!--  -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="addButton" type="submit" class="btn btn-primary" asp-page-handler="AddUserToGroup">Invite</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </form>
+        </div>
     </div>
-  </div>
 </div>
 <!-- End invite memeber modal  -->
-
 <!-- Begin out group modal  -->
 <div class="modal fade" id="outGroupModal" tabindex="-1" aria-labelledby="outGroupModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -581,7 +583,7 @@
                     <h5 class="modal-title">Out Conversation</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                @if(Model.IsLastAdminLogined && !Model.IsLastMemberLogined)
+                @if (Model.IsLastAdminLogined && !Model.IsLastMemberLogined)
                 {
                     <div class="modal-body">
                         Your are the last admin in this conversation, before you out, promote somebody!
@@ -598,7 +600,7 @@
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-primary" asp-page-handler="OutGroup">Quit</button>
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    </div>                   
+                    </div>
                 }
                 else
                 {

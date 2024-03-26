@@ -365,6 +365,7 @@ namespace ChatSystem.Pages.Chat
                 if (participant != null)
                 {
                     participant.status = 0;
+                    participant.isAdmin = false;
 
                     _participantRepository.UpdateParticipants(participant);
 
