@@ -235,12 +235,12 @@ namespace ChatSystem.Pages.Chat
 
 
             UserDto = _userRepository.GetUserDtoWithPhoto(userId);
-            GroupChatParticipants = _userRepository.GetUserInGroupChat(conversationDto.ConversationId);
+            GroupChatParticipants = _userRepository.CheckUserInGroupChat(conversationDto.ConversationId);
 
             foreach (var par in GroupChatParticipants)
             {
                 if (conversationDto.isGroup)
-                {
+                {                    
                     await _messageNotificationHubContext.Clients.Group(par.UserId.ToString()).SendAsync("OnNewMessageReceived", "You receive new message from group " + conversationDto.ConversationName, conversationDto.ConversationId);
                 }
                 else
@@ -250,7 +250,7 @@ namespace ChatSystem.Pages.Chat
 
             }
             //await _messageNotificationHubContext.Clients.All.SendAsync("OnNewMessageReceived", "You receive new message from ", 100);
-
+            GroupChatParticipants = _userRepository.GetUserInGroupChat(conversationDto.ConversationId);
             MessageDtoList = _messageRepository.GetMessagesFromConversation(currentConversation, GroupChatParticipants);
             ChatContentModel = new ChatContentModelDto
             {

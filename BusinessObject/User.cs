@@ -9,7 +9,8 @@ namespace BusinessObject
 
         [Required]
         [Display(Name = "Username")]
-        public string UserName { get; set; }
+		[UserNameValidation]
+		public string UserName { get; set; }
 
         [Required]
         [DataType(DataType.Password)]

@@ -13,7 +13,7 @@ namespace ChatSystem.Pages.Users
         public int UserId { get; set; }
 
         [Required(ErrorMessage = "UserName is required")]
-        [UserNameValidation]
+        [BusinessObject.UserNameValidation]
         public string UserName { get; set; }
         [DataType(DataType.Date)]
         [BirthdayValidation(18)]
